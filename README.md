@@ -5,7 +5,7 @@ Fast-Food-Fast is a web app used by a restaurant for food delivery. It is a boot
 The app offers different features for normal users and administrators.
 
 With the app normal users can:
-* create and account and log in
+* create an account and log in
 * place an order for food
 * see a history of ordered food
 
