@@ -11,7 +11,7 @@ With the app normal users can:
 
 Admins are able to:
 * add, edit, or delete fast-food items
-* see a list of fast food items
+* see a list of fast-food items
 * see a list of food orders
 * accept or decline food orders
 * mark food orders as completed
