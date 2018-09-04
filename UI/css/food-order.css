@@ -1,0 +1,88 @@
+.clearfix {
+  height: 100%;
+  overflow: auto;
+}
+
+.clearfix::after {
+  content: '';
+  clear: both;
+  display: table;
+}
+
+.food-menu {
+  width: 90%;
+  margin: auto;
+  margin-top: 20px;
+  box-shadow: 0 0 30px lightgrey;
+  background: white;
+  margin-bottom: 20px;
+  padding: 0 10px 5px 10px;
+}
+
+.menu-item {
+  text-align: left;
+  cursor: pointer;
+  border-bottom: 1px solid lightgrey;
+  padding: 10px;
+  transition: 0.4s;
+  width: 100%;
+  display: inline-block;
+}
+
+.menu-item::after {
+  content: '\02795';
+  color: darkblue;
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+}
+
+.menu-item:hover, .selected {
+  background: #f3f3f3;
+}
+
+.selected::after {
+  content: '\2796';
+}
+
+.menu-item-details {
+  overflow: hidden;
+  display: none;
+  padding: 10px;
+  border-bottom: 1px solid lightgrey;
+  background: #f3f3f3;
+}
+
+.quantity, .menu-item-details > button {
+  margin: auto;
+  display: block;
+  width: 50%;
+}
+
+.menu-item-details > button {
+  margin-top: 5px;
+  color: white;
+  background: darkblue;
+  padding: 6px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.menu-item-details > button:hover, .order:hover {
+  background: blue;
+}
+
+.order {
+  padding: 10px;
+  background: darkblue;
+  font-size: 1.25em;
+  border-radius: 7px;
+  border: none;
+  color: white;
+  display: block;
+  margin: 10px 0;
+  margin-bottom: 20px;
+  width: 100%;
+  cursor: pointer;
+}

@@ -59,7 +59,7 @@ input:focus {
   box-shadow: 0 0 8px lightblue;
 }
 
-input[type=submit] {
+input[type=submit], .add-to-list {
   color: white;
   font-size: 1.25em;
   background: darkblue;
@@ -67,3 +67,6 @@ input[type=submit] {
   cursor: pointer;
 }
 
+input[type=submit]:hover {
+  background: blue;
+}
