@@ -1,0 +1,17 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f3f3f3;
+  font-family: arial, helvetica, sans-serif;
+  color: darkblue;
+}
+
+.header {
+  text-align: center;
+  background: white;
+  box-shadow: 0 0 30px lightgrey;
+  border: 1px solid lightgrey;
+}
