@@ -1,0 +1,52 @@
+.process-order {
+  text-align: center;
+  border-bottom: 1px solid lightgrey;
+}
+
+.admin-orders a:link, .admin-orders a:visited {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 5px;
+  margin: 5px 8px;
+  text-decoration: none;
+}
+
+.accept:link, .accept:visited {
+  border: 1px solid darkgreen;
+  color: darkgreen;
+}
+
+.accept:hover, .accept:active {
+  color: white;
+  background: darkgreen;
+}
+
+.decline:link, .decline:visited {
+  border: 1px solid darkred;
+  color: darkred;
+}
+
+.decline:hover, .decline:active {
+  color: white;
+  background: darkred;
+}
+
+.complete:link, .complete:visited {
+  color: darkblue;
+  border: 1px solid darkblue;
+}
+
+.complete:hover, .complete:active {
+  color: white;
+  background: darkblue;
+}
+
+.details:link, .details:visited {
+  color: darkblue;
+  border: 1px solid darkblue;
+}
+
+.details:hover, .details:active {
+  color: white;
+  background: darkblue;
+}
