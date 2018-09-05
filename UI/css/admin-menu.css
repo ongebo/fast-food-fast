@@ -1,0 +1,60 @@
+.menu-list, .orders-list {
+  border-collapse: collapse;
+  width: 100%;
+  padding: 10px;
+}
+
+tr {
+  border-bottom: 1px solid lightgrey;
+}
+
+th, td {
+  padding: 10px;
+  text-align: left;
+}
+
+.edit:link, .edit:visited {
+  text-decoration: none;
+  text-align: center;
+  border-radius: 5px;
+  display: block;
+  border: 1px solid darkblue;
+  color: darkblue;
+  padding: 5px;
+}
+
+.edit:hover, .edit:active {
+  color: white;
+  background: darkblue;
+}
+
+.delete:link, .delete:visited {
+  text-decoration: none;
+  padding: 5px;
+  text-align: center;
+  border-radius: 5px;
+  display: block;
+  color: darkred;
+  border: 1px solid darkred;
+}
+
+.delete:hover, .delete:active {
+  color: white;
+  background: darkred;
+}
+
+.add:link, .add:visited {
+  text-decoration: none;
+  display: block;
+  margin: 10px 10px;
+  padding: 10px;
+  border-radius: 7px;
+  color: darkgreen;
+  border: 1px solid darkgreen;
+  text-align: center;
+}
+
+.add:hover, .add:active {
+  color: white;
+  background: darkgreen;
+}
