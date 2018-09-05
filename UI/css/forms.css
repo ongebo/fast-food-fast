@@ -70,3 +70,15 @@ input[type=submit], .add-to-list {
 input[type=submit]:hover {
   background: blue;
 }
+
+@media only screen and (min-width: 600px) and (max-width: 1000px) {
+  form {
+    width: 80%;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  form {
+    width: 100%;
+  }
+}

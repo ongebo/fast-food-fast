@@ -11,13 +11,34 @@
 }
 
 .order-list {
-  max-width: 90%;
+  width: 90%;
   margin: auto;
   background: white;
   box-shadow: 0 0 30px lightgrey;
   padding: 0 10px 5px 10px;
   margin-top: 20px;
+  margin-bottom: 20px;
   height: 100%;
   overflow: auto;
   text-align: center;
+}
+
+@media only screen and (max-width: 600px) {
+  .column {
+    float: none;
+  }
+  .main, .side, .order-list, .food-menu {
+    width: 100%;
+  }
+}
+
+@media only screen and (min-width: 600px) and (max-width: 1000px) {
+  .order-list, .food-menu {
+    width: 95%;
+    box-shadow: none;
+    border: 1px solid lightgrey;
+  }
+  .order-total, .title {
+    font-size: 1em;
+  }
 }
