@@ -1,31 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Create Account</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" type="text/css" href="css/styles.css">
   <link rel="stylesheet" type="text/css" href="css/forms.css">
+  <title>Login</title>
 </head>
 <body>
-  <div class="header">
-    <h1>Fast-Food-Fast</h1>
-    <p>A food delivery service app</p>
-  </div>
-  <form action="food-order.html" method="GET">
-    <span class="form-title">Create Account</span>
-    Username:
-    <input type="text" name="username" placeholder="Enter your name"><br>
-    Email:
-    <input type="email" name="email-address" placeholder="Enter your email"><br>
-    Telephone:
-    <input type="text" name="telephone" placeholder="Enter your number"><br>
-    Password:
-    <input type="password" name="password" placeholder="Enter your password"><br>
-    Re-type Password:
-    <input type="password" name="password" placeholder="Confirm your password"><br>
-    <input type="submit" value="Sign Up">
-    <span class="footnote">Already have an account? <a href="login.html">Login</a></span>
-  </form>
+    <div class="header">
+      <h1>Fast-Food-Fast</h1>
+      <p>Order Online, Delivered Fast</p>
+    </div>
+    <form action="food-order.html" method="GET">
+      <span class="form-title">Login</span>
+      Username:
+      <input type="text" name="username" placeholder="Enter your name" autofocus><br>
+      Password:
+      <input type="password" name="password" placeholder="Enter your password"><br>
+      <input type="submit" value="Login">
+      <span class="footnote">Don't have an account? <a href="index.html">Sign Up</a></span>
+      <input type="submit" value="Login as Admin" formaction="admin-menu.html">
+    </form>
 </body>
 </html>
