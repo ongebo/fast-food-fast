@@ -53,6 +53,7 @@ input {
   border: 1px solid lightblue;
   border-radius: 7px;
   color: darkblue;
+  font-size: 0.9375em;
 }
 
 input:focus {
