@@ -8,6 +8,10 @@
   margin-bottom: 30px;
 }
 
+.admin-menu {
+  overflow-x: scroll;
+}
+
 .history-detail {
   text-align: center;
   border-bottom: 1px solid lightgrey;
