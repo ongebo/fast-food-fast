@@ -7,10 +7,12 @@ A demo of the app's interface can be found on github pages at:
 https://ongebo.github.io/fast-food-fast/UI/
 ### Features
 The app offers different features for normal users and administrators.
+
 With the app normal users can:
 * create an account and log in
 * place an order for food
 * see a history of ordered food
+
 Admins are able to:
 * add, edit, or delete fast-food items
 * see a list of fast-food items
