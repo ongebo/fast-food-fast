@@ -10,11 +10,18 @@ class Order:
         orders.append(order)
         return order
     
-    def read(self, id=None):
+    def read_orders(self, id=None):
         if id == None:
             return orders
         else:
             return orders[id]
+    
+    def read_order_history(self, customer):
+        history = list()
+        for order in orders:
+            if order['customer'] == customer:
+                history.append(order)
+        return history
     
     def update_order(self, id, customer, items, cost):
         order = orders[id]
