@@ -30,6 +30,3 @@ Admins are able to:
 
 ## Authors
 * Isaac Ongebo - *isaacongebo@gmail.com*
-
-## Credits
-* Accordion HowTo guide - https://www.w3schools.com/howto/howto_js_accordion.asp
