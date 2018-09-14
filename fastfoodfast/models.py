@@ -7,6 +7,7 @@ admins = list()
 class Order:
     def create_order(self, customer, items, cost):
         order = {'id': len(orders), 'customer': customer, 'items': items, 'cost': cost}
+        order['status'] = 'pending'
         orders.append(order)
         return order
     
@@ -16,11 +17,12 @@ class Order:
         else:
             return orders[id]
     
-    def update_order(self, id, customer, items, cost):
+    def update_order(self, id, customer, items, cost, status):
         order = orders[id]
         order['customer'] = customer
         order['items'] = items
         order['cost'] = cost
+        order['status'] = status
     
     def delete_order(self, id):
         del orders[id]
