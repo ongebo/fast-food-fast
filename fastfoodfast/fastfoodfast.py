@@ -1,11 +1,24 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 
 app = Flask(__name__)
 
+
 @app.route('/api/v1/orders')
 def get_all_orders():
-    return jsonify({'orders': orders})
+    pass
 
 
-orders = list()
+@app.route('/api/v1/orders/<int:id>')
+def get_a_specific_order(id):
+    pass
+
+
+@app.route('/api/v1/orders', methods=['POST'])
+def place_a_new_order():
+    pass
+
+
+@app.route('/api/v1/orders/<int:id>', methods=['PUT'])
+def update_order_status(id):
+    pass
