@@ -4,6 +4,11 @@ from flask import Flask, jsonify, request
 app = Flask(__name__)
 
 
+@app.route('/')
+def index_page():
+    return 'Welcome to Fast-Food-Fast!'
+
+
 @app.route('/api/v1/orders')
 def get_all_orders():
     pass
