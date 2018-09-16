@@ -1,7 +1,9 @@
 from flask import Flask, jsonify, request
+from .models import Order
 
 
 app = Flask(__name__)
+order_model = Order()
 
 
 @app.route('/')
@@ -11,7 +13,9 @@ def index_page():
 
 @app.route('/api/v1/orders')
 def get_all_orders():
-    pass
+    orders = order_model.get_all()
+    result = {'orders': orders}
+    return jsonify(result)
 
 
 @app.route('/api/v1/orders/<int:id>')
