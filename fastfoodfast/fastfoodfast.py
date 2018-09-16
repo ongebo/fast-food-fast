@@ -35,3 +35,8 @@ def place_a_new_order():
 @app.route('/api/v1/orders/<int:id>', methods=['PUT'])
 def update_order_status(id):
     pass
+
+
+@app.errorhandler(404)
+def resource_not_found():
+    return '404 - The requested resource does not exist', 404
