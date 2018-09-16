@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, abort, Response
-from .models import Order, OrderNotFound
+from .models import Order, OrderNotFound, BadRequest
 
 
 app = Flask(__name__)
@@ -52,7 +52,17 @@ def place_a_new_order():
 
 @app.route('/api/v1/orders/<int:id>', methods=['PUT'])
 def update_order_status(id):
-    pass
+    try:
+        order_model.update_order_status(id, request.get_json())
+        response = Response('', status=200, mimetype='application/json')
+        return response
+    except OrderNotFound:
+        abort(404)
+    except BadRequest:
+        response = Response('Bad Request!', status=400, mimetype='application/json')
+        return response
+    except:
+        return 'Bad Request!', 400
 
 
 @app.errorhandler(404)
