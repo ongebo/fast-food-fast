@@ -1,5 +1,5 @@
-from flask import Flask, jsonify, request
-from .models import Order
+from flask import Flask, jsonify, request, abort
+from .models import Order, OrderNotFound
 
 
 app = Flask(__name__)
@@ -20,7 +20,11 @@ def get_all_orders():
 
 @app.route('/api/v1/orders/<int:id>')
 def get_a_specific_order(id):
-    pass
+    try:
+        order = order_model.get_order(id)
+        return jsonify(order)
+    except OrderNotFound:
+        abort(404)
 
 
 @app.route('/api/v1/orders', methods=['POST'])
