@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, abort
+from flask import Flask, jsonify, request, abort, Response
 from .models import Order, OrderNotFound
 
 
@@ -29,7 +29,23 @@ def get_a_specific_order(id):
 
 @app.route('/api/v1/orders', methods=['POST'])
 def place_a_new_order():
-    pass
+    try:
+        order = request.get_json()
+        created_order = order_model.create_order(order)
+        response = Response(str(created_order), status=201, mimetype='application/json')
+        response.headers['Location'] = '/api/v1/orders/{}'.format(created_order['order-id'])
+        return response
+    except:
+        bad_request = {
+            'help': 'order should take the form:'
+            '{['
+            '"items": [{"item": <name>, "quantity": <number>, "cost": <number>},'
+            '{"item": <name>, "quantity": <number>, "cost": <number>},'
+            '{"item": <name>, "quantity": <number>, "cost": <number>},'
+            '] }'
+        }
+        response = Response(str(bad_request), status=400, mimetype='application/json')
+        return response
 
 
 @app.route('/api/v1/orders/<int:id>', methods=['PUT'])
