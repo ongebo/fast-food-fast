@@ -37,6 +37,7 @@ class Order:
                 new_order['order-id'] = order_id
                 new_order['items'] = order['items']
                 new_order['total-cost'] = total_cost
+                new_order['status'] = 'pending'
                 Order.orders.append(new_order)
                 return new_order
             else:
