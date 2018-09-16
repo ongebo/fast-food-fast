@@ -1,0 +1,1 @@
+from .fastfoodfast import app
