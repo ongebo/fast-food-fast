@@ -37,12 +37,14 @@ def place_a_new_order():
         return response
     except:
         bad_request = {
-            'help': 'order should take the form:'
-            '{['
-            '"items": [{"item": <name>, "quantity": <number>, "cost": <number>},'
-            '{"item": <name>, "quantity": <number>, "cost": <number>},'
-            '{"item": <name>, "quantity": <number>, "cost": <number>},'
-            '] }'
+            'help': 'order should take the form:\n'
+            '{\n'
+            '  "items": [\n'
+            '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
+            '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
+            '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
+            '  ]\n'
+            '}\n'
         }
         response = Response(str(bad_request), status=400, mimetype='application/json')
         return response
