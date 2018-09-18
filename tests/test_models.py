@@ -49,3 +49,17 @@ def test_order_model_raises_type_error_given_an_id_which_is_not_an_integer(order
 def test_order_model_raises_order_not_found_if_requested_order_does_not_exist(order_model):
     with pytest.raises(OrderNotFound):
         order_model.get_order(34)
+
+
+def test_order_model_returns_true_for_valid_order_items(order_model):
+    order_item_1 = {'item': 'hamburger', 'quantity': 2, 'cost': 10000}
+    order_item_2 = {'item': 'pizza', 'quantity': 0.5, 'cost': 10000.4}
+    assert order_model.validate_order_item(order_item_1)
+    assert order_model.validate_order_item(order_item_2)
+
+
+def test_order_model_returns_false_for_invalid_order_items(order_model):
+    order_item_1 = {'item': 45, 'quantity': 'alpha', 'cost': 'Ugx 2544'}
+    order_item_2 = {}
+    assert order_model.validate_order_item(order_item_1) == False
+    assert order_model.validate_order_item(order_item_2) == False
