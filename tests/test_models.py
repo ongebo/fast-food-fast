@@ -1,5 +1,5 @@
 import pytest
-from fastfoodfast.models import Order, OrderNotFound
+from fastfoodfast.models import Order, OrderNotFound, BadRequest
 
 
 @pytest.fixture
@@ -38,9 +38,9 @@ def add_order(id):
 
 
 def delete_order(id):
-    for order in Order.orders:
-        if order['order-id'] == id:
-            del order
+    for x in range(len(Order.orders)):
+        if Order.orders[x]['order-id'] == id:
+            del Order.orders[x]
 
 
 def test_returns_correct_list_of_orders(order_model):
@@ -98,3 +98,39 @@ def test_order_model_returns_false_for_invalid_orders(order_model, invalid_order
     assert order_model.validate_order(order_1) == False
     assert order_model.validate_order(order_2) == False
     assert order_model.validate_order(order_3) == False
+
+
+def test_that_order_model_correctly_creates_new_orders(order_model, valid_order_items):
+    order_1 = {'items': valid_order_items}
+    order_2 = {'items': valid_order_items, 'status': 'pending', 'total-cost': 45000}
+    order_3 = {'items': valid_order_items, 'order-id': 5}
+    result_1 = order_model.create_order(order_1)
+    result_2 = order_model.create_order(order_2)
+    result_3 = order_model.create_order(order_3)
+
+    total_cost = 0
+    for item in valid_order_items:
+        total_cost += float(item['cost'])
+    assert result_1['total-cost'] == total_cost
+    assert result_2['total-cost'] == total_cost
+    assert result_3['total-cost'] == total_cost
+    assert 'status' in result_1 and result_1['status'] == 'pending'
+    assert 'status' in result_2 and result_2['status'] == 'pending'
+    assert 'status' in result_3 and result_3['status'] == 'pending'
+    assert 'order-id' in result_1 and result_1['order-id'] == 0
+    assert 'order-id' in result_2 and result_2['order-id'] == 1
+    assert 'order-id' in result_3 and result_3['order-id'] == 2
+    assert result_1 in Order.orders
+    assert result_2 in Order.orders
+    assert result_3 in Order.orders
+    Order.orders = list()
+
+
+def test_order_model_raises_bad_request_given_bad_orders_to_create(order_model, invalid_order_items):
+    order_1 = {'items': invalid_order_items[0], 'status': 'accepted', 'total-cost': 45336, 'order-id': 45}
+    order_2 = {'items': invalid_order_items[1], 'total-cost': 765}
+    order_3 = {'items': invalid_order_items[2]}
+    with pytest.raises(BadRequest):
+        order_model.create_order(order_1)
+        order_model.create_order(order_2)
+        order_model.create_order(order_3)
