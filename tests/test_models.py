@@ -61,5 +61,7 @@ def test_order_model_returns_true_for_valid_order_items(order_model):
 def test_order_model_returns_false_for_invalid_order_items(order_model):
     order_item_1 = {'item': 45, 'quantity': 'alpha', 'cost': 'Ugx 2544'}
     order_item_2 = {}
+    order_item_3 = ['pizza', 4, 67]
     assert order_model.validate_order_item(order_item_1) == False
     assert order_model.validate_order_item(order_item_2) == False
+    assert order_model.validate_order_item(order_item_3) == False
