@@ -58,13 +58,10 @@ def update_order_status(id):
         order_model.update_order_status(id, request.get_json())
         response = Response('', status=200, mimetype='application/json')
         return response
-    except OrderNotFound:
-        abort(404)
-    except BadRequest:
-        response = Response('Bad Request!', status=400, mimetype='application/json')
-        return response
-    except:
-        return 'Bad Request!', 400
+    except Exception as e:
+        if isinstance(e, OrderNotFound):
+            abort(404)
+        return jsonify('Bad Request!'), 400
 
 
 @app.errorhandler(404)
