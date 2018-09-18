@@ -34,16 +34,22 @@ def place_a_new_order():
         created_order = order_model.create_order(order)
         return jsonify(created_order), 201
     except:
-        bad_request = 'help': 'order should take the form:\n'
-            '{\n'
-            '  "items": [\n'
-            '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
-            '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
-            '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
-            '  ]\n'
-            '}\n'
-        response = Response(str(bad_request), status=400, mimetype='application/json')
-        return response
+        help_text = """
+        order should have the format:
+        {
+            'items': [
+                {'item': '<item-name>', 'quantity': <number>, 'cost': <number>},
+                {'item': '<item-name>', 'quantity': <number>, 'cost': <number>}
+            ],
+            'status': '<order-status>',
+            'total-cost': <number>,
+            'order-id': <number>
+        }
+        status: can be pending, accepted or complete
+        status, total-cost, and order-id are optional
+        items: compulsory
+        """
+        return jsonify({'help': help_text}), 400
 
 
 @app.route('/api/v1/orders/<int:id>', methods=['PUT'])
