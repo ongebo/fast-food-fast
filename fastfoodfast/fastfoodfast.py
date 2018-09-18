@@ -32,12 +32,9 @@ def place_a_new_order():
     try:
         order = request.get_json()
         created_order = order_model.create_order(order)
-        response = Response(str(created_order), status=201, mimetype='application/json')
-        response.headers['Location'] = '/api/v1/orders/{}'.format(created_order['order-id'])
-        return response
+        return jsonify(created_order), 201
     except:
-        bad_request = {
-            'help': 'order should take the form:\n'
+        bad_request = 'help': 'order should take the form:\n'
             '{\n'
             '  "items": [\n'
             '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
@@ -45,7 +42,6 @@ def place_a_new_order():
             '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
             '  ]\n'
             '}\n'
-        }
         response = Response(str(bad_request), status=400, mimetype='application/json')
         return response
 
