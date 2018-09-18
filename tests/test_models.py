@@ -134,3 +134,16 @@ def test_order_model_raises_bad_request_given_bad_orders_to_create(order_model, 
         order_model.create_order(order_1)
         order_model.create_order(order_2)
         order_model.create_order(order_3)
+
+
+def test_that_order_model_correctly_updates_an_order(order_model, valid_order_items):
+    created_order = order_model.create_order({'items': valid_order_items})
+    order_model.update_order_status(created_order['order-id'], {'status': 'accepted'})
+    assert created_order['status'] == 'accepted'
+    Order.orders = list()
+
+
+def test_order_model_raises_exception_when_wrong_order_is_used_to_update(order_model, valid_order_items):
+    order = order_model.create_order({'items': valid_order_items})
+    with pytest.raises(BadRequest):
+        order_model.update_order_status(order['order-id'], {1: 2, 2: 3})
