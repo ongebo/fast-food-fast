@@ -25,8 +25,10 @@ def test_api_returns_empty_orders_list_when_no_order_has_been_created(test_clien
 
 
 def test_api_returns_created_order_in_orders_list(test_client):
-    response = test_client.post('/api/v1/orders', json={'items': []})
-    assert response.get_json() in Order.orders
+    response_1 = test_client.post('/api/v1/orders', json={'items': []})
+    response_2 = test_client.get('/api/v1/orders')
+    assert response_1.get_json() in response_2.get_json()['orders']
+    assert response_2.status_code == 200
     reset_orders_list()
 
 
