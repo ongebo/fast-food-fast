@@ -55,18 +55,13 @@ class Order:
     def validate_order_item(self, item):
         try:
             dict(item)
-        except:
-            return False
-        if 'item' not in item and type(item['item']) != str:
-            return False
-        elif 'quantity' not in item and not str(item['quantity']).isdigit():
-            return False
-        elif 'cost' not in item and not str(item['cost']).isdigit():
-            return False
-        elif len(item) > 3:
-            return False
-        else:
+            assert 'item' in item and isinstance(item['item'], str)
+            assert 'quantity' in item and float(item['quantity'])
+            assert 'cost' in item and float(item['cost'])
+            assert len(item) == 3
             return True
+        except (AssertionError, TypeError, ValueError):
+            return False
     
     def validate_order(self, order):
         try:
