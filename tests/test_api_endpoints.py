@@ -52,3 +52,17 @@ def test_api_returns_help_text_incase_of_bad_order_format_in_request(test_client
     reset_orders_list()
     assert 'help' in data and 'order should have the format:' in data['help']
     assert response.status_code == 400
+
+
+def test_api_can_return_a_specific_order_that_exists(test_client):
+    response_1 = test_client.post('/api/v1/orders', json={'items': []})
+    response_2 = test_client.get('/api/v1/orders/{}'.format(response_1.get_json()['order-id']))
+    assert response_1.get_json() == response_2.get_json()
+    assert response_2.status_code == 200
+    reset_orders_list()
+
+
+def test_api_returns_404_for_a_wrong_order_id(test_client):
+    response = test_client.get('/api/v1/orders/0')
+    assert response.status_code == 404
+    assert '404 - The requested resource does not exist' in response.get_json()
