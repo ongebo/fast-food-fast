@@ -16,7 +16,7 @@ class Order:
         if not isinstance(id, int):
             raise TypeError('The id should be an integer')
         for order in Order.orders:
-            if order['id'] == id:
+            if order['order-id'] == id:
                 return order
         raise OrderNotFound('No order with id {} exists'.format(id))
     
