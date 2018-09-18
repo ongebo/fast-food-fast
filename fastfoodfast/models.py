@@ -65,18 +65,30 @@ class Order:
     
     def validate_order(self, order):
         try:
-            dict(order)
-            list(order['items'])
+            assert isinstance(order, dict)
+            assert 'items' in order
+            assert isinstance(order['items'], list)
+            for item in order['items']:
+                assert self.validate_order_item(item)
+            
+            if len(order) == 2:
+                assert 'status' in order or 'total-cost' in order or 'order-id' in order
+            elif len(order) == 3:
+                condition_1 = 'status' in order and 'total-cost' in order
+                condition_2 = 'status' in order and 'order-id' in order
+                condition_3 = 'total-cost' in order and 'order-id' in order
+                assert condition_1 or condition_2 or condition_3
+            elif len(order) == 4:
+                assert 'status' in order and 'total-cost' in order and 'order-id' in order
+            elif len(order) > 4:
+                return False
+            
+            if 'status' in order:
+                assert order['status'] in ['pending', 'accepted', 'complete']
+            if 'total-cost' in order:
+                assert float(order['total-cost'])
+            if 'order-id' in order:
+                assert float(order['order-id'])
+            return True
         except:
             return False
-        items_list_correct = True
-        for item in order['items']:
-            if not self.validate_order_item(item): items_list_correct = False
-        if not items_list_correct:
-            return False
-        elif 2 <= len(order) <= 3 and 'status' not in order and 'total-amount' not in order:
-            return False
-        elif len(order) > 3:
-            return False
-        else:
-            return True
