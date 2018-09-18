@@ -21,29 +21,20 @@ class Order:
         raise OrderNotFound('No order with id {} exists'.format(id))
     
     def create_order(self, order):
-        try:
-            if 'items' in order:
-                for item in order['items']:
-                    assert 'item' in item and 'quantity' in item and 'cost' in item
-                new_order = dict()
-                total_cost = 0
-                for item in order['items']:
-                    total_cost += int(item['cost'])
-                order_id = None
-                if len(Order.orders) == 0:
-                    order_id = 0
-                else:
-                    order_id = Order.orders[-1]['order-id'] + 1
-                new_order['order-id'] = order_id
-                new_order['items'] = order['items']
-                new_order['total-cost'] = total_cost
-                new_order['status'] = 'pending'
-                Order.orders.append(new_order)
-                return new_order
-            else:
-                raise BadRequest
-        except:
-            raise
+        if self.validate_order(order):
+            new_order = dict()
+            new_order['items'] = order['items']
+            new_order['status'] = 'pending'
+            total_cost = 0
+            for item in order['items']:
+                total_cost += float(item['cost'])
+            new_order['total-cost'] = total_cost
+            order_id = 0 if len(Order.orders) == 0 else Order.orders[-1]['order-id'] + 1
+            new_order['order-id'] = order_id
+            Order.orders.append(new_order)
+            return new_order
+        else:
+            raise BadRequest
     
     def update_order_status(self, id, new_order):
         order_to_update = self.get_order(id)
