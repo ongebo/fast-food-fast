@@ -24,6 +24,12 @@ def test_api_returns_empty_orders_list_when_no_order_has_been_created(test_clien
     assert response.status_code == 200
 
 
+def test_api_returns_created_order_in_orders_list(test_client):
+    response = test_client.post('/api/v1/orders', json={'items': []})
+    assert response.get_json() in Order.orders
+    reset_orders_list()
+
+
 def test_api_correctly_creates_a_new_order(test_client):
     order_items = [
         {'item': 'hamburger', 'quantity': 2, 'cost': 12000},
