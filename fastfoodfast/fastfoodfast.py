@@ -69,4 +69,4 @@ def update_order_status(id):
 
 @app.errorhandler(404)
 def resource_not_found(error):
-    return '404 - The requested resource does not exist', 404
+    return jsonify('404 - The requested resource does not exist'), 404
