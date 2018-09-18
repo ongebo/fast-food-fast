@@ -37,3 +37,10 @@ def test_order_model_can_return_order_with_correct_id(order_model):
     retrieved_order = order_model.get_order(3)
     assert order == retrieved_order
     delete_order(3)
+
+
+def test_order_model_raises_type_error_given_an_id_which_is_not_an_integer(order_model):
+    with pytest.raises(TypeError):
+        order_model.get_order('3')
+    with pytest.raises(TypeError):
+        order_model.get_order(23.45)
