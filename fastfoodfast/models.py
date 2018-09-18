@@ -38,8 +38,14 @@ class Order:
     
     def update_order_status(self, id, new_order):
         order_to_update = self.get_order(id)
+        if 'items' not in new_order:
+            new_order['items'] = order_to_update['items'][:] # slice to create a new copy
         if self.validate_order(new_order):
             order_to_update.update(new_order)
+            total_cost = 0
+            for item in order_to_update['items']:
+                total_cost += item['cost']
+            order_to_update['total-cost'] = total_cost
         else:
             raise BadRequest
     
