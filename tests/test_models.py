@@ -7,6 +7,21 @@ def order_model():
     return Order()
 
 
+@pytest.fixture
+def valid_order_items():
+    order_item_1 = {'item': 'hamburger', 'quantity': 2, 'cost': 10000}
+    order_item_2 = {'item': 'pizza', 'quantity': 0.5, 'cost': 10000.4}
+    return [order_item_1, order_item_2]
+
+
+@pytest.fixture
+def invalid_order_items():
+    order_item_1 = {'item': 45, 'quantity': 'alpha', 'cost': 'Ugx 2544'}
+    order_item_2 = {}
+    order_item_3 = ['pizza', 4, 67]
+    return [order_item_1, order_item_2, order_item_3]
+
+
 def add_order(id):
     order = {'order-id': id, 'status': 'pending'}
     order_items = [
@@ -51,17 +66,35 @@ def test_order_model_raises_order_not_found_if_requested_order_does_not_exist(or
         order_model.get_order(34)
 
 
-def test_order_model_returns_true_for_valid_order_items(order_model):
-    order_item_1 = {'item': 'hamburger', 'quantity': 2, 'cost': 10000}
-    order_item_2 = {'item': 'pizza', 'quantity': 0.5, 'cost': 10000.4}
+def test_order_model_returns_true_for_valid_order_items(order_model, valid_order_items):
+    order_item_1 = valid_order_items[0]
+    order_item_2 = valid_order_items[1]
     assert order_model.validate_order_item(order_item_1)
     assert order_model.validate_order_item(order_item_2)
 
 
-def test_order_model_returns_false_for_invalid_order_items(order_model):
-    order_item_1 = {'item': 45, 'quantity': 'alpha', 'cost': 'Ugx 2544'}
-    order_item_2 = {}
-    order_item_3 = ['pizza', 4, 67]
+def test_order_model_returns_false_for_invalid_order_items(order_model, invalid_order_items):
+    order_item_1 = invalid_order_items[0]
+    order_item_2 = invalid_order_items[1]
+    order_item_3 = invalid_order_items[2]
     assert order_model.validate_order_item(order_item_1) == False
     assert order_model.validate_order_item(order_item_2) == False
     assert order_model.validate_order_item(order_item_3) == False
+
+
+def test_order_model_returns_true_for_valid_orders(order_model, valid_order_items):
+    order_1 = {'items': valid_order_items}
+    order_2 = {'items': valid_order_items, 'status': 'pending', 'total-cost': 45000}
+    order_3 = {'items': valid_order_items, 'order-id': 5}
+    assert order_model.validate_order(order_1)
+    assert order_model.validate_order(order_2)
+    assert order_model.validate_order(order_3)
+
+
+def test_order_model_returns_false_for_invalid_orders(order_model, invalid_order_items):
+    order_1 = {'items': invalid_order_items[0], 'status': 'accepted', 'total-cost': 45336, 'order-id': 45}
+    order_2 = {'items': invalid_order_items[1], 'total-cost': 765}
+    order_3 = {'items': invalid_order_items[2]}
+    assert order_model.validate_order(order_1) == False
+    assert order_model.validate_order(order_2) == False
+    assert order_model.validate_order(order_3) == False
