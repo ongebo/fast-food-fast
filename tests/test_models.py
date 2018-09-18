@@ -1,5 +1,5 @@
 import pytest
-from fastfoodfast.models import Order
+from fastfoodfast.models import Order, OrderNotFound
 
 
 @pytest.fixture
@@ -44,3 +44,8 @@ def test_order_model_raises_type_error_given_an_id_which_is_not_an_integer(order
         order_model.get_order('3')
     with pytest.raises(TypeError):
         order_model.get_order(23.45)
+
+
+def test_order_model_raises_order_not_found_if_requested_order_does_not_exist(order_model):
+    with pytest.raises(OrderNotFound):
+        order_model.get_order(34)
