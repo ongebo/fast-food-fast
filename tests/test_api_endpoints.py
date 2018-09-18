@@ -64,5 +64,25 @@ def test_api_can_return_a_specific_order_that_exists(test_client):
 
 def test_api_returns_404_for_a_wrong_order_id(test_client):
     response = test_client.get('/api/v1/orders/0')
+    test_client.put('/api/v1/orders/45', json={'status': 'accepted'})
     assert response.status_code == 404
     assert '404 - The requested resource does not exist' in response.get_json()
+
+
+def test_api_can_update_status_of_a_created_order(test_client):
+    response_1 = test_client.post('/api/v1/orders', json={'items': []})
+    id = response_1.get_json()['order-id']
+    response_2 = test_client.put('/api/v1/orders/{}'.format(id), json={'status': 'accepted'})
+    response_3 = test_client.get('/api/v1/orders/{}'.format(id))
+    assert response_3.get_json()['status'] == 'accepted'
+    assert response_2.status_code == 200
+    reset_orders_list()
+
+
+def test_api_returns_error_message_for_wrong_order_update_data(test_client):
+    response_1 = test_client.post('/api/v1/orders', json={'items': []})
+    id = response_1.get_json()['order-id']
+    response_2 = test_client.put('/api/v1/orders/{}'.format(id), json={'status': 'invalid'})
+    assert response_2.status_code == 400
+    assert 'Bad Request!' in response_2.get_json()
+    reset_orders_list()
