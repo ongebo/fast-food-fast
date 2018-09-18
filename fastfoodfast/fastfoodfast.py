@@ -8,7 +8,7 @@ order_model = Order()
 
 @app.route('/')
 def index_page():
-    return 'Welcome to Fast-Food-Fast!'
+    return jsonify('Welcome to Fast-Food-Fast!')
 
 
 @app.route('/api/v1/orders')
