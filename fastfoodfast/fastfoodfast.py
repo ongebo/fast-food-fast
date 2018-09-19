@@ -82,6 +82,7 @@ def update_order_status(order_id):
 
 @app.route('/api/v1/orders/<int:order_id>', methods=['DELETE'])
 def delete_specific_order(order_id):
+    """Deletes order with id <order_id> if it exists in the orders list"""
     try:
         order_model.delete_order(order_id)
         return jsonify('NO CONTENT'), 204
@@ -91,4 +92,5 @@ def delete_specific_order(order_id):
 
 @app.errorhandler(404)
 def resource_not_found(error):
+    """Called when a 404 error has occurred"""
     return jsonify('404 - The requested resource does not exist'), 404

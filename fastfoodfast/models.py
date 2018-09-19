@@ -56,6 +56,7 @@ class Order:
             raise BadRequest
     
     def delete_order(self, order_id):
+        """Deletes order with specified order_id, raises exception if it's non-existent"""
         if not isinstance(order_id, int):
             raise TypeError('The id should be an integer')
         order_present = False
