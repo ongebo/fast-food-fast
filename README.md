@@ -24,3 +24,28 @@ Admins are able to:
 * see a list of food orders
 * accept or decline food orders
 * mark food orders as completed
+### API Description
+The backend of Fast-Food-Fast is powered by a RESTful API implemented in Flask, a python web microframework. Version 1 of the API is hosted on Heroku and the home page can be accessed at: https://gbo-fast-food-fast.herokuapp.com. The functionality of the API with corresponding endpoints is described below:
+Endpoint                       | Function
+-------------------------------|----------------------------------------------------
+GET /api/v1/orders             | Returns orders in JSON format
+GET /api/v1/orders/<orderID>   | Returns a specific order in JSON
+POST /api/v1/orders            | Creates a new order
+PUT /api/v1/orders/<orderID>   | Updates the status of the order with specified ID
+
+When using the API, an example order is represented in JSON as:
+```javascript
+{
+    "items": [
+        {"item": "hamburger", "quantity": 2, "cost": 12000},
+        {"item": "pizza", "quantity": 1, "cost": 20000}
+    ],
+    "status": "pending",
+    "total-cost": 22000,
+    "order-id": 23
+}
+```
+Points to note:
+* "items" is compulsory and its value must be a list of individual items
+* When posting and order, "status", "total-cost", and "order-id" are optional, they are automatically assigned by the API
+* Version 1 of the RESTful API uses data structures to store orders, so the orders don't persist among multiple runs of the application
