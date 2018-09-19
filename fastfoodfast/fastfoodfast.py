@@ -2,7 +2,7 @@
 Definitions for Flask Route Functions to implement the API endpoints:
 GET /api/v1/orders
 GET /api/v1/orders/<orderID>
-POST /api/v1/orders/<orderID>
+POST /api/v1/orders
 PUT /api/v1/orders/<orderID>
 DELETE /api/v1/orders/<orderID>
 """
@@ -27,11 +27,12 @@ def get_all_orders():
     return jsonify(result), 200
 
 
-@app.route('/api/v1/orders/<int:id>')
-def get_a_specific_order(id):
+@app.route('/api/v1/orders/<int:order_id>')
+def get_a_specific_order(order_id):
+    """Returns order with specific order_id"""
     try:
-        order = order_model.get_order(id)
-        return jsonify(order)
+        order = order_model.get_order(order_id)
+        return jsonify(order), 200
     except OrderNotFound:
         abort(404)
 
@@ -61,10 +62,10 @@ def place_a_new_order():
         return jsonify({'help': help_text}), 400
 
 
-@app.route('/api/v1/orders/<int:id>', methods=['PUT'])
-def update_order_status(id):
+@app.route('/api/v1/orders/<int:order_id>', methods=['PUT'])
+def update_order_status(order_id):
     try:
-        order_model.update_order_status(id, request.get_json())
+        order_model.update_order_status(order_id, request.get_json())
         response = Response('', status=200, mimetype='application/json')
         return response
     except Exception as e:
@@ -73,10 +74,10 @@ def update_order_status(id):
         return jsonify('Bad Request!'), 400
 
 
-@app.route('/api/v1/orders/<int:id>', methods=['DELETE'])
-def delete_specific_order(id):
+@app.route('/api/v1/orders/<int:order_id>', methods=['DELETE'])
+def delete_specific_order(order_id):
     try:
-        order_model.delete_order(id)
+        order_model.delete_order(order_id)
         return jsonify('NO CONTENT'), 204
     except OrderNotFound:
         abort(404)

@@ -16,6 +16,7 @@ class Order:
         return Order.orders
     
     def get_order(self, order_id):
+        """Returns order with specific order_id if it exists"""
         if not isinstance(order_id, int):
             raise TypeError('The id should be an integer')
         for order in Order.orders:
