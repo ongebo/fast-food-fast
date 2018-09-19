@@ -1,3 +1,11 @@
+"""
+Definitions for Flask Route Functions to implement the API endpoints:
+GET /api/v1/orders
+GET /api/v1/orders/<orderID>
+POST /api/v1/orders/<orderID>
+PUT /api/v1/orders/<orderID>
+DELETE /api/v1/orders/<orderID>
+"""
 from flask import Flask, jsonify, request, abort, Response
 from .models import Order, OrderNotFound, BadRequest
 

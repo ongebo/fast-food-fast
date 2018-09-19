@@ -1,3 +1,6 @@
+"""
+Model Classes Responsible for Handling Non-Persistent Data for the Application
+"""
 class OrderNotFound(Exception):
     pass
 
