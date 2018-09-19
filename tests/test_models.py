@@ -147,3 +147,20 @@ def test_order_model_raises_exception_when_wrong_order_is_used_to_update(order_m
     order = order_model.create_order({'items': valid_order_items})
     with pytest.raises(BadRequest):
         order_model.update_order_status(order['order-id'], {1: 2, 2: 3})
+    Order.orders = list()
+
+
+def test_that_order_model_can_delete_an_order_with_specific_id(order_model):
+    order_1 = add_order(34)
+    order_2 = add_order(45)
+    assert Order.orders == [order_1, order_2]
+    order_model.delete_order(34)
+    order_model.delete_order(45)
+    assert Order.orders == []
+    assert order_1 != None # the created orders
+    assert order_2 != None # are still bound to order_1 and order_2
+
+
+def test_order_model_raises_exception_when_trying_to_delete_non_existent_order(order_model):
+    with pytest.raises(OrderNotFound):
+        order_model.delete_order(567)
