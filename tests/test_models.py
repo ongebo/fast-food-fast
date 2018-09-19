@@ -1,3 +1,6 @@
+"""
+Unit Tests for the Application Models Defined in fastfoodfast/models.py
+"""
 import pytest
 from fastfoodfast.models import Order, OrderNotFound, BadRequest
 

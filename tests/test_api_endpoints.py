@@ -1,3 +1,8 @@
+"""
+This module contains functional tests for the flask application (fastfoodfast).
+Run the tests using the pytest testing framework, by navigating to the project's
+root folder, and entering the command 'pytest' in the terminal.
+"""
 import pytest
 from fastfoodfast import app
 from fastfoodfast.models import Order
