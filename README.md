@@ -48,7 +48,7 @@ When using the API, an example order is represented in JSON as:
 ```
 Points to note:
 * "items" is compulsory and its value must be a list of individual items
-* When posting and order, "status", "total-cost", and "order-id" are optional, they are automatically assigned by the API
+* When posting an order, "status", "total-cost", and "order-id" are optional, they are automatically assigned by the API
 * Version 1 of the RESTful API uses data structures to store orders, so the orders don't persist among multiple runs of the application
 
 ## Installation Instructions
