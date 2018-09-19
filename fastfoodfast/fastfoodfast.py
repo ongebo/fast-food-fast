@@ -21,9 +21,10 @@ def index_page():
 
 @app.route('/api/v1/orders')
 def get_all_orders():
+    """Returns JSON representation of all orders in the model"""
     orders = order_model.get_all()
     result = {'orders': orders}
-    return jsonify(result)
+    return jsonify(result), 200
 
 
 @app.route('/api/v1/orders/<int:id>')
