@@ -33,6 +33,7 @@ GET /api/v1/orders             | Returns orders in JSON format
 GET /api/v1/orders/<orderID>   | Returns a specific order in JSON
 POST /api/v1/orders            | Creates a new order
 PUT /api/v1/orders/<orderID>   | Updates the status of the order with specified ID
+DELETE /api/v1/orders/<orderID>| Deletes the order having the specified ID
 
 When using the API, an example order is represented in JSON as:
 ```javascript
