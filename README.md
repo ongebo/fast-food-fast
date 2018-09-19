@@ -26,12 +26,13 @@ Admins are able to:
 * mark food orders as completed
 ### API Description
 The backend of Fast-Food-Fast is powered by a RESTful API implemented in Flask, a python web microframework. Version 1 of the API is hosted on Heroku and the home page can be accessed at: https://gbo-fast-food-fast.herokuapp.com. The functionality of the API with corresponding endpoints is described below:
-Endpoint | Function
------------------- | ---------------------------------------------------
-GET /api/v1/orders | Returns orders in JSON format
-GET /api/v1/orders/<orderID> | Returns a specific order in JSON
-POST /api/v1/orders | Creates a new order
-PUT /api/v1/orders/<orderID> | Updates the status of the order with specified ID
+
+Endpoint                       | Function
+-------------------------------|----------------------------------------------------
+GET /api/v1/orders             | Returns orders in JSON format
+GET /api/v1/orders/<orderID>   | Returns a specific order in JSON
+POST /api/v1/orders            | Creates a new order
+PUT /api/v1/orders/<orderID>   | Updates the status of the order with specified ID
 
 When using the API, an example order is represented in JSON as:
 ```javascript
@@ -58,14 +59,19 @@ To run the application, follow these steps:
     cd fast-food-fast
     python3 -m venv venv
 * Activate the virtual environment and install flask
-    . venv/bin/activate
-    pip install flask
+```
+. venv/bin/activate
+pip install flask
+```
 * Run the run.py script
-    python3 run.py
+```
+python3 run.py
+```
 * Test the API endpoints using Postman
 
 ## Source Tree
 The root directory contains the files run.py, requirements.txt, Procfile, and README.md for the following purposes:
+
 File                | Purpose
 --------------------|--------------------------------------------------------
 run.py              | Runs the application with the command _python run.py_
