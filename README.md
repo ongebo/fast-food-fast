@@ -79,3 +79,10 @@ The application's code lives in fastfoodfast:
 * fastfoodfast/fastfoodfast.py defines flask route functions mapped to request URLs
 * fastfoodfast/models.py contains Python classes which are responsible for managing the data for the application
 * fastfoodfast/__init__.py marks the fastfoodfast directory as a Python package
+
+## Contributors
+* Isaac Ongebo - *isaacongebo@gmail.com*
+
+## Credits
+* Testing Python Applications with Pytest - https://semaphoreci.com/community/tutorials/testing-python-applications-with-pytest
+* What is CRUD - https://www.codecademy.com/articles/what-is-crud
