@@ -49,6 +49,21 @@ class Order:
         else:
             raise BadRequest
     
+    def delete_order(self, id):
+        if not isinstance(id, int):
+            raise TypeError('The id should be an integer')
+        order_present = False
+        order_index = None
+        for order in Order.orders:
+            if order['order-id'] == id:
+                order_present = True
+                order_index = Order.orders.index(order)
+                break # assuming there's no other order in the list with 'order-id' == id
+        if order_present:
+            del Order.orders[order_index]
+        else:
+            raise OrderNotFound('No order with id {} exists'.format(id))
+    
     def validate_order_item(self, item):
         try:
             dict(item)
