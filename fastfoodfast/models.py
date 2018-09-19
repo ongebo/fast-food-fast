@@ -15,13 +15,13 @@ class Order:
     def get_all(self):
         return Order.orders
     
-    def get_order(self, id):
-        if not isinstance(id, int):
+    def get_order(self, order_id):
+        if not isinstance(order_id, int):
             raise TypeError('The id should be an integer')
         for order in Order.orders:
-            if order['order-id'] == id:
+            if order['order-id'] == order_id:
                 return order
-        raise OrderNotFound('No order with id {} exists'.format(id))
+        raise OrderNotFound('No order with id {} exists'.format(order_id))
     
     def create_order(self, order):
         if self.validate_order(order):
@@ -39,8 +39,8 @@ class Order:
         else:
             raise BadRequest
     
-    def update_order_status(self, id, new_order):
-        order_to_update = self.get_order(id)
+    def update_order_status(self, order_id, new_order):
+        order_to_update = self.get_order(order_id)
         if 'items' not in new_order:
             new_order['items'] = order_to_update['items'][:] # slice to create a new copy
         if self.validate_order(new_order):
@@ -52,20 +52,20 @@ class Order:
         else:
             raise BadRequest
     
-    def delete_order(self, id):
-        if not isinstance(id, int):
+    def delete_order(self, order_id):
+        if not isinstance(order_id, int):
             raise TypeError('The id should be an integer')
         order_present = False
         order_index = None
         for order in Order.orders:
-            if order['order-id'] == id:
+            if order['order-id'] == order_id:
                 order_present = True
                 order_index = Order.orders.index(order)
                 break # assuming there's no other order in the list with 'order-id' == id
         if order_present:
             del Order.orders[order_index]
         else:
-            raise OrderNotFound('No order with id {} exists'.format(id))
+            raise OrderNotFound('No order with id {} exists'.format(order_id))
     
     def validate_order_item(self, item):
         try:
