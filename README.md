@@ -27,13 +27,13 @@ Admins are able to:
 ### API Description
 The backend of Fast-Food-Fast is powered by a RESTful API implemented in Flask, a python web microframework. Version 1 of the API is hosted on Heroku and the home page can be accessed at: https://gbo-fast-food-fast.herokuapp.com. The functionality of the API with corresponding endpoints is described below:
 
-Endpoint                       | Function
--------------------------------|----------------------------------------------------
-GET /api/v1/orders             | Returns orders in JSON format
-GET /api/v1/orders/<orderID>   | Returns a specific order in JSON
-POST /api/v1/orders            | Creates a new order
-PUT /api/v1/orders/<orderID>   | Updates the status of the order with specified ID
-DELETE /api/v1/orders/<orderID>| Deletes the order having the specified ID
+Endpoint                           | Function
+-----------------------------------|------------------------------------------------
+GET /api/v1/orders                 | Returns orders in JSON format
+GET /api/v1/orders/\<orderID\>     | Returns a specific order in JSON
+POST /api/v1/orders                | Creates a new order
+PUT /api/v1/orders/\<orderID\>     | Updates the status of the order with specified ID
+DELETE /api/v1/orders/\<orderID\>  | Deletes the order having the specified ID
 
 When using the API, an example order is represented in JSON as:
 ```javascript
