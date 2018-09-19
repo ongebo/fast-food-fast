@@ -86,3 +86,15 @@ def test_api_returns_error_message_for_wrong_order_update_data(test_client):
     assert response_2.status_code == 400
     assert 'Bad Request!' in response_2.get_json()
     reset_orders_list()
+
+
+def test_api_deletes_an_order_with_specific_id(test_client):
+    id = test_client.post('/api/v1/orders', json={'items': []}).get_json()['order-id']
+    response = test_client.delete('/api/v1/orders/{}'.format(id))
+    assert response.status_code == 204
+
+
+def test_api_returns_error_message_when_deleting_a_non_existent_order(test_client):
+    response = test_client.delete('/api/v1/orders/34')
+    assert response.status_code == 404
+    assert '404 - The requested resource does not exist' in response.get_json()
