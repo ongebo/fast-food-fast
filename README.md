@@ -49,3 +49,33 @@ Points to note:
 * "items" is compulsory and its value must be a list of individual items
 * When posting and order, "status", "total-cost", and "order-id" are optional, they are automatically assigned by the API
 * Version 1 of the RESTful API uses data structures to store orders, so the orders don't persist among multiple runs of the application
+
+## Installation Instructions
+To run the application, follow these steps:
+* Install python 3 and Postman on your local machine
+* Clone this repository and checkout to the api branch
+* Navigate to the repository root (fast-food-fast) and create a virtual environment
+    cd fast-food-fast
+    python3 -m venv venv
+* Activate the virtual environment and install flask
+    . venv/bin/activate
+    pip install flask
+* Run the run.py script
+    python3 run.py
+* Test the API endpoints using Postman
+
+## Source Tree
+The root directory contains the files run.py, requirements.txt, Procfile, and README.md for the following purposes:
+File                | Purpose
+--------------------|--------------------------------------------------------
+run.py              | Runs the application with the command _python run.py_
+requirements.txt    | Defines the python dependencies for the application
+Procfile            | Enables deployment of the application to Heroku
+README.md           | Provides information about the project
+
+The tests directory contains code for testing the application scripts in fastfoodfast. The tests can be run using pytest, a python testing framework.
+
+The application's code lives in fastfoodfast:
+* fastfoodfast/fastfoodfast.py defines flask route functions mapped to request URLs
+* fastfoodfast/models.py contains Python classes which are responsible for managing the data for the application
+* fastfoodfast/__init__.py marks the fastfoodfast directory as a Python package
