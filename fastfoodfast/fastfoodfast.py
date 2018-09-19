@@ -64,6 +64,15 @@ def update_order_status(id):
         return jsonify('Bad Request!'), 400
 
 
+@app.route('/api/v1/orders/<int:id>', methods=['DELETE'])
+def delete_specific_order(id):
+    try:
+        order_model.delete_order(id)
+        return jsonify('NO CONTENT'), 204
+    except OrderNotFound:
+        abort(404)
+
+
 @app.errorhandler(404)
 def resource_not_found(error):
     return jsonify('404 - The requested resource does not exist'), 404
