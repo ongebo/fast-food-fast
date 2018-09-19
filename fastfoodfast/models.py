@@ -65,7 +65,7 @@ class Order:
             if order['order-id'] == order_id:
                 order_present = True
                 order_index = Order.orders.index(order)
-                break # assuming there's no other order in the list with 'order-id' == id
+                break # assuming there's no other order in the list with 'order-id' == order_id
         if order_present:
             del Order.orders[order_index]
         else:
