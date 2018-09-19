@@ -39,6 +39,11 @@ def get_a_specific_order(order_id):
 
 @app.route('/api/v1/orders', methods=['POST'])
 def place_a_new_order():
+    """
+    Adds a new order to the orders list and returns 201 - CREATED status code
+    if no exception occurs, otherwise help text with a status code of 400 - BAD REQUEST
+    is returned
+    """
     try:
         order = request.get_json()
         created_order = order_model.create_order(order)

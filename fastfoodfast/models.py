@@ -25,6 +25,7 @@ class Order:
         raise OrderNotFound('No order with id {} exists'.format(order_id))
     
     def create_order(self, order):
+        """Creates and returns a reference to a new order in the orders list"""
         if self.validate_order(order):
             new_order = dict()
             new_order['items'] = order['items']
@@ -69,6 +70,7 @@ class Order:
             raise OrderNotFound('No order with id {} exists'.format(order_id))
     
     def validate_order_item(self, item):
+        """Checks that an item (dictionary) in an order items list is valid"""
         try:
             dict(item)
             assert 'item' in item and isinstance(item['item'], str)
@@ -80,6 +82,7 @@ class Order:
             return False
     
     def validate_order(self, order):
+        """Returns True if the data for an order is valid, False otherwise"""
         try:
             assert isinstance(order, dict)
             assert 'items' in order
