@@ -4,8 +4,14 @@ python:
     - "3.5"
     - "3.6"
 
-deploy:
-    provider: heroku
-    api_key: 7a17a111-4b6b-4694-9769-3a0d33f8280d
-    app: gbo-fast-food-fast
-    on: api
+install:
+    - pip install pytest
+    - pip install pytest-cov
+    - pip install coveralls
+    - pip install flask
+
+script:
+    - pytest --cov=fastfoodfast
+
+after_success:
+    - coveralls

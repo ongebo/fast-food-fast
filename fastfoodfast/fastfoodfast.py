@@ -8,7 +8,7 @@ order_model = Order()
 
 @app.route('/')
 def index_page():
-    return 'Welcome to Fast-Food-Fast!'
+    return jsonify('Welcome to Fast-Food-Fast!')
 
 
 @app.route('/api/v1/orders')
@@ -32,22 +32,24 @@ def place_a_new_order():
     try:
         order = request.get_json()
         created_order = order_model.create_order(order)
-        response = Response(str(created_order), status=201, mimetype='application/json')
-        response.headers['Location'] = '/api/v1/orders/{}'.format(created_order['order-id'])
-        return response
+        return jsonify(created_order), 201
     except:
-        bad_request = {
-            'help': 'order should take the form:\n'
-            '{\n'
-            '  "items": [\n'
-            '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
-            '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
-            '    {"item": <name>, "quantity": <number>, "cost": <number>},\n'
-            '  ]\n'
-            '}\n'
+        help_text = """
+        order should have the format:
+        {
+            'items': [
+                {'item': '<item-name>', 'quantity': <number>, 'cost': <number>},
+                {'item': '<item-name>', 'quantity': <number>, 'cost': <number>}
+            ],
+            'status': '<order-status>',
+            'total-cost': <number>,
+            'order-id': <number>
         }
-        response = Response(str(bad_request), status=400, mimetype='application/json')
-        return response
+        status: can be pending, accepted or complete
+        status, total-cost, and order-id are optional
+        items: compulsory
+        """
+        return jsonify({'help': help_text}), 400
 
 
 @app.route('/api/v1/orders/<int:id>', methods=['PUT'])
@@ -56,15 +58,12 @@ def update_order_status(id):
         order_model.update_order_status(id, request.get_json())
         response = Response('', status=200, mimetype='application/json')
         return response
-    except OrderNotFound:
-        abort(404)
-    except BadRequest:
-        response = Response('Bad Request!', status=400, mimetype='application/json')
-        return response
-    except:
-        return 'Bad Request!', 400
+    except Exception as e:
+        if isinstance(e, OrderNotFound):
+            abort(404)
+        return jsonify('Bad Request!'), 400
 
 
 @app.errorhandler(404)
-def resource_not_found():
-    return '404 - The requested resource does not exist', 404
+def resource_not_found(error):
+    return jsonify('404 - The requested resource does not exist'), 404
