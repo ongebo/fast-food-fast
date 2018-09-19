@@ -42,6 +42,7 @@ class Order:
             raise BadRequest
     
     def update_order_status(self, order_id, new_order):
+        """Updates order having id <order_id> with new_order"""
         order_to_update = self.get_order(order_id)
         if 'items' not in new_order:
             new_order['items'] = order_to_update['items'][:] # slice to create a new copy

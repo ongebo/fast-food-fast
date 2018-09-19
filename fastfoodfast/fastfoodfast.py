@@ -69,6 +69,7 @@ def place_a_new_order():
 
 @app.route('/api/v1/orders/<int:order_id>', methods=['PUT'])
 def update_order_status(order_id):
+    """Updates status of order with specified order_id if it exists"""
     try:
         order_model.update_order_status(order_id, request.get_json())
         response = Response('', status=200, mimetype='application/json')
