@@ -5,7 +5,7 @@ root folder, and entering the command 'pytest' in the terminal.
 """
 import pytest
 from fastfoodfast import app
-from fastfoodfast.models import Order
+from fastfoodfast.models import Order, Menu
 
 
 @pytest.fixture
@@ -15,6 +15,10 @@ def test_client():
 
 def reset_orders_list():
     Order.orders = list()
+
+
+def reset_menu():
+    Menu.menu_items = list()
 
 
 def test_index_page_contains_welcome_message(test_client):
@@ -103,3 +107,21 @@ def test_api_returns_error_message_when_deleting_a_non_existent_order(test_clien
     response = test_client.delete('/api/v1/orders/34')
     assert response.status_code == 404
     assert '404 - The requested resource does not exist' in response.get_json()
+
+
+def test_api_correctly_creates_new_menu_items(test_client):
+    valid_item_1 = {'item': 'Chicken', 'unit': 'piece', 'rate': 5000}
+    valid_item_2 = {'rate': 7000, 'item': 'hamburger'}
+    response_1 = test_client.post('/api/v1/menu-items', json=valid_item_1)
+    response_2 = test_client.post('/api/v1/menu-items', json=valid_item_2)
+    assert response_1.status_code == 201
+    assert response_2.status_code == 201
+    assert response_1.get_json()['item-id'] == 1
+    assert response_2.get_json()['item-id'] == 2
+    reset_menu()
+
+
+def test_api_returns_400_given_wrong_request_data_to_create_menuitem(test_client):
+    response = test_client.post('/api/v1/menu-items', json={})
+    assert response.status_code == 400
+    assert 'Invalid menu item data' in response.get_json()['help']
