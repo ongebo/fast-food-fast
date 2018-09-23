@@ -153,3 +153,6 @@ class Menu:
             return True
         except AssertionError:
             return False
+    
+    def get_all(self):
+        return Menu.menu_items
