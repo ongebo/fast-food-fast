@@ -119,6 +119,7 @@ class Menu:
     menu_items = list()
 
     def create_menu_item(self, menu_item):
+        """Adds new food item to the menu, returns reference to it"""
         if self.is_valid_menu_item(menu_item):
             new_item = dict()
             new_item['item'] = menu_item['item']
@@ -132,6 +133,7 @@ class Menu:
             raise Exception('Invalid menu item data.')
 
     def is_valid_menu_item(self, menu_item):
+        """Returns True if menu_item argument is valid, False otherwise"""
         try:
             assert isinstance(menu_item, dict)
             assert 'item' in menu_item and isinstance(menu_item['item'], str)
