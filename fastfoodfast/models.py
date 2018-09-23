@@ -113,3 +113,28 @@ class Order:
             return True
         except:
             return False
+
+
+class Menu:
+    menu_items = list()
+
+    def is_valid_menu_item(self, menu_item):
+        try:
+            assert isinstance(menu_item, dict)
+            assert 'item' in menu_item and isinstance(menu_item['item'], str)
+            assert 'rate' in menu_item and float(menu_item['rate'])
+
+            if len(menu_item) == 3:
+                assert 'unit' in menu_item or 'item-id' in menu_item
+            elif len(menu_item) == 4:
+                assert 'unit' in menu_item and 'item-id' in menu_item
+            elif len(menu_item) > 4:
+                return False
+            
+            if 'unit' in menu_item:
+                assert isinstance(menu_item['unit'], str)
+            if 'item-id' in menu_item:
+                assert float(menu_item['item-id'])
+            return True
+        except (AssertionError, TypeError):
+            return False
