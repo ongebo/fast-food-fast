@@ -7,11 +7,12 @@ PUT /api/v1/orders/<orderID>
 DELETE /api/v1/orders/<orderID>
 """
 from flask import Flask, jsonify, request, abort, Response
-from .models import Order, OrderNotFound, BadRequest
+from .models import Order, Menu, OrderNotFound, BadRequest
 
 
 app = Flask(__name__)
 order_model = Order()
+menu_model = Menu()
 
 
 @app.route('/')
@@ -94,3 +95,29 @@ def delete_specific_order(order_id):
 def resource_not_found(error):
     """Called when a 404 error has occurred"""
     return jsonify('404 - The requested resource does not exist'), 404
+
+
+# Routes for Handling Food Menu
+
+
+@app.route('/api/v1/menu-items', methods=['POST'])
+def add_new_menu_item():
+    try:
+        menu_item = request.get_json()
+        created_item = menu_model.create_menu_item(menu_item)
+        response = jsonify(created_item)
+        response.headers['Location'] = '/api/v1/menu-items/{}'.format(created_item['item-id'])
+        return response, 201
+    except Exception as e:
+        help_text = """
+        Menu Item should be represtented as:
+        {
+            'item': '<item-name>',
+            'unit': '<measurement-unit>',
+            'rate': <unit-cost>
+        }
+        'item', and 'rate' are compulsory
+        'unit' for example piece, pack, etc: is optional
+        """
+        response = {'help': e.args[0] + '\n' + help_text}
+        return jsonify(response), 400
