@@ -2,12 +2,17 @@
 Unit Tests for the Application Models Defined in fastfoodfast/models.py
 """
 import pytest
-from fastfoodfast.models import Order, OrderNotFound, BadRequest
+from fastfoodfast.models import Order, OrderNotFound, BadRequest, Menu
 
 
 @pytest.fixture
 def order_model():
     return Order()
+
+
+@pytest.fixture
+def menu_model():
+    return Menu()
 
 
 @pytest.fixture
@@ -167,3 +172,20 @@ def test_that_order_model_can_delete_an_order_with_specific_id(order_model):
 def test_order_model_raises_exception_when_trying_to_delete_non_existent_order(order_model):
     with pytest.raises(OrderNotFound):
         order_model.delete_order(567)
+
+
+def test_menu_model_can_create_a_new_menu_item(menu_model):
+    menu_item = {'item': 'Chicken', 'unit': 'piece', 'rate': 5000}
+    created_item = menu_model.create_menu_item(menu_item)
+    assert 'item-id' in created_item and created_item['item-id'] == 1
+    assert len(Menu.menu_items) == 1
+    assert created_item in Menu.menu_items
+    Menu.menu_items = list()
+
+
+def test_menu_model_raises_exception_when_creating_menu_item_with_bad_argument(menu_model):
+    bad_item_1 = {}
+    bad_item_2 = 567
+    with pytest.raises(Exception):
+        menu_model.create_menu_item(bad_item_1)
+        menu_model.create_menu_item(bad_item_2)
