@@ -125,3 +125,12 @@ def test_api_returns_400_given_wrong_request_data_to_create_menuitem(test_client
     response = test_client.post('/api/v1/menu-items', json={})
     assert response.status_code == 400
     assert 'Invalid menu item data' in response.get_json()['help']
+
+
+def test_api_can_return_all_food_menu_items(test_client):
+    response_1 = test_client.post('/api/v1/menu-items', json={'item': 'chicken', 'rate': 5000})
+    assert response_1.status_code == 201
+    response_2 = test_client.get('/api/v1/menu-items')
+    assert response_2.status_code == 200
+    assert response_1.get_json() in response_2.get_json()['menu-items']
+    reset_menu()
