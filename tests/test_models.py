@@ -189,3 +189,12 @@ def test_menu_model_raises_exception_when_creating_menu_item_with_bad_argument(m
     with pytest.raises(Exception):
         menu_model.create_menu_item(bad_item_1)
         menu_model.create_menu_item(bad_item_2)
+
+
+def test_menu_model_correctly_validates_menu_items(menu_model):
+    bad_item_1 = [1, 2, 3]
+    bad_item_2 = {'rate': 5000, 'unit': 'pack'}
+    valid_item = {'item': 'Pizza', 'rate': 20000}
+    assert menu_model.is_valid_menu_item(bad_item_1) == False
+    assert menu_model.is_valid_menu_item(bad_item_2) == False
+    assert menu_model.is_valid_menu_item(valid_item) == True
