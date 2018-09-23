@@ -5,6 +5,8 @@ GET /api/v1/orders/<orderID>
 POST /api/v1/orders
 PUT /api/v1/orders/<orderID>
 DELETE /api/v1/orders/<orderID>
+
+POST /api/v1/menu-items
 """
 from flask import Flask, jsonify, request, abort, Response
 from .models import Order, Menu, OrderNotFound, BadRequest
@@ -102,6 +104,10 @@ def resource_not_found(error):
 
 @app.route('/api/v1/menu-items', methods=['POST'])
 def add_new_menu_item():
+    """
+    Adds a new food item to the menu from POST request data. Returns the created menu item and
+    a status code of 201 if successful, otherwise returns help text and a status code of 400
+    """
     try:
         menu_item = request.get_json()
         created_item = menu_model.create_menu_item(menu_item)
