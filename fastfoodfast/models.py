@@ -118,6 +118,19 @@ class Order:
 class Menu:
     menu_items = list()
 
+    def create_menu_item(self, menu_item):
+        if self.is_valid_menu_item(menu_item):
+            new_item = dict()
+            new_item['item'] = menu_item['item']
+            new_item['rate'] = menu_item['rate']
+            new_item['unit'] = menu_item.get('unit')
+            item_id = 1 if len(Menu.menu_items) == 0 else Menu.menu_items[-1]['item-id'] + 1
+            new_item['item-id'] = item_id
+            Menu.menu_items.append(new_item)
+            return new_item
+        else:
+            raise Exception('Invalid menu item data.')
+
     def is_valid_menu_item(self, menu_item):
         try:
             assert isinstance(menu_item, dict)
@@ -136,5 +149,5 @@ class Menu:
             if 'item-id' in menu_item:
                 assert float(menu_item['item-id'])
             return True
-        except (AssertionError, TypeError):
+        except AssertionError:
             return False
