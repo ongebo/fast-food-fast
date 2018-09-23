@@ -7,6 +7,7 @@ PUT /api/v1/orders/<orderID>
 DELETE /api/v1/orders/<orderID>
 
 POST /api/v1/menu-items
+GET /api/v1/menu-items
 """
 from flask import Flask, jsonify, request, abort, Response
 from .models import Order, Menu, OrderNotFound, BadRequest
@@ -127,3 +128,9 @@ def add_new_menu_item():
         """
         response = {'help': e.args[0] + '\n' + help_text}
         return jsonify(response), 400
+
+@app.route('/api/v1/menu-items')
+def get_all_menu_items():
+    """Returns all availabe food items in the Menu model with 200 status code"""
+    menu_items = menu_model.get_all()
+    return jsonify({'menu-items': menu_items}), 200
