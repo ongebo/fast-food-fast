@@ -198,3 +198,10 @@ def test_menu_model_correctly_validates_menu_items(menu_model):
     assert menu_model.is_valid_menu_item(bad_item_1) == False
     assert menu_model.is_valid_menu_item(bad_item_2) == False
     assert menu_model.is_valid_menu_item(valid_item) == True
+
+
+def test_menu_model_can_return_all_food_menu_items(menu_model):
+    assert menu_model.get_all() == []
+    item = menu_model.create_menu_item({'item': 'pizza', 'rate': 20000})
+    assert item in menu_model.get_all()
+    Menu.menu_items = list()
