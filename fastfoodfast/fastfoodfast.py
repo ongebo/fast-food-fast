@@ -56,19 +56,22 @@ def place_a_new_order():
         help_text = """
         order should have the format:
         {
+
             'items': [
-                {'item': '<item-name>', 'quantity': <number>, 'cost': <number>},
-                {'item': '<item-name>', 'quantity': <number>, 'cost': <number>}
+                {'item': '<item-name>', 'quantity': number, 'cost': number},
+                {'item': '<item-name>', 'quantity': number, 'cost': number}
             ],
-            'status': '<order-status>',
-            'total-cost': <number>,
-            'order-id': <number>
+            'status': 'order-status',
+            'total-cost': number,
+            'order-id': number
+            
         }
         status: can be pending, accepted or complete
         status, total-cost, and order-id are optional
         items: compulsory
         """
-        return jsonify({'help': help_text}), 400
+        response = Response(help_text, status=400, mimetype='text/plain')
+        return response
 
 
 @app.route('/api/v1/orders/<int:order_id>', methods=['PUT'])
