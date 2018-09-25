@@ -60,9 +60,8 @@ def test_api_correctly_creates_a_new_order(test_client):
 
 def test_api_returns_help_text_incase_of_bad_order_format_in_request(test_client):
     response = test_client.post('/api/v1/orders', json={'items': [1, 2]})
-    data = response.get_json()
     reset_orders_list()
-    assert 'help' in data and 'order should have the format:' in data['help']
+    assert b'order should have the format:' in response.data
     assert response.status_code == 400
 
 
