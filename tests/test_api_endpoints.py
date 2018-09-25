@@ -24,6 +24,7 @@ def reset_menu():
 def test_index_page_contains_welcome_message(test_client):
     response = test_client.get('/')
     assert 'Welcome to Fast-Food-Fast!' in response.get_json()
+    assert response.status_code == 200
 
 
 def test_api_returns_empty_orders_list_when_no_order_has_been_created(test_client):
@@ -37,6 +38,7 @@ def test_api_returns_created_order_in_orders_list(test_client):
     response_1 = test_client.post('/api/v1/orders', json={'items': []})
     response_2 = test_client.get('/api/v1/orders')
     assert response_1.get_json() in response_2.get_json()['orders']
+    assert response_1.status_code == 201
     assert response_2.status_code == 200
     reset_orders_list()
 
@@ -53,6 +55,7 @@ def test_api_correctly_creates_a_new_order(test_client):
     assert 'status' in data and data['status'] == 'pending'
     assert 'total-cost' in data and data['total-cost'] == 24000
     assert 'order-id' in data
+    assert response.status_code == 201
 
 
 def test_api_returns_help_text_incase_of_bad_order_format_in_request(test_client):
@@ -68,39 +71,46 @@ def test_api_can_return_a_specific_order_that_exists(test_client):
     response_2 = test_client.get('/api/v1/orders/{}'.format(response_1.get_json()['order-id']))
     assert response_1.get_json() == response_2.get_json()
     assert response_2.status_code == 200
+    assert response_1.status_code == 201
     reset_orders_list()
 
 
 def test_api_returns_404_for_a_wrong_order_id(test_client):
-    response = test_client.get('/api/v1/orders/0')
-    test_client.put('/api/v1/orders/45', json={'status': 'accepted'})
-    assert response.status_code == 404
-    assert '404 - The requested resource does not exist' in response.get_json()
+    response_1 = test_client.get('/api/v1/orders/0')
+    response_2 = test_client.put('/api/v1/orders/45', json={'status': 'accepted'})
+    assert response_1.status_code == 404
+    assert response_2.status_code == 404
+    assert '404 - The requested resource does not exist' in response_1.get_json()
 
 
 def test_api_can_update_status_of_a_created_order(test_client):
     response_1 = test_client.post('/api/v1/orders', json={'items': []})
-    id = response_1.get_json()['order-id']
-    response_2 = test_client.put('/api/v1/orders/{}'.format(id), json={'status': 'accepted'})
-    response_3 = test_client.get('/api/v1/orders/{}'.format(id))
+    order_id = response_1.get_json()['order-id']
+    response_2 = test_client.put('/api/v1/orders/{}'.format(order_id), json={'status': 'accepted'})
+    response_3 = test_client.get('/api/v1/orders/{}'.format(order_id))
     assert response_3.get_json()['status'] == 'accepted'
+    assert response_1.status_code == 201
     assert response_2.status_code == 200
+    assert response_3.status_code == 200
     reset_orders_list()
 
 
 def test_api_returns_error_message_for_wrong_order_update_data(test_client):
     response_1 = test_client.post('/api/v1/orders', json={'items': []})
-    id = response_1.get_json()['order-id']
-    response_2 = test_client.put('/api/v1/orders/{}'.format(id), json={'status': 'invalid'})
+    order_id = response_1.get_json()['order-id']
+    response_2 = test_client.put('/api/v1/orders/{}'.format(order_id), json={'status': 'invalid'})
+    assert response_1.status_code == 201
     assert response_2.status_code == 400
     assert 'Bad Request!' in response_2.get_json()
     reset_orders_list()
 
 
 def test_api_deletes_an_order_with_specific_id(test_client):
-    id = test_client.post('/api/v1/orders', json={'items': []}).get_json()['order-id']
-    response = test_client.delete('/api/v1/orders/{}'.format(id))
-    assert response.status_code == 204
+    response_1 = test_client.post('/api/v1/orders', json={'items': []})
+    order_id = response_1.get_json()['order-id']
+    response_2 = test_client.delete('/api/v1/orders/{}'.format(order_id))
+    assert response_1.status_code == 201
+    assert response_2.status_code == 204
 
 
 def test_api_returns_error_message_when_deleting_a_non_existent_order(test_client):
