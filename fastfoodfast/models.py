@@ -76,8 +76,14 @@ class Order:
         try:
             dict(item)
             assert 'item' in item and isinstance(item['item'], str)
+            item['item'] = item['item'].strip() # remove leading and trailing spaces
+            assert len(item['item']) != 0
+            for c in item['item']:
+                assert c.isalnum() or c.isspace()
             assert 'quantity' in item and float(item['quantity'])
+            assert float(item['quantity']) > 0 # quantity cannot be zero or negative
             assert 'cost' in item and float(item['cost'])
+            assert float(item['cost']) > 0 # cost cannot be negative
             assert len(item) == 3
             return True
         except (AssertionError, TypeError, ValueError):
