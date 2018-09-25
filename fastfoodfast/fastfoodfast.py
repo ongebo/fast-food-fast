@@ -54,21 +54,26 @@ def place_a_new_order():
         return jsonify(created_order), 201
     except:
         help_text = """
-        order should have the format:
+        You posted invalid data for an order. Ensure you follow these rules:
+        
+        1. order should have the format:
         {
 
             'items': [
-                {'item': '<item-name>', 'quantity': number, 'cost': number},
-                {'item': '<item-name>', 'quantity': number, 'cost': number}
+                {'item': '<item-name>', 'quantity': <number>, 'cost': <number>},
+                {'item': '<item-name>', 'quantity': <number>, 'cost': <number>}
             ],
             'status': 'order-status',
             'total-cost': number,
             'order-id': number
             
         }
-        status: can be pending, accepted or complete
+        status: can be 'pending', 'accepted' or 'complete'
         status, total-cost, and order-id are optional
         items: compulsory
+        
+        2. <item-name> cannot be an empty string, and can only contain letters, numbers and spaces
+        3. <number> for 'quantity' and 'cost' cannot be zero or negative
         """
         response = Response(help_text, status=400, mimetype='text/plain')
         return response
