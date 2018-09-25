@@ -76,8 +76,8 @@ def update_order_status(order_id):
     """Updates status of order with specified order_id if it exists"""
     try:
         order_model.update_order_status(order_id, request.get_json())
-        response = Response('', status=200, mimetype='application/json')
-        return response
+        message = 'Successfully updated status of order with id {}'.format(order_id)
+        return jsonify(message), 200
     except Exception as e:
         if isinstance(e, OrderNotFound):
             abort(404)
