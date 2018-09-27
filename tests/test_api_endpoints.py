@@ -133,7 +133,7 @@ def test_api_correctly_creates_new_menu_items(test_client):
 def test_api_returns_400_given_wrong_request_data_to_create_menuitem(test_client):
     response = test_client.post('/api/v1/menu-items', json={})
     assert response.status_code == 400
-    assert 'Invalid menu item data' in response.get_json()['help']
+    assert b'Menu Item should be represented as:' in response.data
 
 
 def test_api_can_return_all_food_menu_items(test_client):
