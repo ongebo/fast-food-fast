@@ -111,6 +111,7 @@ class Order:
                 return False
             
             if 'status' in order:
+                order['status'] = order['status'].strip().lower()
                 assert order['status'] in ['pending', 'accepted', 'complete']
             if 'total-cost' in order:
                 assert float(order['total-cost'])
