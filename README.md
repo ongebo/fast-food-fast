@@ -58,8 +58,10 @@ To run the application, follow these steps:
 * Install python 3 and Postman on your local machine
 * Clone this repository and checkout to the api branch
 * Navigate to the repository root (fast-food-fast) and create a virtual environment
-    cd fast-food-fast
-    python3 -m venv venv
+```
+$ cd fast-food-fast
+$ python3 -m venv venv
+```
 * Activate the virtual environment and install flask
 ```
 $ . venv/bin/activate
