@@ -123,19 +123,21 @@ def add_new_menu_item():
         response = jsonify(created_item)
         response.headers['Location'] = '/api/v1/menu-items/{}'.format(created_item['item-id'])
         return response, 201
-    except Exception as e:
+    except:
         help_text = """
-        Menu Item should be represtented as:
+        Menu Item should be represented as:
+
         {
             'item': '<item-name>',
             'unit': '<measurement-unit>',
             'rate': <unit-cost>
         }
+        
         'item', and 'rate' are compulsory
         'unit' for example piece, pack, etc: is optional
         """
-        response = {'help': e.args[0] + '\n' + help_text}
-        return jsonify(response), 400
+        response = Response(help_text, status=400, mimetype='text/plain')
+        return response
 
 @app.route('/api/v1/menu-items')
 def get_all_menu_items():
