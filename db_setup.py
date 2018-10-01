@@ -29,7 +29,8 @@ def main():
         CREATE TABLE users (
             Id SERIAL PRIMARY KEY,
             Username VARCHAR(80) NOT NULL,
-            Password VARCHAR(80) NOT NULL
+            Password VARCHAR(80) NOT NULL,
+            Admin BOOLEAN NOT NULL
         );
         """
     )
