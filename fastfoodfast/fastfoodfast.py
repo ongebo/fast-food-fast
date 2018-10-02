@@ -85,9 +85,16 @@ def get_user_order_history():
 
 
 @app.route('/api/v1/orders/', methods=['GET'])
+@jwt_required
 def get_all_orders():
     """Retrieves all food orders from the database"""
-    pass
+    try:
+        identity = get_jwt_identity()
+        if not order_model.is_admin(identity):
+            return jsonify({'message': 'only admin can get all orders'}), 401
+        return jsonify({'orders': order_model.get_all_orders()}), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 404
 
 
 @app.route('/api/v1/orders/<int:order_id>', methods=['GET'])
