@@ -1,37 +1,7 @@
 import psycopg2
-import sys
 
 
-def get_database_credentials():
-    while True:
-        try:
-            db = input('Database name: ')
-            username = input('User: ')
-            password = input('Password: ')
-            conn = psycopg2.connect(
-                database=db,
-                user=username,
-                password=password,
-                host='127.0.0.1',
-                port='5432'
-            )
-            print('Successfully connected to database...\n')
-            return conn
-        except:
-            print('\nWrong Credentials, try again.\n')
-
-
-def main():
-    if len(sys.argv) == 2 and sys.argv[1] == 'user_credentials':
-        conn = get_database_credentials()
-    else:
-        conn = psycopg2.connect(
-                database='fffdb',
-                user='ongebo',
-                password='nothing',
-                host='127.0.0.1',
-                port='5432'
-            )
+def create_tables(conn):
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -81,6 +51,33 @@ def main():
     )
     conn.commit()
     conn.close()
+
+
+def setup_testdb():
+    conn = psycopg2.connect(
+        database='testdb',
+        user='ongebo',
+        password='nothing',
+        host='127.0.0.1',
+        port='5432'
+    )
+    create_tables(conn)
+
+
+def main():
+    conn = None
+    try:
+        conn = psycopg2.connect(
+                database='fffdb',
+                user='ongebo',
+                password='nothing',
+                host='127.0.0.1',
+                port='5432'
+            )
+    except:
+        print('Could not establish connection to database...')
+        return
+    create_tables(conn)
     print('Database tables successfully setup...')
 
 
