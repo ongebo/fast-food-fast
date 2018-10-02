@@ -49,3 +49,27 @@ def test_model_raises_exception_given_incorrect_user_data_for_registration(datab
     incorrect_data = {'username': ' ', 'password': 786}
     with pytest.raises(Exception):
         user_model.register_user(incorrect_data)
+
+
+def test_model_can_get_a_specific_user_by_username_from_db(database_connection):
+    user_model = User()
+    database_connection.cursor().execute(
+        "INSERT INTO users (username, password, admin) VALUES ('Thor', 'asgard', 'f')"
+    )
+    database_connection.commit()
+    user = user_model.get_user('Thor')
+    assert user['username'] == 'Thor'
+    assert user['password'] == 'asgard'
+    database_connection.cursor().execute(
+        "DELETE FROM users WHERE username='Thor'"
+    )
+    database_connection.commit()
+    database_connection.close()
+
+
+def test_model_raises_exception_when_retrieving_non_existent_user():
+    user_model = User()
+    with pytest.raises(Exception):
+        user_model.get_user('Non-existent user!')
+    with pytest.raises(Exception):
+        user_model.get_user(34)

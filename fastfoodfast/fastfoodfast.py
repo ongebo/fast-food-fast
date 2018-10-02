@@ -1,8 +1,12 @@
 from flask import Flask, request, jsonify, Response
+from werkzeug.security import check_password_hash
+from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from .models import User
 
 
 app = Flask(__name__)
+app.config['JWT_SECRET_KEY'] = 'secret-key'
+jwt = JWTManager(app)
 user_model = User()
 
 
@@ -21,7 +25,15 @@ def register_a_user():
 @app.route('/api/v1/auth/login', methods=['POST'])
 def login_a_user():
     """Logs in a registered user"""
-    pass
+    try:
+        data = request.get_json()
+        user = user_model.get_user(data['username'])
+        if not check_password_hash(user['password'], data['password']):
+            return jsonify({'error': 'wrong password'}), 401
+        token = create_access_token(identity=user['username'])
+        return jsonify({'token': token}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 
 @app.route('/api/v1/users/orders', methods=['POST'])
