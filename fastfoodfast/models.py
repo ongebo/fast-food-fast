@@ -139,3 +139,38 @@ class Order:
             order['items'] = items
             orders.append(order)
         return orders
+    
+    def get_all_orders(self):
+        self.connect_to_db()
+        self.cursor.execute(
+            'SELECT id, public_id, customer, status, total_cost FROM orders'
+        )
+        records = self.cursor.fetchall()
+        if not records:
+            raise Exception('No orders available')
+        orders = list()
+        for record in records:
+            order = dict()
+            order['order-id'] = record[1]
+            order['customer'] = record[2]
+            order['status'] = record[3]
+            order['total-cost'] = record[4]
+            self.cursor.execute(
+                'SELECT item, quantity, cost FROM order_items WHERE order_id = %s',
+                (record[0], )
+            )
+            items = list()
+            for item in self.cursor.fetchall():
+                item = {'item': item[0], 'quantity': item[1], 'cost': item[2]}
+                items.append(item)
+            order['items'] = items
+            orders.append(order)
+        self.conn.close()
+        return orders
+    
+    def is_admin(self, user):
+        self.connect_to_db()
+        self.cursor.execute('SELECT admin FROM users WHERE username = %s', (user, ))
+        value = self.cursor.fetchone()[0]
+        self.conn.close()
+        return value
