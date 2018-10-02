@@ -97,14 +97,21 @@ def get_all_orders():
         return jsonify({'message': str(e)}), 404
 
 
-@app.route('/api/v1/orders/<int:order_id>', methods=['GET'])
-def get_specific_order():
+@app.route('/api/v1/orders/<order_id>', methods=['GET'])
+@jwt_required
+def get_specific_order(order_id):
     """Retrieves a specific food order from the database"""
-    pass
+    try:
+        if not order_model.is_admin(get_jwt_identity):
+            return jsonify({'message': 'only admin can fetch a specific order'}), 401
+        order = order_model.get_specific_order(order_id)
+        return jsonify({'order': order})
+    except Exception as e:
+        return jsonify({'message': str(e)})
 
 
-@app.route('/api/v1/orders/<int:order_id>', methods=['PUT'])
-def update_order_status():
+@app.route('/api/v1/orders/<order_id>', methods=['PUT'])
+def update_order_status(order_id):
     """Updates the status of an order in the database"""
     pass
 
