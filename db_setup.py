@@ -1,4 +1,5 @@
 import psycopg2
+import sys
 
 
 def get_database_credentials():
@@ -21,7 +22,16 @@ def get_database_credentials():
 
 
 def main():
-    conn = get_database_credentials()
+    if len(sys.argv) == 2 and sys.argv[1] == 'user_credentials':
+        conn = get_database_credentials()
+    else:
+        conn = psycopg2.connect(
+                database='fffdb',
+                user='ongebo',
+                password='nothing',
+                host='127.0.0.1',
+                port='5432'
+            )
     cursor = conn.cursor()
     cursor.execute(
         """
