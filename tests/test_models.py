@@ -1,5 +1,5 @@
 import pytest, psycopg2
-from fastfoodfast.models import User
+from fastfoodfast.models import User, Order
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -73,3 +73,29 @@ def test_model_raises_exception_when_retrieving_non_existent_user():
         user_model.get_user('Non-existent user!')
     with pytest.raises(Exception):
         user_model.get_user(34)
+
+
+def test_model_can_add_a_new_order_to_the_database(database_connection):
+    order_model = Order()
+    order = {'items': [{'item': 'pizza', 'quantity': 1, 'cost': 18000}]}
+    created_order = order_model.create_order(order, 'skywalker')
+    assert 'order-id' in created_order and 'status' in created_order
+    cursor = database_connection.cursor()
+    cursor.execute(
+        'SELECT * FROM orders WHERE public_id = %s', (created_order['order-id'], )
+    )
+    result = cursor.fetchone()
+    assert 'skywalker' in result and 'pending' in result
+    cursor.execute('SELECT * FROM order_items')
+    result = cursor.fetchone()
+    assert 'pizza' in result and 1.0 in result and 18000 in result
+    cursor.execute('DELETE FROM order_items WHERE item = %s', ('pizza', ))
+    cursor.execute('DELETE FROM orders WHERE public_id = %s', (created_order['order-id'], ))
+    database_connection.commit()
+    database_connection.close()
+
+
+def test_model_raises_exception_given_invalid_order_data():
+    order_model = Order()
+    with pytest.raises(Exception):
+        order_model.create_order([], 'jon snow')
