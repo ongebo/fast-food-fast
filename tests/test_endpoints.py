@@ -94,3 +94,28 @@ def test_api_returns_error_message_given_incorrect_post_order_data(test_client, 
     cursor.execute('DELETE FROM users WHERE username = %s', ('Loki Odinson', ))
     connection.commit()
     connection.close()
+
+
+def test_api_returns_user_order_history(test_client, connection):
+    user_data = {'username': 'steve rodgers', 'password': 'capitan'}
+    response_1 = test_client.post('/api/v1/auth/signup', json=user_data)
+    response_2 = test_client.post('/api/v1/auth/login', json=user_data)
+    data = response_2.get_json()
+    headers = {'Authorization': 'Bearer ' + data['token']}
+    order_1 = {'items': [{'item': 'hot dog', 'quantity': 2, 'cost': 15000}]}
+    order_2 = {'items': [{'item': 'salad', 'quantity': 1, 'cost': 10000}]}
+    response_3 = test_client.post('/api/v1/users/orders', json=order_1, headers=headers)
+    response_4 = test_client.post('/api/v1/users/orders', json=order_2, headers=headers)
+    response_5 = test_client.get('/api/v1/users/orders', headers=headers)
+    assert response_1.status_code == 201 and response_2.status_code == 201
+    assert response_3.status_code == 201 and response_4.status_code == 201
+    assert response_5.status_code == 200
+    assert response_3.get_json() in response_5.get_json()['orders']
+    assert response_4.get_json() in response_5.get_json()['orders']
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM order_items WHERE item = %s', ('hot dog', ))
+    cursor.execute('DELETE FROM order_items WHERE item = %s', ('salad', ))
+    cursor.execute('DELETE FROM orders WHERE customer = %s', ('steve rodgers', ))
+    cursor.execute("DELETE FROM orders WHERE customer = '{}'".format('steve rodgers'))
+    connection.commit()
+    connection.close()
