@@ -73,9 +73,15 @@ def place_new_order_for_food():
 
 
 @app.route('/api/v1/users/orders', methods=['GET'])
+@jwt_required
 def get_user_order_history():
     """Gets a list of orders made by a user in the past"""
-    pass
+    try:
+        customer = get_jwt_identity()
+        orders = order_model.get_order_history(customer)
+        return jsonify({'orders': orders}), 200
+    except Exception as e:
+        return jsonify({'message': str(e)}), 404
 
 
 @app.route('/api/v1/orders/', methods=['GET'])
