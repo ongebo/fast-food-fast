@@ -53,3 +53,17 @@ def validate_order(order):
             return True
         except:
             return False
+
+
+def validate_user(user):
+    try:
+        assert isinstance(user, dict)
+        assert 'username' in user
+        user['username'] = user['username'].strip()
+        assert len(user['username']) != 0
+        assert 'password' in user and isinstance(user['password'], str)
+        user['password'] = user['password'].strip()
+        assert len(user['password']) != 0
+        return True
+    except:
+        return False
