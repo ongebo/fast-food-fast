@@ -168,6 +168,29 @@ class Order:
         self.conn.close()
         return orders
     
+    def get_specific_order(self, order_id):
+        self.connect_to_db()
+        self.cursor.execute('SELECT * FROM orders WHERE public_id = %s', (order_id, ))
+        record = self.cursor.fetchone()
+        if not record:
+            raise Exception('No order with id {} exists!'.format(order_id))
+        order = dict()
+        items = list()
+        self.cursor.execute(
+            'SELECT item, quantity, cost FROM order_items WHERE order_id = %s',
+            (record[0], )
+        )
+        for item in self.cursor.fetchall():
+            item = {'item': item[0], 'quantity': item[1], 'cost': item[2]}
+            items.append(item)
+        order['items'] = items
+        order['order-id'] = record[1]
+        order['customer'] = record[2]
+        order['status'] = record[3]
+        order['total-cost'] = record[4]
+        self.conn.close()
+        return order
+    
     def is_admin(self, user):
         self.connect_to_db()
         self.cursor.execute('SELECT admin FROM users WHERE username = %s', (user, ))
