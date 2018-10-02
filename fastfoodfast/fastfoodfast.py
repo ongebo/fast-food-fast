@@ -1,13 +1,14 @@
 from flask import Flask, request, jsonify, Response
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
-from .models import User
+from .models import User, Order
 
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'secret-key'
 jwt = JWTManager(app)
 user_model = User()
+order_model = Order()
 
 
 @app.route('/api/v1/auth/signup', methods=['POST'])
@@ -37,9 +38,38 @@ def login_a_user():
 
 
 @app.route('/api/v1/users/orders', methods=['POST'])
+@jwt_required
 def place_new_order_for_food():
     """Adds a new order for food to the database"""
-    pass
+    try:
+        order = request.get_json()
+        customer = get_jwt_identity()
+        created_order = order_model.create_order(order, customer)
+        return jsonify(created_order), 201
+    except:
+        help_text = """
+        You posted invalid data for an order. Ensure you follow these rules:
+        
+        1. order should have the format:
+        {
+            'items': [
+                {'item': '<item-name>', 'quantity': <number>, 'cost': <number>},
+                {'item': '<item-name>', 'quantity': <number>, 'cost': <number>}
+            ],
+            'status': 'order-status',
+            'total-cost': number,
+            'order-id': number
+            
+        }
+        status: can be 'pending', 'accepted' or 'complete'
+        status, total-cost, and order-id are optional
+        items: compulsory
+        
+        2. <item-name> cannot be an empty string, and can only contain letters, numbers and spaces
+        3. <number> for 'quantity' and 'cost' cannot be zero or negative
+        """
+        response = Response(help_text, status=400, mimetype='text/plain')
+        return response
 
 
 @app.route('/api/v1/users/orders', methods=['GET'])
