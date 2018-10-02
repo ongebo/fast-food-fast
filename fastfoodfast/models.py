@@ -112,3 +112,30 @@ class Order:
             return new_order
         else:
             raise Exception
+    
+    def get_order_history(self, customer):
+        self.connect_to_db()
+        self.cursor.execute(
+            'SELECT id, public_id, status, total_cost FROM orders WHERE customer = %s',
+            (customer, )
+        )
+        records = self.cursor.fetchall()
+        if not records:
+            raise Exception('No orders made by {}'.format(customer))
+        orders = list()
+        for record in records:
+            order = dict()
+            order['order-id'] = record[1]
+            order['status'] = record[2]
+            order['total-cost'] = record[3]
+            self.cursor.execute(
+                'SELECT item, quantity, cost FROM order_items WHERE order_id = %s',
+                (record[0], )
+            )
+            items = list()
+            for item in self.cursor.fetchall():
+                item = {'item': item[0], 'quantity': item[1], 'cost': item[2]}
+                items.append(item)
+            order['items'] = items
+            orders.append(order)
+        return orders
