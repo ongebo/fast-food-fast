@@ -99,3 +99,25 @@ def test_model_raises_exception_given_invalid_order_data():
     order_model = Order()
     with pytest.raises(Exception):
         order_model.create_order([], 'jon snow')
+
+
+def test_model_can_get_order_history_for_a_given_customer(database_connection):
+    order_model = Order()
+    order_1 = {'items': [{'item': 'pizza', 'quantity': 2, 'cost': 40000}]}
+    order_2 = {'items': [{'item': 'hamburger', 'quantity': 1, 'cost': 10000}]}
+    created_order1 = order_model.create_order(order_1, 'luke skywalker')
+    created_order2 = order_model.create_order(order_2, 'luke skywalker')
+    orders = order_model.get_order_history('luke skywalker')
+    assert created_order1 in orders and created_order2 in orders
+    cursor = database_connection.cursor()
+    cursor.execute('DELETE FROM order_items WHERE item = %s', ('pizza', ))
+    cursor.execute('DELETE FROM order_items WHERE item = %s', ('hamburger', ))
+    cursor.execute('DELETE FROM orders WHERE customer = %s', ('luke skywalker', ))
+    database_connection.commit()
+    database_connection.close()
+
+
+def test_model_raises_exception_when_no_orders_have_been_made_by_a_user():
+    order_model = Order()
+    with pytest.raises(Exception):
+        order_model.get_order_history('museveni')
