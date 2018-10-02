@@ -21,7 +21,7 @@ install:
     - pip install flask-jwt-extended
 
 script:
-    - python db_setup.py
+    - python fastfoodfast/db_setup.py
     - pytest --cov=fastfoodfast
 
 after_success:
