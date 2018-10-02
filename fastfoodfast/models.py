@@ -15,9 +15,12 @@ Ensure you follow these rules when providing user sign up data.
 
 
 class User:
-    def __init__(self):
+    def __init__(self, db='fffdb'):
+        self.database = db
+
+    def connect_to_db(self):
         self.conn = psycopg2.connect(
-            database='fffdb',
+            database=self.database,
             user='ongebo',
             password='nothing',
             host='127.0.0.1',
@@ -27,6 +30,7 @@ class User:
 
     def register_user(self, user):
         if validate_user(user):
+            self.connect_to_db()
             self.cursor.execute('SELECT username FROM users')
             for record in self.cursor.fetchall():
                 if user['username'] in record:
@@ -44,3 +48,19 @@ class User:
             return new_user
         else:
             raise Exception(expected_user_data_format)
+    
+    def get_user(self, username):
+        if not isinstance(username, str):
+            raise Exception('Username must be a string')
+        self.connect_to_db()
+        self.cursor.execute(
+            "SELECT username, password FROM users WHERE username = '{}'".format(username)
+        )
+        result = self.cursor.fetchone()
+        self.conn.close()
+        if not result:
+            raise Exception('No user with name "{}" exists'.format(username))
+        user = dict()
+        user['username'] = result[0]
+        user['password'] = result[1]
+        return user
