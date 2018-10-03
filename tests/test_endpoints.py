@@ -113,6 +113,7 @@ def test_api_returns_user_order_history(test_client, connection):
     assert response_3.get_json() in response_5.get_json()['orders']
     assert response_4.get_json() in response_5.get_json()['orders']
     cursor = connection.cursor()
+    cursor.execute('DELETE FROM users WHERE username = %s', ('steve rodgers', ))
     cursor.execute('DELETE FROM order_items WHERE item = %s', ('hot dog', ))
     cursor.execute('DELETE FROM order_items WHERE item = %s', ('salad', ))
     cursor.execute('DELETE FROM orders WHERE customer = %s', ('steve rodgers', ))
