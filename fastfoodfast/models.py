@@ -191,6 +191,22 @@ class Order:
         self.conn.close()
         return order
     
+    def update_order_status(self, order_id, status):
+        if not self.get_specific_order(order_id):
+            raise Exception('The specified order does not exist!')
+        if validate_order(status):
+            if 'status' not in status:
+                raise Exception('No status specified!')
+            self.connect_to_db()
+            self.cursor.execute(
+                'UPDATE orders SET (status = %s) WHERE order_id = %s',
+                (status['status'], order_id)
+            )
+            self.conn.commit()
+            self.conn.close()
+        else:
+            raise Exception('Invalid data!')
+    
     def is_admin(self, user):
         self.connect_to_db()
         self.cursor.execute('SELECT admin FROM users WHERE username = %s', (user, ))
