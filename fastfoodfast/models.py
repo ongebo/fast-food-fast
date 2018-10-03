@@ -230,4 +230,14 @@ class Menu:
         self.cursor = self.conn.cursor()
 
     def get_food_menu(self):
-        pass
+        self.connect_to_db()
+        self.cursor.execute(
+            'SELECT item, unit, rate FROM menu'
+        )
+        menu_items = self.cursor.fetchall()
+        if not menu_items:
+            raise Exception('The food menu is empty')
+        menu = list()
+        for item in menu_items:
+            menu.append({'item': item[0], 'unit': item[1], 'rate': item[2]})
+        return menu
