@@ -2,6 +2,7 @@ import psycopg2, uuid
 from .validation import validate_user, validate_order, validate_menu_item
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
 expected_user_data_format = """
 Ensure you follow these rules when providing user sign up data.
 
