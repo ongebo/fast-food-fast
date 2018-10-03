@@ -1,5 +1,5 @@
 import psycopg2, uuid
-from .validation import validate_user, validate_order
+from .validation import validate_user, validate_order, validate_menu_item
 from werkzeug.security import generate_password_hash, check_password_hash
 
 expected_user_data_format = """
@@ -241,3 +241,13 @@ class Menu:
         for item in menu_items:
             menu.append({'item': item[0], 'unit': item[1], 'rate': item[2]})
         return menu
+    
+    def add_menu_item(self, menu_item):
+        validate_menu_item(menu_item)
+        self.connect_to_db()
+        self.cursor.execute(
+            'INSERT INTO menu (item, unit, rate) VALUES (%s, %s, %s)',
+            (menu_item['item'], menu_item['unit'], menu_item['rate'])
+        )
+        self.conn.commit()
+        self.conn.close()
