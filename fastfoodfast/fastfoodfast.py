@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, Response
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
-from .models import User, Order
+from .models import User, Order, Menu
 
 
 app = Flask(__name__)
@@ -9,6 +9,7 @@ app.config['JWT_SECRET_KEY'] = 'secret-key'
 jwt = JWTManager(app)
 user_model = User()
 order_model = Order()
+menu_model = Menu
 
 
 @app.route('/api/v1/auth/signup', methods=['POST'])
@@ -125,9 +126,14 @@ def update_order_status(order_id):
 
 
 @app.route('/api/v1/menu', methods=['GET'])
+@jwt_required
 def get_food_items():
     """Retrieves all the available food items in the menu"""
-    pass
+    try:
+        menu = menu_model.get_food_menu()
+        return jsonify({'menu': menu}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 404
 
 
 @app.route('/api/v1/menu', methods=['POST'])
