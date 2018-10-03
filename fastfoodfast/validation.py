@@ -71,13 +71,13 @@ def validate_user(user):
 
 def validate_menu_item(menu_item):
     assert isinstance(menu_item, dict), 'Invalid format for menu item, it should be a dictionary'
-    assert 'item' in menu_item and isinstance(menu_item['item'], dict), 'Define item as a string'
+    assert 'item' in menu_item and isinstance(menu_item['item'], str), 'Define item as a string'
     menu_item['item'] = menu_item['item'].strip()
     if len(menu_item['item']) == 0:
         raise Exception('Item name cannot be empty!')
     for c in menu_item['item']:
         if not c.isalnum() and not c.isspace():
             raise Exception('Item name can only contain letters, numbers and spaces')
-    assert 'unit' in menu_item and float(menu_item['unit']), 'Specify correct item unit'
+    assert 'unit' in menu_item and isinstance(menu_item['unit'], str), 'Specify correct item unit'
     assert 'rate' in menu_item and float(menu_item['rate']), 'Specify correc item rate'
     assert len(menu_item) == 3, 'Redundant data specified for menu item'
