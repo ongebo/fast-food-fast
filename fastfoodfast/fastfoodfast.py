@@ -137,9 +137,17 @@ def get_food_items():
 
 
 @app.route('/api/v1/menu', methods=['POST'])
+@jwt_required
 def add_menu_item():
     """Adds a new food menu item to the database"""
-    pass
+    try:
+        if not order_model.is_admin(get_jwt_identity()):
+            return jsonify({'message': 'you are not an administrator'}), 401
+        menu_item = request.get_json()
+        menu_model.add_menu_item(menu_item)
+        return jsonify({'message': 'correctly created new menu item'}), 201
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 
 @app.errorhandler(404)
