@@ -9,7 +9,7 @@ app.config['JWT_SECRET_KEY'] = 'secret-key'
 jwt = JWTManager(app)
 user_model = User()
 order_model = Order()
-menu_model = Menu
+menu_model = Menu()
 
 
 @app.route('/api/v1/auth/signup', methods=['POST'])
