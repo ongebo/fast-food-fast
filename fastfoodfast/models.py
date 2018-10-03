@@ -213,3 +213,21 @@ class Order:
         value = self.cursor.fetchone()[0]
         self.conn.close()
         return value
+
+
+class Menu:
+    def __init__(self, db='fffdb'):
+        self.database = db
+
+    def connect_to_db(self):
+        self.conn = psycopg2.connect(
+            database=self.database,
+            user='ongebo',
+            password='nothing',
+            host='127.0.0.1',
+            port='5432'
+        )
+        self.cursor = self.conn.cursor()
+
+    def get_food_menu(self):
+        pass
