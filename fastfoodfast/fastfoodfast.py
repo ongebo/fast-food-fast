@@ -107,13 +107,21 @@ def get_specific_order(order_id):
         order = order_model.get_specific_order(order_id)
         return jsonify({'order': order})
     except Exception as e:
-        return jsonify({'message': str(e)})
+        return jsonify({'message': str(e)}), 404
 
 
 @app.route('/api/v1/orders/<order_id>', methods=['PUT'])
+@jwt_required
 def update_order_status(order_id):
     """Updates the status of an order in the database"""
-    pass
+    try:
+        status = request.get_json()
+        if not order_model.is_admin(get_jwt_identity()):
+            return jsonify({'message': 'only admin can update order status'}), 401
+        order_model.update_order_status(order_id, status)
+        return jsonify({'message': 'successfully updated order status'})
+    except Exception as e:
+        return jsonify({'message': str(e)}), 400
 
 
 @app.route('/api/v1/menu', methods=['GET'])
