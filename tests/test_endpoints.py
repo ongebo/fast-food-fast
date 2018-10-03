@@ -120,3 +120,18 @@ def test_api_returns_user_order_history(test_client, connection):
     cursor.execute("DELETE FROM orders WHERE customer = '{}'".format('steve rodgers'))
     connection.commit()
     connection.close()
+
+
+def test_api_returns_message_when_getting_non_existent_order_history(test_client, connection):
+    user = {'username': 'winter soldier', 'password': 'soldier'}
+    response = test_client.post('/api/v1/auth/signup', json=user)
+    response = test_client.post('/api/v1/auth/login', json=user)
+    token = response.get_json()['token']
+    headers = {'Authorization': 'Bearer ' + token}
+    response = test_client.get('/api/v1/users/orders', headers=headers)
+    assert response.status_code == 404
+    assert 'message' in response.get_json()
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM users WHERE username = %s', ('winter soldier', ))
+    connection.commit()
+    connection.close()
