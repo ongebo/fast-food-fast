@@ -1,8 +1,9 @@
 import psycopg2, uuid
-from .validation import validate_user, validate_order, validate_menu_item, validate_status_data
+from .validation import Validation
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
+validator = Validation()
 expected_user_data_format = """
 Ensure you follow these rules when providing user sign up data.
 
@@ -30,7 +31,7 @@ class User:
         self.cursor = self.conn.cursor()
 
     def register_user(self, user):
-        if validate_user(user):
+        if validator.validate_user(user):
             self.connect_to_db()
             self.cursor.execute('SELECT username FROM users')
             for record in self.cursor.fetchall():
@@ -83,7 +84,7 @@ class Order:
 
     def create_order(self, order, customer):
         """Adds a new order to the database"""
-        if validate_order(order):
+        if validator.validate_order(order):
             new_order = dict()
             new_order['items'] = order['items']
             new_order['status'] = 'new'
@@ -195,7 +196,7 @@ class Order:
     def update_order_status(self, order_id, status):
         if not self.get_specific_order(order_id):
             raise Exception('The specified order does not exist!')
-        validate_status_data(status)
+        validator.validate_status_data(status)
         self.connect_to_db()
         self.cursor.execute(
             'UPDATE orders SET status = %s WHERE public_id = %s',
@@ -240,7 +241,7 @@ class Menu:
         return menu
     
     def add_menu_item(self, menu_item):
-        validate_menu_item(menu_item)
+        validator.validate_menu_item(menu_item)
         self.connect_to_db()
         self.cursor.execute(
             'INSERT INTO menu (item, unit, rate) VALUES (%s, %s, %s)',
