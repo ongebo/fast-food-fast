@@ -1,4 +1,5 @@
 import psycopg2
+from werkzeug.security import generate_password_hash
 
 
 def create_tables(conn):
@@ -13,6 +14,12 @@ def create_tables(conn):
             Admin BOOLEAN NOT NULL
         );
         """
+    )
+    cursor.execute(
+        """
+        INSERT INTO users (username, password, admin) VALUES (%s, %s, %s)
+        """,
+        ('admin', generate_password_hash('administrator', method='sha256'), True)
     )
     cursor.execute(
         """
