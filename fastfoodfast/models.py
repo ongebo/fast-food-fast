@@ -1,5 +1,5 @@
 import psycopg2, uuid
-from .validation import validate_user, validate_order, validate_menu_item
+from .validation import validate_user, validate_order, validate_menu_item, validate_status_data
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -86,7 +86,7 @@ class Order:
         if validate_order(order):
             new_order = dict()
             new_order['items'] = order['items']
-            new_order['status'] = 'pending'
+            new_order['status'] = 'new'
             total_cost = 0
             for item in order['items']:
                 total_cost += float(item['cost'])
@@ -195,18 +195,14 @@ class Order:
     def update_order_status(self, order_id, status):
         if not self.get_specific_order(order_id):
             raise Exception('The specified order does not exist!')
-        if validate_order(status):
-            if 'status' not in status:
-                raise Exception('No status specified!')
-            self.connect_to_db()
-            self.cursor.execute(
-                'UPDATE orders SET (status = %s) WHERE order_id = %s',
-                (status['status'], order_id)
-            )
-            self.conn.commit()
-            self.conn.close()
-        else:
-            raise Exception('Invalid data!')
+        validate_status_data(status)
+        self.connect_to_db()
+        self.cursor.execute(
+            'UPDATE orders SET status = %s WHERE public_id = %s',
+            (status['status'], order_id)
+        )
+        self.conn.commit()
+        self.conn.close()
     
     def is_admin(self, user):
         self.connect_to_db()
