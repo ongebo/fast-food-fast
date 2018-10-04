@@ -132,3 +132,18 @@ def test_model_can_add_new_menu_item_to_menu_table_in_database(database_connecti
     cursor.execute('DELETE FROM menu WHERE item = %s', ('chicken', ))
     database_connection.commit()
     database_connection.close()
+
+
+def test_model_can_return_list_of_food_items_in_the_menu(database_connection):
+    menu_model = Menu()
+    item_1 = {'item': 'chapati', 'unit': 'piece', 'rate': 1000}
+    item_2 = {'item': 'samosa', 'unit': 'pack', 'rate': 5000}
+    menu_model.add_menu_item(item_1)
+    menu_model.add_menu_item(item_2)
+    menu = menu_model.get_food_menu()
+    assert item_1 in menu and item_2 in menu
+    cursor = database_connection.cursor()
+    cursor.execute('DELETE FROM menu WHERE item = %s', ('chapati', ))
+    cursor.execute('DELETE FROM menu WHERE item = %s', ('samosa', ))
+    database_connection.commit()
+    database_connection.close()
