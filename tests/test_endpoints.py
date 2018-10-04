@@ -20,6 +20,23 @@ def connection():
     return conn
 
 
+def register_and_login_user(name, password, test_client):
+    user_data = {'username': name, 'password': password}
+    test_client.post('/api/v1/auth/signup', json=user_data)
+    response = test_client.post('/api/v1/auth/login', json=user_data)
+    token = response.get_json()['token']
+    headers = {'Authorization': 'Bearer ' + token}
+    return headers
+
+
+def login_administrator(test_client):
+    admin = {'username': 'admin', 'password': 'administrator'}
+    response = test_client.post('/api/v1/auth/login', json=admin)
+    token = response.get_json()['token']
+    headers = {'Authorization': 'Bearer ' + token}
+    return headers
+
+
 def test_api_correctly_registers_a_user(test_client, connection):
     user_data = {'username': 'John Doe', 'password': 'JonathanDoe'}
     response = test_client.post('/api/v1/auth/signup', json=user_data)
@@ -133,5 +150,22 @@ def test_api_returns_message_when_getting_non_existent_order_history(test_client
     assert 'message' in response.get_json()
     cursor = connection.cursor()
     cursor.execute('DELETE FROM users WHERE username = %s', ('winter soldier', ))
+    connection.commit()
+    connection.close()
+
+
+def test_admin_can_get_a_specific_order_by_id(test_client, connection):
+    headers = login_administrator(test_client)
+    order = {'items': [{'item': 'rolex', 'quantity': 2, 'cost': 2000}]}
+    response = test_client.post('/api/v1/users/orders', json=order, headers=headers)
+    order_id = response.get_json()['order-id']
+    response_2 = test_client.get('/api/v1/orders/{}'.format(order_id), headers=headers)
+    assert response.status_code == 201
+    assert response_2.status_code == 200
+    assert response.get_json()['order-id'] == response_2.get_json()['order-id']
+    assert response.get_json()['status'] == response_2.get_json()['status']
+    assert response.get_json()['total-cost'] == response_2.get_json()['total-cost']
+    connection.cursor().execute('DELETE FROM order_items WHERE item = %s', ('rolex', ))
+    connection.cursor().execute('DELETE FROM orders WHERE customer = %s', ('admin', ))
     connection.commit()
     connection.close()
