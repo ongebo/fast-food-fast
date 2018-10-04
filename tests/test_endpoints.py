@@ -62,7 +62,7 @@ def test_api_correctly_logs_in_registered_user(test_client, connection):
     response = test_client.post('/api/v1/auth/signup', json=user_data)
     assert response.status_code == 201
     response_2 = test_client.post('/api/v1/auth/login', json=user_data)
-    assert response_2.status_code == 201
+    assert response_2.status_code == 200
     assert 'token' in response_2.get_json()
     connection.cursor().execute("DELETE FROM users WHERE username = 'Jon Snow'")
     connection.commit()
@@ -82,7 +82,7 @@ def test_api_can_place_an_order_for_food(test_client, connection):
     assert response_1.status_code == 201
     response_2 = test_client.post('/api/v1/auth/login', json=user_data)
     data = response_2.get_json()
-    assert response_2.status_code == 201 and 'token' in data
+    assert response_2.status_code == 200 and 'token' in data
     order = {'items': [{'item': 'pizza', 'quantity': 1, 'cost': 20000}]}
     headers = {'Authorization': 'Bearer ' + data['token']}
     response_3 = test_client.post('/api/v1/users/orders', json=order, headers=headers)
@@ -104,7 +104,7 @@ def test_api_returns_error_message_given_incorrect_post_order_data(test_client, 
     headers = {'Authorization': 'Bearer ' + data['token']}
     response_3 = test_client.post('/api/v1/users/orders', json={}, headers=headers)
     assert response_1.status_code == 201
-    assert response_2.status_code == 201
+    assert response_2.status_code == 200
     assert response_3.status_code == 400
     assert b'invalid data' in response_3.data
     cursor = connection.cursor()
@@ -124,7 +124,7 @@ def test_api_returns_user_order_history(test_client, connection):
     response_3 = test_client.post('/api/v1/users/orders', json=order_1, headers=headers)
     response_4 = test_client.post('/api/v1/users/orders', json=order_2, headers=headers)
     response_5 = test_client.get('/api/v1/users/orders', headers=headers)
-    assert response_1.status_code == 201 and response_2.status_code == 201
+    assert response_1.status_code == 201 and response_2.status_code == 200
     assert response_3.status_code == 201 and response_4.status_code == 201
     assert response_5.status_code == 200
     assert response_3.get_json() in response_5.get_json()['orders']
