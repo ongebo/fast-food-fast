@@ -169,3 +169,22 @@ def test_admin_can_get_a_specific_order_by_id(test_client, connection):
     connection.cursor().execute('DELETE FROM orders WHERE customer = %s', ('admin', ))
     connection.commit()
     connection.close()
+
+
+def test_admin_can_update_order_status(test_client, connection):
+    headers_1 = register_and_login_user('quill', 'starlord', test_client)
+    order = {'items': [{'item': 'milk', 'quantity': 1, 'cost': 5000}]}
+    response_1 = test_client.post('/api/v1/users/orders', json=order, headers=headers_1)
+    order_id = response_1.get_json()['order-id']
+    headers_2 = login_administrator(test_client)
+    response_3 = test_client.put(
+        '/api/v1/orders/{}'.format(order_id), headers=headers_2, json={'status': 'processing'}
+    )
+    response_3 = test_client.get('/api/v1/orders/{}'.format(order_id), headers=headers_2)
+    assert response_3.status_code == 200
+    assert response_3.get_json()['status'] == 'processing'
+    connection.cursor().execute('DELETE FROM order_items WHERE item = %s', ('milk', ))
+    connection.cursor().execute('DELETE FROM orders WHERE customer = %s', ('quill', ))
+    connection.commit()
+    connection.close()
+
