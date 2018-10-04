@@ -72,7 +72,7 @@ def setup_testdb():
 
 
 def main():
-    if sys.argv[1] == 'testdb':
+    if len(sys.argv) == 2 and sys.argv[1] == 'testdb':
         setup_testdb()
         print('Test database tables successfully setup...')
         return
