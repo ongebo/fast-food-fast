@@ -1,17 +1,13 @@
-import pytest, psycopg2
+import pytest, psycopg2, os
 from fastfoodfast.models import User, Order
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
 @pytest.fixture
 def database_connection():
-    conn = psycopg2.connect(
-        database='fffdb',
-        user='ongebo',
-        password='nothing',
-        host='127.0.0.1',
-        port='5432'
-    )
+    database_url = 'postgres://ongebo:nothing@127.0.0.1:5432/testdb'
+    os.environ['DATABASE_URL'] = database_url
+    conn = psycopg2.connect(database_url)
     return conn
 
 
@@ -67,7 +63,7 @@ def test_model_can_get_a_specific_user_by_username_from_db(database_connection):
     database_connection.close()
 
 
-def test_model_raises_exception_when_retrieving_non_existent_user():
+def test_model_raises_exception_when_retrieving_non_existent_user(database_connection):
     user_model = User()
     with pytest.raises(Exception):
         user_model.get_user('Non-existent user!')
@@ -95,7 +91,7 @@ def test_model_can_add_a_new_order_to_the_database(database_connection):
     database_connection.close()
 
 
-def test_model_raises_exception_given_invalid_order_data():
+def test_model_raises_exception_given_invalid_order_data(database_connection):
     order_model = Order()
     with pytest.raises(Exception):
         order_model.create_order([], 'jon snow')
@@ -117,7 +113,7 @@ def test_model_can_get_order_history_for_a_given_customer(database_connection):
     database_connection.close()
 
 
-def test_model_raises_exception_when_no_orders_have_been_made_by_a_user():
+def test_model_raises_exception_when_no_orders_have_been_made_by_a_user(database_connection):
     order_model = Order()
     with pytest.raises(Exception):
         order_model.get_order_history('museveni')
