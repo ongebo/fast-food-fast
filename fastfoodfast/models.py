@@ -1,4 +1,4 @@
-import psycopg2, uuid
+import psycopg2, uuid, os
 from .validation import Validation
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -21,13 +21,7 @@ class User:
         self.database = db
 
     def connect_to_db(self):
-        self.conn = psycopg2.connect(
-            database='d5jo22paor1da',
-            user='vlsqrnuumjhsuk',
-            password='5ff59ac500be77e9bb4ac04845bc82343f3807728f6016b749a03457b2be650f',
-            host='ec2-54-225-68-133.compute-1.amazonaws.com',
-            port='5432'
-        )
+        self.conn = psycopg2.connect(os.getenv('DATABASE_URL'))
         self.cursor = self.conn.cursor()
 
     def register_user(self, user):
@@ -73,13 +67,7 @@ class Order:
         self.database = db
     
     def connect_to_db(self):
-        self.conn = psycopg2.connect(
-            database='d5jo22paor1da',
-            user='vlsqrnuumjhsuk',
-            password='5ff59ac500be77e9bb4ac04845bc82343f3807728f6016b749a03457b2be650f',
-            host='ec2-54-225-68-133.compute-1.amazonaws.com',
-            port='5432'
-        )
+        self.conn = psycopg2.connect(os.getenv('DATABASE_URL'))
         self.cursor = self.conn.cursor()
 
     def create_order(self, order, customer):
@@ -218,13 +206,7 @@ class Menu:
         self.database = db
 
     def connect_to_db(self):
-        self.conn = psycopg2.connect(
-            database='d5jo22paor1da',
-            user='vlsqrnuumjhsuk',
-            password='5ff59ac500be77e9bb4ac04845bc82343f3807728f6016b749a03457b2be650f',
-            host='ec2-54-225-68-133.compute-1.amazonaws.com',
-            port='5432'
-        )
+        self.conn = psycopg2.connect(os.getenv('DATABASE_URL'))
         self.cursor = self.conn.cursor()
 
     def get_food_menu(self):
