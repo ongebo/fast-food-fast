@@ -103,7 +103,7 @@ def get_all_orders():
 def get_specific_order(order_id):
     """Retrieves a specific food order from the database"""
     try:
-        if not order_model.is_admin(get_jwt_identity):
+        if not order_model.is_admin(get_jwt_identity()):
             return jsonify({'message': 'only admin can fetch a specific order'}), 401
         order = order_model.get_specific_order(order_id)
         return jsonify({'order': order})
