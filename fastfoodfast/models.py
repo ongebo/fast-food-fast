@@ -22,10 +22,10 @@ class User:
 
     def connect_to_db(self):
         self.conn = psycopg2.connect(
-            database=self.database,
-            user='ongebo',
-            password='nothing',
-            host='127.0.0.1',
+            database='d5jo22paor1da',
+            user='vlsqrnuumjhsuk',
+            password='5ff59ac500be77e9bb4ac04845bc82343f3807728f6016b749a03457b2be650f',
+            host='ec2-54-225-68-133.compute-1.amazonaws.com',
             port='5432'
         )
         self.cursor = self.conn.cursor()
@@ -74,10 +74,10 @@ class Order:
     
     def connect_to_db(self):
         self.conn = psycopg2.connect(
-            database=self.database,
-            user='ongebo',
-            password='nothing',
-            host='127.0.0.1',
+            database='d5jo22paor1da',
+            user='vlsqrnuumjhsuk',
+            password='5ff59ac500be77e9bb4ac04845bc82343f3807728f6016b749a03457b2be650f',
+            host='ec2-54-225-68-133.compute-1.amazonaws.com',
             port='5432'
         )
         self.cursor = self.conn.cursor()
@@ -219,10 +219,10 @@ class Menu:
 
     def connect_to_db(self):
         self.conn = psycopg2.connect(
-            database=self.database,
-            user='ongebo',
-            password='nothing',
-            host='127.0.0.1',
+            database='d5jo22paor1da',
+            user='vlsqrnuumjhsuk',
+            password='5ff59ac500be77e9bb4ac04845bc82343f3807728f6016b749a03457b2be650f',
+            host='ec2-54-225-68-133.compute-1.amazonaws.com',
             port='5432'
         )
         self.cursor = self.conn.cursor()
