@@ -97,7 +97,7 @@ class Order:
             self.connect_to_db()
             self.cursor.execute(
                 "INSERT INTO orders (public_id, customer, status, total_cost) VALUES (%s, %s, %s, %s)",
-                (order_id, customer, 'pending', total_cost)
+                (order_id, customer, 'new', total_cost)
             )
             self.cursor.execute(
                 "SELECT id FROM orders WHERE public_id = '{}'".format(order_id)
