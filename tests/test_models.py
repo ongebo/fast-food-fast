@@ -1,5 +1,5 @@
 import pytest, psycopg2, os
-from fastfoodfast.models import User, Order
+from fastfoodfast.models import User, Order, Menu
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -117,3 +117,18 @@ def test_model_raises_exception_when_no_orders_have_been_made_by_a_user(database
     order_model = Order()
     with pytest.raises(Exception):
         order_model.get_order_history('museveni')
+
+
+def test_model_can_add_new_menu_item_to_menu_table_in_database(database_connection):
+    menu_model = Menu()
+    item = {'item': 'chicken', 'unit': 'piece', 'rate': 10000}
+    menu_model.add_menu_item(item)
+    cursor = database_connection.cursor()
+    cursor.execute('SELECT item, unit, rate FROM menu')
+    added_item = cursor.fetchone()
+    assert added_item[0] == item['item']
+    assert added_item[1] == item['unit']
+    assert added_item[2] == item['rate']
+    cursor.execute('DELETE FROM menu WHERE item = %s', ('chicken', ))
+    database_connection.commit()
+    database_connection.close()
