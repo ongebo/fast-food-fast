@@ -1,9 +1,18 @@
 """
-Validation functions for checking the correctness of data sent to the API.
+Validation code for checking the correctness of data sent to the API.
 """
 
 
-def validate_order_item(item):
+class Validation:
+    def validate_status_data(self, status_data):
+        assert isinstance(status_data, dict), 'Enter a dictionary to update status'
+        assert 'status' in status_data, 'Specify status in your request data'
+        status_data['status'] = status_data['status'].strip().lower()
+        if status_data['status'] not in ['new', 'processing', 'cancelled', 'complete']:
+            raise Exception('Specify status as new, processing, cancelled, or complete')
+        assert len(status_data) == 1, 'Redundant data in status request'
+
+    def validate_order_item(self, item):
         """Checks that an item (dictionary) in an order items list is valid"""
         try:
             dict(item)
@@ -21,15 +30,14 @@ def validate_order_item(item):
         except (AssertionError, TypeError, ValueError):
             return False
     
-
-def validate_order(order):
+    def validate_order(self, order):
         """Returns True if the data for an order is valid, False otherwise"""
         try:
             assert isinstance(order, dict)
             assert 'items' in order
             assert isinstance(order['items'], list)
             for item in order['items']:
-                assert validate_order_item(item)
+                assert self.validate_order_item(item)
             
             if len(order) == 2:
                 assert 'status' in order or 'total-cost' in order or 'order-id' in order
@@ -53,31 +61,29 @@ def validate_order(order):
             return True
         except:
             return False
-
-
-def validate_user(user):
-    try:
-        assert isinstance(user, dict)
-        assert 'username' in user
-        user['username'] = user['username'].strip()
-        assert len(user['username']) != 0
-        assert 'password' in user and isinstance(user['password'], str)
-        user['password'] = user['password'].strip()
-        assert len(user['password']) != 0
-        return True
-    except:
-        return False
-
-
-def validate_menu_item(menu_item):
-    assert isinstance(menu_item, dict), 'Invalid format for menu item, it should be a dictionary'
-    assert 'item' in menu_item and isinstance(menu_item['item'], dict), 'Define item as a string'
-    menu_item['item'] = menu_item['item'].strip()
-    if len(menu_item['item']) == 0:
-        raise Exception('Item name cannot be empty!')
-    for c in menu_item['item']:
-        if not c.isalnum() and not c.isspace():
-            raise Exception('Item name can only contain letters, numbers and spaces')
-    assert 'unit' in menu_item and float(menu_item['unit']), 'Specify correct item unit'
-    assert 'rate' in menu_item and float(menu_item['rate']), 'Specify correc item rate'
-    assert len(menu_item) == 3, 'Redundant data specified for menu item'
+    
+    def validate_user(self, user):
+        try:
+            assert isinstance(user, dict)
+            assert 'username' in user
+            user['username'] = user['username'].strip()
+            assert len(user['username']) != 0
+            assert 'password' in user and isinstance(user['password'], str)
+            user['password'] = user['password'].strip()
+            assert len(user['password']) != 0
+            return True
+        except:
+            return False
+    
+    def validate_menu_item(self, menu_item):
+        assert isinstance(menu_item, dict), 'Invalid format for menu item, it should be a dictionary'
+        assert 'item' in menu_item and isinstance(menu_item['item'], str), 'Define item as a string'
+        menu_item['item'] = menu_item['item'].strip()
+        if len(menu_item['item']) == 0:
+            raise Exception('Item name cannot be empty!')
+        for c in menu_item['item']:
+            if not c.isalnum() and not c.isspace():
+                raise Exception('Item name can only contain letters, numbers and spaces')
+        assert 'unit' in menu_item and isinstance(menu_item['unit'], str), 'Specify correct item unit'
+        assert 'rate' in menu_item and float(menu_item['rate']), 'Specify correc item rate'
+        assert len(menu_item) == 3, 'Redundant data specified for menu item'

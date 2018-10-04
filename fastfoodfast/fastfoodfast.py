@@ -33,7 +33,7 @@ def login_a_user():
         if not check_password_hash(user['password'], data['password']):
             return jsonify({'error': 'wrong password'}), 401
         token = create_access_token(identity=user['username'])
-        return jsonify({'token': token}), 201
+        return jsonify({'token': token}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
@@ -103,10 +103,10 @@ def get_all_orders():
 def get_specific_order(order_id):
     """Retrieves a specific food order from the database"""
     try:
-        if not order_model.is_admin(get_jwt_identity):
+        if not order_model.is_admin(get_jwt_identity()):
             return jsonify({'message': 'only admin can fetch a specific order'}), 401
         order = order_model.get_specific_order(order_id)
-        return jsonify({'order': order})
+        return jsonify(order), 200
     except Exception as e:
         return jsonify({'message': str(e)}), 404
 
@@ -120,7 +120,7 @@ def update_order_status(order_id):
         if not order_model.is_admin(get_jwt_identity()):
             return jsonify({'message': 'only admin can update order status'}), 401
         order_model.update_order_status(order_id, status)
-        return jsonify({'message': 'successfully updated order status'})
+        return jsonify({'message': 'successfully updated order status'}), 200
     except Exception as e:
         return jsonify({'message': str(e)}), 400
 
