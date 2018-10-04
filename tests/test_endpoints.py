@@ -183,3 +183,14 @@ def test_admin_can_update_order_status(test_client, connection):
     connection.commit()
     connection.close()
 
+
+def test_api_can_return_created_menu_item_to_admin(test_client, connection):
+    headers = login_administrator(test_client)
+    menu_item = {'item': 'spaghetti', 'unit': 'pack', 'rate': 5000}
+    test_client.post('/api/v1/menu', json=menu_item, headers=headers)
+    response = test_client.get('/api/v1/menu', headers=headers)
+    assert menu_item in response.get_json()['menu']
+    assert response.status_code == 200
+    connection.cursor().execute('DELETE FROM menu WHERE item = %s', ('spaghetti', ))
+    connection.commit()
+    connection.close
