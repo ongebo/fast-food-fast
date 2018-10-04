@@ -3,6 +3,15 @@ Validation functions for checking the correctness of data sent to the API.
 """
 
 
+def validate_status_data(status_data):
+    assert isinstance(status_data, dict), 'Enter a dictionary to update status'
+    assert 'status' in status_data, 'Specify status in your request data'
+    status_data['status'] = status_data['status'].strip().lower()
+    if status_data['status'] not in ['new', 'processing', 'cancelled', 'complete']:
+        raise Exception('Specify status as new, processing, cancelled, or complete')
+    assert len(status_data) == 1, 'Redundant data in status request'
+
+
 def validate_order_item(item):
         """Checks that an item (dictionary) in an order items list is valid"""
         try:
