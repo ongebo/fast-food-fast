@@ -25,15 +25,19 @@ Admins are able to:
 * accept or decline food orders
 * mark food orders as completed
 ### API Description
-The backend of Fast-Food-Fast is powered by a RESTful API implemented in Flask, a python web microframework. Version 1 of the API is hosted on Heroku and the home page can be accessed at: https://gbo-fast-food-fast.herokuapp.com. The functionality of the API with corresponding endpoints is described below:
+The backend of Fast-Food-Fast is powered by a RESTful API implemented in Flask, a python web microframework. Version 1 of the API is hosted on Heroku and the home page can be accessed at: https://gbo-fff-with-db.herokuapp.com. The functionality of the API with corresponding endpoints is described below:
 
 Endpoint                           | Function
 -----------------------------------|------------------------------------------------
-GET /api/v1/orders                 | Returns orders in JSON format
-GET /api/v1/orders/\<orderID\>     | Returns a specific order in JSON
-POST /api/v1/orders                | Creates a new order
-PUT /api/v1/orders/\<orderID\>     | Updates the status of the order with specified ID
-DELETE /api/v1/orders/\<orderID\>  | Deletes the order having the specified ID
+POST /api/v1/auth/signup           | Registers a user to the database
+POST /api/v1/auth/login            | Logs in a registered user
+POST /api/v1/users/orders          | Creates a new user order for food
+GET /api/v1/users/orders           | Fetches the order history of a user
+GET /api/v1/orders/                | Gets all orders in the database (only for admins)
+GET /api/v1/orders/\<orderID\>     | Gets a specific order by ID (only for admins)
+PUT /api/v1/orders/\<orderID\>     | Updates the status of a specified user (only for admins)
+GET /api/v1/menu                   | Retrieves the food items available on the menu
+POST /api/v1/menu                  | Adds a new food item to the menu (only for admins)
 
 When using the API, an example order is represented in JSON as:
 ```javascript
@@ -55,16 +59,16 @@ Points to note:
 ## Installation Instructions
 To run the application, follow these steps:
 * Install python 3 and Postman on your local machine
-* Clone this repository and checkout to the api branch
+* Clone this repository and checkout to the api-with-db branch
 * Navigate to the repository root (fast-food-fast) and create a virtual environment
 ```
 $ cd fast-food-fast
 $ python3 -m venv venv
 ```
-* Activate the virtual environment and install flask
+* Activate the virtual environment and install dependencies in requirements.txt
 ```
 $ . venv/bin/activate
-$ pip install flask
+$ pip install -r requirements.txt
 ```
 * Run the run.py script
 ```
