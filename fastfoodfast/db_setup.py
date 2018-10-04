@@ -62,10 +62,10 @@ def create_tables(conn):
 
 def setup_testdb():
     conn = psycopg2.connect(
-        database='d5jo22paor1da',
-        user='vlsqrnuumjhsuk',
-        password='5ff59ac500be77e9bb4ac04845bc82343f3807728f6016b749a03457b2be650f',
-        host='ec2-54-225-68-133.compute-1.amazonaws.com',
+        database='testdb',
+        user='ongebo',
+        password='nothing',
+        host='127.0.0.1',
         port='5432'
     )
     create_tables(conn)
