@@ -1,4 +1,4 @@
-import psycopg2, uuid
+import psycopg2, uuid, os
 from .validation import Validation
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -21,13 +21,7 @@ class User:
         self.database = db
 
     def connect_to_db(self):
-        self.conn = psycopg2.connect(
-            database=self.database,
-            user='ongebo',
-            password='nothing',
-            host='127.0.0.1',
-            port='5432'
-        )
+        self.conn = psycopg2.connect(os.getenv('DATABASE_URL'))
         self.cursor = self.conn.cursor()
 
     def register_user(self, user):
@@ -73,13 +67,7 @@ class Order:
         self.database = db
     
     def connect_to_db(self):
-        self.conn = psycopg2.connect(
-            database=self.database,
-            user='ongebo',
-            password='nothing',
-            host='127.0.0.1',
-            port='5432'
-        )
+        self.conn = psycopg2.connect(os.getenv('DATABASE_URL'))
         self.cursor = self.conn.cursor()
 
     def create_order(self, order, customer):
@@ -218,13 +206,7 @@ class Menu:
         self.database = db
 
     def connect_to_db(self):
-        self.conn = psycopg2.connect(
-            database=self.database,
-            user='ongebo',
-            password='nothing',
-            host='127.0.0.1',
-            port='5432'
-        )
+        self.conn = psycopg2.connect(os.getenv('DATABASE_URL'))
         self.cursor = self.conn.cursor()
 
     def get_food_menu(self):

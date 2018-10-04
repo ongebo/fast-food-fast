@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg2, os, sys
 from werkzeug.security import generate_password_hash
 
 
@@ -72,15 +72,13 @@ def setup_testdb():
 
 
 def main():
+    if len(sys.argv) == 2 and sys.argv[1] == 'testdb':
+        setup_testdb()
+        print('Test database tables successfully setup...')
+        return
     conn = None
     try:
-        conn = psycopg2.connect(
-                database='fffdb',
-                user='ongebo',
-                password='nothing',
-                host='127.0.0.1',
-                port='5432'
-            )
+        conn = psycopg2.connect(os.getenv('DATABASE_URL'))
     except:
         print('Could not establish connection to database...')
         return
