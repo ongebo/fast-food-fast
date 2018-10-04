@@ -85,7 +85,7 @@ def test_model_can_add_a_new_order_to_the_database(database_connection):
         'SELECT * FROM orders WHERE public_id = %s', (created_order['order-id'], )
     )
     result = cursor.fetchone()
-    assert 'skywalker' in result and 'pending' in result
+    assert 'skywalker' in result and 'new' in result
     cursor.execute('SELECT * FROM order_items')
     result = cursor.fetchone()
     assert 'pizza' in result and 1.0 in result and 18000 in result
