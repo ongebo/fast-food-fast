@@ -1,22 +1,17 @@
-import pytest, psycopg2
+import pytest, psycopg2, os
 from fastfoodfast import app
 from werkzeug.security import check_password_hash
 
 
 @pytest.fixture
 def test_client():
+    os.environ['DATABASE_URL'] = 'postgres://ongebo:nothing@127.0.0.1:5432/testdb'
     return app.test_client()
 
 
 @pytest.fixture
 def connection():
-    conn = psycopg2.connect(
-        database='fffdb',
-        user='ongebo',
-        password='nothing',
-        host='127.0.0.1',
-        port='5432'
-    )
+    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
     return conn
 
 
