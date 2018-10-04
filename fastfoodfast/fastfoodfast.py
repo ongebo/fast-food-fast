@@ -106,7 +106,7 @@ def get_specific_order(order_id):
         if not order_model.is_admin(get_jwt_identity()):
             return jsonify({'message': 'only admin can fetch a specific order'}), 401
         order = order_model.get_specific_order(order_id)
-        return jsonify({'order': order})
+        return jsonify(order), 200
     except Exception as e:
         return jsonify({'message': str(e)}), 404
 
