@@ -73,7 +73,11 @@ def test_model_raises_exception_when_retrieving_non_existent_user(database_conne
 
 def test_model_can_add_a_new_order_to_the_database(database_connection):
     order_model = Order()
-    order = {'items': [{'item': 'pizza', 'quantity': 1, 'cost': 18000}]}
+    order = {
+        'items': [{'item': 'pizza', 'quantity': 1, 'cost': 18000}],
+        'status': 'pending',
+        'total-cost': 18000
+    }
     created_order = order_model.create_order(order, 'skywalker')
     assert 'order-id' in created_order and 'status' in created_order
     cursor = database_connection.cursor()
