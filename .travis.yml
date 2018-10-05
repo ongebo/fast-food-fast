@@ -22,7 +22,7 @@ install:
     - pip install flasgger
 
 script:
-    - python fastfoodfast/db_setup.py testdb
+    - python db_setup.py testdb
     - pytest --cov=fastfoodfast
 
 after_success:
