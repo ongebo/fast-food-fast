@@ -56,6 +56,8 @@ Points to note:
 * When posting an order, "status", "total-cost", and "order-id" are optional, they are automatically assigned by the API
 * Version 1 of the RESTful API uses data structures to store orders, so the orders don't persist among multiple runs of the application
 
+More information about the API here: https://gbo-fff-with-db.herokuapp.com/apidocs
+
 ## Installation Instructions
 To run the application, follow these steps:
 * Install python 3 and Postman on your local machine
@@ -99,3 +101,4 @@ The application's code lives in fastfoodfast:
 ## Credits
 * Testing Python Applications with Pytest - https://semaphoreci.com/community/tutorials/testing-python-applications-with-pytest
 * What is CRUD - https://www.codecademy.com/articles/what-is-crud
+* Flasgger - API playground with Flask and Swagger UI - http://brunorocha.org/python/flask/flasgger-api-playground-with-flask-and-swagger-ui.html
