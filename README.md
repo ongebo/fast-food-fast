@@ -1,6 +1,7 @@
 # Fast-Food-Fast
 
 [![Build Status](https://travis-ci.org/ongebo/fast-food-fast.svg?branch=ft-register-user-160882822)](https://travis-ci.org/ongebo/fast-food-fast)
+
 [![Coverage Status](https://coveralls.io/repos/github/ongebo/fast-food-fast/badge.svg?branch=api-with-db)](https://coveralls.io/github/ongebo/fast-food-fast?branch=api-with-db)
 
 Order Fast-Food Online, Have it Delivered Fast
@@ -93,7 +94,7 @@ The tests directory contains code for testing the application scripts in fastfoo
 The application's code lives in fastfoodfast:
 * fastfoodfast/fastfoodfast.py defines flask route functions mapped to request URLs
 * fastfoodfast/models.py contains Python classes which are responsible for managing the data for the application
-* fastfoodfast/__init__.py marks the fastfoodfast directory as a Python package
+* fastfoodfast/\_\_init\_\_.py marks the fastfoodfast directory as a Python package
 
 ## Contributors
 * Isaac Ongebo - *isaacongebo@gmail.com*
