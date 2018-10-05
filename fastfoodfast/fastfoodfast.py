@@ -2,17 +2,21 @@ from flask import Flask, request, jsonify, Response
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
 from .models import User, Order, Menu
+from flasgger import Swagger
+from flasgger.utils import swag_from
 
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'secret-key'
 jwt = JWTManager(app)
+Swagger(app)
 user_model = User()
 order_model = Order()
 menu_model = Menu()
 
 
 @app.route('/api/v1/auth/signup', methods=['POST'])
+@swag_from('docs/register.yml')
 def register_a_user():
     """Creates a new user account"""
     try:
@@ -25,6 +29,7 @@ def register_a_user():
 
 
 @app.route('/api/v1/auth/login', methods=['POST'])
+@swag_from('docs/login.yml')
 def login_a_user():
     """Logs in a registered user"""
     try:
@@ -40,6 +45,7 @@ def login_a_user():
 
 @app.route('/api/v1/users/orders', methods=['POST'])
 @jwt_required
+@swag_from('docs/place_order.yml')
 def place_new_order_for_food():
     """Adds a new order for food to the database"""
     try:
@@ -75,6 +81,7 @@ def place_new_order_for_food():
 
 @app.route('/api/v1/users/orders', methods=['GET'])
 @jwt_required
+@swag_from('docs/order_history.yml')
 def get_user_order_history():
     """Gets a list of orders made by a user in the past"""
     try:
@@ -87,6 +94,7 @@ def get_user_order_history():
 
 @app.route('/api/v1/orders/', methods=['GET'])
 @jwt_required
+@swag_from('docs/orders.yml')
 def get_all_orders():
     """Retrieves all food orders from the database"""
     try:
@@ -100,6 +108,7 @@ def get_all_orders():
 
 @app.route('/api/v1/orders/<order_id>', methods=['GET'])
 @jwt_required
+@swag_from('docs/order.yml')
 def get_specific_order(order_id):
     """Retrieves a specific food order from the database"""
     try:
@@ -113,6 +122,7 @@ def get_specific_order(order_id):
 
 @app.route('/api/v1/orders/<order_id>', methods=['PUT'])
 @jwt_required
+@swag_from('docs/update_order.yml')
 def update_order_status(order_id):
     """Updates the status of an order in the database"""
     try:
@@ -127,6 +137,7 @@ def update_order_status(order_id):
 
 @app.route('/api/v1/menu', methods=['GET'])
 @jwt_required
+@swag_from('docs/menu.yml')
 def get_food_items():
     """Retrieves all the available food items in the menu"""
     try:
@@ -138,6 +149,7 @@ def get_food_items():
 
 @app.route('/api/v1/menu', methods=['POST'])
 @jwt_required
+@swag_from('docs/menu_item.yml')
 def add_menu_item():
     """Adds a new food menu item to the database"""
     try:
