@@ -25,6 +25,7 @@ class User:
         self.cursor = self.conn.cursor()
 
     def register_user(self, user):
+        """Adds a new user to the database"""
         if validator.validate_user(user):
             self.connect_to_db()
             self.cursor.execute('SELECT username FROM users')
@@ -46,6 +47,7 @@ class User:
             raise Exception(expected_user_data_format)
     
     def get_user(self, username):
+        """Retrieves a user from the database"""
         if not isinstance(username, str):
             raise Exception('Username must be a string')
         self.connect_to_db()
@@ -104,6 +106,7 @@ class Order:
             raise Exception
     
     def get_order_history(self, customer):
+        """Returns a list of all orders made by a user"""
         self.connect_to_db()
         self.cursor.execute(
             'SELECT id, public_id, status, total_cost FROM orders WHERE customer = %s',
@@ -131,6 +134,7 @@ class Order:
         return orders
     
     def get_all_orders(self):
+        """Fetches all orders from the database"""
         self.connect_to_db()
         self.cursor.execute(
             'SELECT id, public_id, customer, status, total_cost FROM orders'
@@ -159,6 +163,7 @@ class Order:
         return orders
     
     def get_specific_order(self, order_id):
+        """"Fetches a specific order from the database with public_id = <order_id>"""
         self.connect_to_db()
         self.cursor.execute('SELECT * FROM orders WHERE public_id = %s', (order_id, ))
         record = self.cursor.fetchone()
@@ -182,6 +187,7 @@ class Order:
         return order
     
     def update_order_status(self, order_id, status):
+        """Updates the status of an order with <order_id>"""
         if not self.get_specific_order(order_id):
             raise Exception('The specified order does not exist!')
         validator.validate_status_data(status)
@@ -194,6 +200,7 @@ class Order:
         self.conn.close()
     
     def is_admin(self, user):
+        """Returns True if user is admin, False otherwise"""
         self.connect_to_db()
         self.cursor.execute('SELECT admin FROM users WHERE username = %s', (user, ))
         value = self.cursor.fetchone()[0]
@@ -210,6 +217,7 @@ class Menu:
         self.cursor = self.conn.cursor()
 
     def get_food_menu(self):
+        """Returns all food items in the menu"""
         self.connect_to_db()
         self.cursor.execute(
             'SELECT item, unit, rate FROM menu'
@@ -223,6 +231,7 @@ class Menu:
         return menu
     
     def add_menu_item(self, menu_item):
+        """Adds a new item to the food menu"""
         validator.validate_menu_item(menu_item)
         self.connect_to_db()
         self.cursor.execute(
