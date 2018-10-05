@@ -7,4 +7,4 @@ responses:
   404:
     description: No orders in the database!
   200:
-    description: A language with its awesomeness
+    description: Successfully retrieved all orders from database
