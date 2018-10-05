@@ -1,0 +1,17 @@
+Place new order for food
+POST data to this endpoint to add a new order to the database
+---
+tags:
+  - Orders
+parameters:
+  - name: items
+    type: array
+    items:
+      type: object
+    required: true
+    description: The items being ordered
+responses:
+  400:
+    description: Invalid order request data!
+  201:
+    description: Order successfully created!
