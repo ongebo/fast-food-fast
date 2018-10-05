@@ -1,0 +1,15 @@
+Update the status of an order in the database
+Admin uses this endpoint to update order status (new, processing, declined, or complete)
+---
+tags:
+  - Orders
+parameters:
+  - name: order_id
+    type: string
+    required: true
+    description: The ID of the order to update
+responses:
+  404:
+    description: The order to update is not in the database!
+  200:
+    description: Successfully updated the status of an order
