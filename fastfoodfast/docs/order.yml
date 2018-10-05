@@ -1,0 +1,15 @@
+Returns a specific order's details
+Admin user calls this endpoint to retrieve a specific order by ID from database
+---
+tags:
+  - Orders
+parameters:
+  - name: order_id
+    type: string
+    required: true
+    description: The ID of the order to retrieve
+responses:
+  404:
+    description: The specific order is not in the database!
+  200:
+    description: Specific order successfully retrieved from the database
