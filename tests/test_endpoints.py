@@ -130,14 +130,14 @@ def test_api_returns_message_when_getting_non_existent_order_history(test_client
 def test_admin_can_get_a_specific_order_by_id(test_client, connection):
     headers = login_administrator(test_client)
     order = {'items': [{'item': 'rolex', 'quantity': 2, 'cost': 2000}]}
-    response = test_client.post('/api/v1/users/orders', json=order, headers=headers)
-    order_id = response.get_json()['order-id']
+    response_1 = test_client.post('/api/v1/users/orders', json=order, headers=headers)
+    order_id = response_1.get_json()['order-id']
     response_2 = test_client.get('/api/v1/orders/{}'.format(order_id), headers=headers)
-    assert response.status_code == 201
+    assert response_1.status_code == 201
     assert response_2.status_code == 200
-    assert response.get_json()['order-id'] == response_2.get_json()['order-id']
-    assert response.get_json()['status'] == response_2.get_json()['status']
-    assert response.get_json()['total-cost'] == response_2.get_json()['total-cost']
+    assert response_1.get_json()['order-id'] == response_2.get_json()['order-id']
+    assert response_1.get_json()['status'] == response_2.get_json()['status']
+    assert response_1.get_json()['total-cost'] == response_2.get_json()['total-cost']
     connection.cursor().execute('DELETE FROM order_items WHERE item = %s', ('rolex', ))
     connection.cursor().execute('DELETE FROM orders WHERE customer = %s', ('admin', ))
     connection.commit()
@@ -156,6 +156,7 @@ def test_admin_can_update_order_status(test_client, connection):
     response_3 = test_client.get('/api/v1/orders/{}'.format(order_id), headers=headers_2)
     assert response_3.status_code == 200
     assert response_3.get_json()['status'] == 'processing'
+    connection.cursor().execute('DELETE FROM users WHERE username = %s', ('quill', ))
     connection.cursor().execute('DELETE FROM order_items WHERE item = %s', ('milk', ))
     connection.cursor().execute('DELETE FROM orders WHERE customer = %s', ('quill', ))
     connection.commit()
