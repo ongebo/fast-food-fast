@@ -31,7 +31,7 @@ class User:
             self.cursor.execute('SELECT username FROM users')
             for record in self.cursor.fetchall():
                 if user['username'] in record:
-                    raise Exception('Username: "{}" already exists!'.format(user['username']))
+                    raise Exception('{} already exists!'.format(user['username']))
             new_user = dict()
             new_user['username'] = user['username']
             new_user['password'] = generate_password_hash(user['password'], method='sha256')
@@ -57,7 +57,7 @@ class User:
         result = self.cursor.fetchone()
         self.conn.close()
         if not result:
-            raise Exception('No user with name "{}" exists'.format(username))
+            raise Exception('No user with name {} exists!'.format(username))
         user = dict()
         user['username'] = result[0]
         user['password'] = result[1]
