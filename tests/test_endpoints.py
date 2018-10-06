@@ -72,17 +72,11 @@ def test_api_returns_error_message_given_wrong_login_data(test_client):
 
 
 def test_api_can_place_an_order_for_food(test_client, connection):
-    user_data = {'username': 'Loki Odinson', 'password': 'mischief'}
-    response_1 = test_client.post('/api/v1/auth/signup', json=user_data)
-    assert response_1.status_code == 201
-    response_2 = test_client.post('/api/v1/auth/login', json=user_data)
-    data = response_2.get_json()
-    assert response_2.status_code == 200 and 'token' in data
+    headers = register_and_login_user('Loki Odinson', 'mischief', test_client)
     order = {'items': [{'item': 'pizza', 'quantity': 1, 'cost': 20000}]}
-    headers = {'Authorization': 'Bearer ' + data['token']}
-    response_3 = test_client.post('/api/v1/users/orders', json=order, headers=headers)
-    assert response_3.status_code == 201
-    assert 'order-id' in response_3.get_json()
+    response = test_client.post('/api/v1/users/orders', json=order, headers=headers)
+    assert response.status_code == 201
+    assert 'order-id' in response.get_json()
     cursor = connection.cursor()
     cursor.execute('DELETE FROM order_items WHERE item = %s', ('pizza', ))
     cursor.execute('DELETE FROM orders WHERE customer = %s', ('Loki Odinson', ))
@@ -92,54 +86,38 @@ def test_api_can_place_an_order_for_food(test_client, connection):
 
 
 def test_api_returns_error_message_given_incorrect_post_order_data(test_client, connection):
-    user_data = {'username': 'Loki Odinson', 'password': 'mischief'}
-    response_1 = test_client.post('/api/v1/auth/signup', json=user_data)
-    response_2 = test_client.post('/api/v1/auth/login', json=user_data)
-    data = response_2.get_json()
-    headers = {'Authorization': 'Bearer ' + data['token']}
-    response_3 = test_client.post('/api/v1/users/orders', json={}, headers=headers)
-    assert response_1.status_code == 201
-    assert response_2.status_code == 200
-    assert response_3.status_code == 400
-    assert b'invalid data' in response_3.data
+    headers = register_and_login_user('okoye', 'general', test_client)
+    response = test_client.post('/api/v1/users/orders', json={}, headers=headers)
+    assert response.status_code == 400
+    assert b'invalid data' in response.data
     cursor = connection.cursor()
-    cursor.execute('DELETE FROM users WHERE username = %s', ('Loki Odinson', ))
+    cursor.execute('DELETE FROM users WHERE username = %s', ('okoye', ))
     connection.commit()
     connection.close()
 
 
 def test_api_returns_user_order_history(test_client, connection):
-    user_data = {'username': 'steve rodgers', 'password': 'capitan'}
-    response_1 = test_client.post('/api/v1/auth/signup', json=user_data)
-    response_2 = test_client.post('/api/v1/auth/login', json=user_data)
-    data = response_2.get_json()
-    headers = {'Authorization': 'Bearer ' + data['token']}
+    headers = register_and_login_user('steve rodgers', 'capitan', test_client)
     order_1 = {'items': [{'item': 'hot dog', 'quantity': 2, 'cost': 15000}]}
     order_2 = {'items': [{'item': 'salad', 'quantity': 1, 'cost': 10000}]}
-    response_3 = test_client.post('/api/v1/users/orders', json=order_1, headers=headers)
-    response_4 = test_client.post('/api/v1/users/orders', json=order_2, headers=headers)
-    response_5 = test_client.get('/api/v1/users/orders', headers=headers)
-    assert response_1.status_code == 201 and response_2.status_code == 200
-    assert response_3.status_code == 201 and response_4.status_code == 201
-    assert response_5.status_code == 200
-    assert response_3.get_json() in response_5.get_json()['orders']
-    assert response_4.get_json() in response_5.get_json()['orders']
+    response_1 = test_client.post('/api/v1/users/orders', json=order_1, headers=headers)
+    response_2 = test_client.post('/api/v1/users/orders', json=order_2, headers=headers)
+    response_3 = test_client.get('/api/v1/users/orders', headers=headers)
+    assert response_1.status_code == 201 and response_2.status_code == 201
+    assert response_3.status_code == 200
+    assert response_1.get_json() in response_3.get_json()['orders']
+    assert response_2.get_json() in response_3.get_json()['orders']
     cursor = connection.cursor()
     cursor.execute('DELETE FROM users WHERE username = %s', ('steve rodgers', ))
     cursor.execute('DELETE FROM order_items WHERE item = %s', ('hot dog', ))
     cursor.execute('DELETE FROM order_items WHERE item = %s', ('salad', ))
-    cursor.execute('DELETE FROM orders WHERE customer = %s', ('steve rodgers', ))
     cursor.execute('DELETE FROM orders WHERE customer = %s', ('steve rodgers', ))
     connection.commit()
     connection.close()
 
 
 def test_api_returns_message_when_getting_non_existent_order_history(test_client, connection):
-    user = {'username': 'winter soldier', 'password': 'soldier'}
-    response = test_client.post('/api/v1/auth/signup', json=user)
-    response = test_client.post('/api/v1/auth/login', json=user)
-    token = response.get_json()['token']
-    headers = {'Authorization': 'Bearer ' + token}
+    headers = register_and_login_user('winter soldier', 'soldier', test_client)
     response = test_client.get('/api/v1/users/orders', headers=headers)
     assert response.status_code == 404
     assert 'message' in response.get_json()
