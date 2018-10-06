@@ -52,7 +52,8 @@ class User:
             raise Exception('Username must be a string')
         self.connect_to_db()
         self.cursor.execute(
-            "SELECT username, password FROM users WHERE username = '{}'".format(username)
+            'SELECT username, password FROM users WHERE username = %s',
+            (username, )
         )
         result = self.cursor.fetchone()
         self.conn.close()
@@ -82,16 +83,16 @@ class Order:
             for item in order['items']:
                 total_cost += float(item['cost'])
             new_order['total-cost'] = total_cost
-            order_id = str(uuid.uuid4())[:8]
+            order_id = str(uuid.uuid4())[:8] # random public ID for security
             new_order['order-id'] = order_id
 
             self.connect_to_db()
             self.cursor.execute(
-                "INSERT INTO orders (public_id, customer, status, total_cost) VALUES (%s, %s, %s, %s)",
+                'INSERT INTO orders (public_id, customer, status, total_cost) VALUES (%s, %s, %s, %s)',
                 (order_id, customer, 'new', total_cost)
             )
             self.cursor.execute(
-                "SELECT id FROM orders WHERE public_id = '{}'".format(order_id)
+                'SELECT id FROM orders WHERE public_id = %s', (order_id, )
             )
             primary_key = self.cursor.fetchone()[0]
             for item in new_order['items']:
