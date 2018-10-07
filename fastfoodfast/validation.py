@@ -20,7 +20,7 @@ class Validation:
     def validate_order_item(self, item):
         """Checks that an item (dictionary) in an order items list is valid"""
         try:
-            dict(item)
+            assert isinstance(item, dict)
             assert 'item' in item and isinstance(item['item'], str)
             item['item'] = item['item'].strip() # remove leading and trailing spaces
             assert len(item['item']) != 0
