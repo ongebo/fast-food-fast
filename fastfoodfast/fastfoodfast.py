@@ -1,3 +1,7 @@
+"""
+Definitions of API routes for managing users, orders, and food menu data.
+"""
+
 from flask import Flask, request, jsonify, Response
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
