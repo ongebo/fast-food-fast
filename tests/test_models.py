@@ -86,7 +86,7 @@ def test_model_can_add_a_new_order_to_the_database(database_connection):
     )
     result = cursor.fetchone()
     assert 'skywalker' in result and 'new' in result
-    cursor.execute('SELECT * FROM order_items')
+    cursor.execute('SELECT * FROM order_items WHERE order_id = %s', (result[0], ))
     result = cursor.fetchone()
     assert 'pizza' in result and 1.0 in result and 18000 in result
     cursor.execute('DELETE FROM order_items WHERE item = %s', ('pizza', ))
