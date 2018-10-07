@@ -11,6 +11,28 @@ def database_connection():
     return conn
 
 
+def clean_users(conn, *usernames):
+    """Used by tests to reset changes made to users table"""
+    cursor = conn.cursor()
+    for username in usernames:
+        cursor.execute('DELETE FROM users WHERE username = %s', (username, ))
+
+
+def clean_orders(conn, *customers):
+    """Used by tests to revert changes made to database when testing orders management"""
+    cursor = conn.cursor()
+    for customer in customers:
+        cursor.execute('SELECT id FROM orders WHERE customer = %s', (customer, ))
+        for order_id in cursor.fetchall():
+            cursor.execute('DELETE FROM order_items WHERE order_id = %s', (order_id, ))
+        cursor.execute('DELETE FROM orders WHERE customer = %s', (customer, ))
+
+
+def commit_and_close(conn):
+    conn.commit()
+    conn.close()
+
+
 def test_model_correctly_registers_new_user_to_the_database(database_connection):
     user_model = User()
     new_user = user_model.register_user({'username': 'customer', 'password': 'p@$$word'})
@@ -18,14 +40,14 @@ def test_model_correctly_registers_new_user_to_the_database(database_connection)
     assert check_password_hash(new_user['password'], 'p@$$word')
     assert new_user['admin'] == False
     cursor = database_connection.cursor()
-    cursor.execute('SELECT username, password FROM users WHERE username = \'customer\'')
-    result = cursor.fetchall()
-    assert 'customer' in result[0]
-    assert check_password_hash(result[0][1], 'p@$$word')
-    cursor = database_connection.cursor()
-    cursor.execute('DELETE FROM users WHERE username = \'customer\'')
-    database_connection.commit()
-    database_connection.close()
+    cursor.execute(
+        'SELECT username, password, admin FROM users WHERE username = %s', ('customer', )
+    )
+    result = cursor.fetchone()
+    assert 'customer' == result[0] and False == result[2]
+    assert check_password_hash(result[1], 'p@$$word')
+    clean_users(database_connection, 'customer')
+    commit_and_close(database_connection)
 
 
 def test_model_raises_exception_when_registering_with_existent_username(database_connection):
@@ -34,10 +56,8 @@ def test_model_raises_exception_when_registering_with_existent_username(database
     user_model.register_user(user)
     with pytest.raises(Exception):
         user_model.register_user(user) # try to re-register user
-    cursor = database_connection.cursor()
-    cursor.execute('DELETE FROM users WHERE username = \'customer\'')
-    database_connection.commit()
-    database_connection.close()
+    clean_users(database_connection, 'customer')
+    commit_and_close(database_connection)
 
 
 def test_model_raises_exception_given_incorrect_user_data_for_registration(database_connection):
@@ -49,18 +69,12 @@ def test_model_raises_exception_given_incorrect_user_data_for_registration(datab
 
 def test_model_can_get_a_specific_user_by_username_from_db(database_connection):
     user_model = User()
-    database_connection.cursor().execute(
-        "INSERT INTO users (username, password, admin) VALUES ('Thor', 'asgard', 'f')"
-    )
-    database_connection.commit()
+    user_model.register_user({'username': 'Thor', 'password': 'asgard'})
     user = user_model.get_user('Thor')
     assert user['username'] == 'Thor'
-    assert user['password'] == 'asgard'
-    database_connection.cursor().execute(
-        "DELETE FROM users WHERE username='Thor'"
-    )
-    database_connection.commit()
-    database_connection.close()
+    assert check_password_hash(user['password'], 'asgard')
+    clean_users(database_connection, 'Thor')
+    commit_and_close(database_connection)
 
 
 def test_model_raises_exception_when_retrieving_non_existent_user(database_connection):
@@ -89,10 +103,8 @@ def test_model_can_add_a_new_order_to_the_database(database_connection):
     cursor.execute('SELECT * FROM order_items WHERE order_id = %s', (result[0], ))
     result = cursor.fetchone()
     assert 'pizza' in result and 1.0 in result and 18000 in result
-    cursor.execute('DELETE FROM order_items WHERE item = %s', ('pizza', ))
-    cursor.execute('DELETE FROM orders WHERE public_id = %s', (created_order['order-id'], ))
-    database_connection.commit()
-    database_connection.close()
+    clean_orders(database_connection, 'skywalker')
+    commit_and_close(database_connection)
 
 
 def test_model_raises_exception_given_invalid_order_data(database_connection):
@@ -109,12 +121,8 @@ def test_model_can_get_order_history_for_a_given_customer(database_connection):
     created_order2 = order_model.create_order(order_2, 'luke skywalker')
     orders = order_model.get_order_history('luke skywalker')
     assert created_order1 in orders and created_order2 in orders
-    cursor = database_connection.cursor()
-    cursor.execute('DELETE FROM order_items WHERE item = %s', ('pizza', ))
-    cursor.execute('DELETE FROM order_items WHERE item = %s', ('hamburger', ))
-    cursor.execute('DELETE FROM orders WHERE customer = %s', ('luke skywalker', ))
-    database_connection.commit()
-    database_connection.close()
+    clean_orders(database_connection, 'luke skywalker')
+    commit_and_close(database_connection)
 
 
 def test_model_raises_exception_when_no_orders_have_been_made_by_a_user(database_connection):
@@ -133,13 +141,8 @@ def test_model_can_return_all_orders_in_database(database_connection):
     created_order_1['customer'] = 'thanos'
     created_order_2['customer'] = 'nakia'
     assert created_order_1 in orders and created_order_2 in orders
-    cursor = database_connection.cursor()
-    cursor.execute('DELETE FROM order_items WHERE item = %s', ('pillao', ))
-    cursor.execute('DELETE FROM order_items WHERE item = %s', ('beef', ))
-    cursor.execute('DELETE FROM orders WHERE customer = %s', ('thanos', ))
-    cursor.execute('DELETE FROM orders WHERE customer = %s', ('nakia', ))
-    database_connection.commit()
-    database_connection.close()
+    clean_orders(database_connection, 'thanos', 'nakia')
+    commit_and_close(database_connection)
 
 
 def test_model_can_add_new_menu_item_to_menu_table_in_database(database_connection):
@@ -153,8 +156,7 @@ def test_model_can_add_new_menu_item_to_menu_table_in_database(database_connecti
     assert added_item[1] == item['unit']
     assert added_item[2] == item['rate']
     cursor.execute('DELETE FROM menu WHERE item = %s', ('chicken', ))
-    database_connection.commit()
-    database_connection.close()
+    commit_and_close(database_connection)
 
 
 def test_model_can_return_list_of_food_items_in_the_menu(database_connection):
@@ -168,8 +170,7 @@ def test_model_can_return_list_of_food_items_in_the_menu(database_connection):
     cursor = database_connection.cursor()
     cursor.execute('DELETE FROM menu WHERE item = %s', ('chapati', ))
     cursor.execute('DELETE FROM menu WHERE item = %s', ('samosa', ))
-    database_connection.commit()
-    database_connection.close()
+    commit_and_close(database_connection)
 
 
 def test_model_raises_exception_when_menu_table_is_empty(database_connection):
