@@ -5,6 +5,11 @@ Validation code for checking the correctness of data sent to the API.
 
 class Validation:
     def validate_status_data(self, status_data):
+        """
+        Checks if request data sent by admin to update the status of an order is valid i.e is
+        of the form {'status': '<status>'}, where <status> can only be 'new', 'processing',
+        'cancelled' or 'complete'. An exception is raised if the data is invalid.
+        """
         assert isinstance(status_data, dict), 'Enter a dictionary to update status'
         assert 'status' in status_data, 'Specify status in your request data'
         status_data['status'] = status_data['status'].strip().lower()
@@ -63,6 +68,7 @@ class Validation:
             return False
     
     def validate_user(self, user):
+        """Returns True if user data is valid, False otherwise"""
         try:
             assert isinstance(user, dict)
             assert 'username' in user
@@ -76,6 +82,7 @@ class Validation:
             return False
     
     def validate_menu_item(self, menu_item):
+        """Ensures that menu item data sent by admin is valid, raises exception if invalid. """
         assert isinstance(menu_item, dict), 'Invalid format for menu item, it should be a dictionary'
         assert 'item' in menu_item and isinstance(menu_item['item'], str), 'Define item as a string'
         menu_item['item'] = menu_item['item'].strip()
