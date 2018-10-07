@@ -16,14 +16,14 @@ Ensure you follow these rules when providing user sign up data.
 """
 
 
-class User:
-    def __init__(self, db='fffdb'):
-        self.database = db
-
+class Model:
+    """Base class for the model classes"""
     def connect_to_db(self):
         self.conn = psycopg2.connect(os.getenv('DATABASE_URL'))
         self.cursor = self.conn.cursor()
 
+
+class User(Model):
     def register_user(self, user):
         """Adds a new user to the database"""
         if validator.validate_user(user):
@@ -65,14 +65,7 @@ class User:
         return user
 
 
-class Order:
-    def __init__(self, db='fffdb'):
-        self.database = db
-    
-    def connect_to_db(self):
-        self.conn = psycopg2.connect(os.getenv('DATABASE_URL'))
-        self.cursor = self.conn.cursor()
-
+class Order(Model):
     def create_order(self, order, customer):
         """Adds a new order to the database"""
         if validator.validate_order(order):
@@ -115,7 +108,7 @@ class Order:
         )
         records = self.cursor.fetchall()
         if not records:
-            raise Exception('No orders made by {}'.format(customer))
+            raise Exception('No orders made by {}!'.format(customer))
         orders = list()
         for record in records:
             order = dict()
@@ -142,7 +135,7 @@ class Order:
         )
         records = self.cursor.fetchall()
         if not records:
-            raise Exception('No orders available')
+            raise Exception('No orders available!')
         orders = list()
         for record in records:
             order = dict()
@@ -209,14 +202,7 @@ class Order:
         return value
 
 
-class Menu:
-    def __init__(self, db='fffdb'):
-        self.database = db
-
-    def connect_to_db(self):
-        self.conn = psycopg2.connect(os.getenv('DATABASE_URL'))
-        self.cursor = self.conn.cursor()
-
+class Menu(Model):
     def get_food_menu(self):
         """Returns all food items in the menu"""
         self.connect_to_db()
