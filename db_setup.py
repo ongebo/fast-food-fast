@@ -1,3 +1,9 @@
+"""
+This module sets up tables in the database specified by the DATABASE_URL environment variable.
+It should only be executed for initial setup, when the tables are not in existence otherwise
+data will be lost.
+"""
+
 import psycopg2, os, sys
 from werkzeug.security import generate_password_hash
 
@@ -61,6 +67,10 @@ def create_tables(conn):
 
 
 def setup_testdb():
+    """
+    Used to setup a test database, separate from the production database
+    specified in the DATABASE_URL environment variable.
+    """
     conn = psycopg2.connect(
         database='testdb',
         user='ongebo',
@@ -73,9 +83,13 @@ def setup_testdb():
 
 def main():
     if len(sys.argv) == 2 and sys.argv[1] == 'testdb':
-        setup_testdb()
-        print('Test database tables successfully setup...')
-        return
+        try:
+            setup_testdb() # only when this script is executed with 'python db_setup.py testdb'
+            print('Test database tables successfully setup...')
+            return
+        except:
+            print('Could not establish connection to the test database...')
+            return
     conn = None
     try:
         conn = psycopg2.connect(os.getenv('DATABASE_URL'))
