@@ -16,6 +16,7 @@ def connection():
 
 
 def register_and_login_user(name, password, test_client):
+    """Signs up and logs in a new user, returns Authorization header for the user"""
     user_data = {'username': name, 'password': password}
     test_client.post('/api/v1/auth/signup', json=user_data)
     response = test_client.post('/api/v1/auth/login', json=user_data)
@@ -25,11 +26,33 @@ def register_and_login_user(name, password, test_client):
 
 
 def login_administrator(test_client):
+    """Logs in the administrator and returns headers containing JWT token for the admin"""
     admin = {'username': 'admin', 'password': 'administrator'}
     response = test_client.post('/api/v1/auth/login', json=admin)
     token = response.get_json()['token']
     headers = {'Authorization': 'Bearer ' + token}
     return headers
+
+
+def clean_users(conn, *usernames):
+    """Used by tests to reset changes made to users table"""
+    cursor = conn.cursor()
+    for username in usernames:
+        cursor.execute('DELETE FROM users WHERE username = %s', (username, ))
+
+
+def clean_orders(conn, customer):
+    """Used by tests to revert changes made to database when testing orders management"""
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM orders WHERE customer = %s', (customer, ))
+    for order_id in cursor.fetchall():
+        cursor.execute('DELETE FROM order_items WHERE order_id = %s', (order_id, ))
+    cursor.execute('DELETE FROM orders WHERE customer = %s', (customer, ))
+
+
+def commit_and_close(conn):
+    conn.commit()
+    conn.close()
 
 
 def test_api_correctly_registers_a_user(test_client, connection):
@@ -40,9 +63,8 @@ def test_api_correctly_registers_a_user(test_client, connection):
     assert data['username'] == 'John Doe'
     assert check_password_hash(data['password'], 'JonathanDoe')
     assert data['admin'] == False
-    connection.cursor().execute('DELETE FROM users WHERE username = %s', ('John Doe', ))
-    connection.commit()
-    connection.close()
+    clean_users(connection, 'John Doe')
+    commit_and_close(connection)
 
 
 def test_api_returns_error_message_given_wrong_registration_data(test_client):
@@ -59,9 +81,8 @@ def test_api_correctly_logs_in_registered_user(test_client, connection):
     response_2 = test_client.post('/api/v1/auth/login', json=user_data)
     assert response_2.status_code == 200
     assert 'token' in response_2.get_json()
-    connection.cursor().execute('DELETE FROM users WHERE username = %s', ('Jon Snow', ))
-    connection.commit()
-    connection.close()
+    clean_users(connection, 'Jon Snow')
+    commit_and_close(connection)
 
 
 def test_api_returns_error_message_given_wrong_login_data(test_client):
@@ -77,12 +98,9 @@ def test_api_can_place_an_order_for_food(test_client, connection):
     response = test_client.post('/api/v1/users/orders', json=order, headers=headers)
     assert response.status_code == 201
     assert 'order-id' in response.get_json()
-    cursor = connection.cursor()
-    cursor.execute('DELETE FROM order_items WHERE item = %s', ('pizza', ))
-    cursor.execute('DELETE FROM orders WHERE customer = %s', ('Loki Odinson', ))
-    cursor.execute('DELETE FROM users WHERE username = %s', ('Loki Odinson', ))
-    connection.commit()
-    connection.close()
+    clean_orders(connection, 'Loki Odinson')
+    clean_users(connection, 'Loki Odinson')
+    commit_and_close(connection)
 
 
 def test_api_returns_error_message_given_incorrect_post_order_data(test_client, connection):
@@ -90,10 +108,8 @@ def test_api_returns_error_message_given_incorrect_post_order_data(test_client, 
     response = test_client.post('/api/v1/users/orders', json={}, headers=headers)
     assert response.status_code == 400
     assert b'invalid data' in response.data
-    cursor = connection.cursor()
-    cursor.execute('DELETE FROM users WHERE username = %s', ('okoye', ))
-    connection.commit()
-    connection.close()
+    clean_users(connection, 'okoye')
+    commit_and_close(connection)
 
 
 def test_api_returns_user_order_history(test_client, connection):
@@ -107,13 +123,9 @@ def test_api_returns_user_order_history(test_client, connection):
     assert response_3.status_code == 200
     assert response_1.get_json() in response_3.get_json()['orders']
     assert response_2.get_json() in response_3.get_json()['orders']
-    cursor = connection.cursor()
-    cursor.execute('DELETE FROM users WHERE username = %s', ('steve rodgers', ))
-    cursor.execute('DELETE FROM order_items WHERE item = %s', ('hot dog', ))
-    cursor.execute('DELETE FROM order_items WHERE item = %s', ('salad', ))
-    cursor.execute('DELETE FROM orders WHERE customer = %s', ('steve rodgers', ))
-    connection.commit()
-    connection.close()
+    clean_users(connection, 'steve rodgers')
+    clean_orders(connection, 'steve rodgers')
+    commit_and_close(connection)
 
 
 def test_api_returns_message_when_getting_non_existent_order_history(test_client, connection):
@@ -138,10 +150,8 @@ def test_admin_can_get_a_specific_order_by_id(test_client, connection):
     assert response_1.get_json()['order-id'] == response_2.get_json()['order-id']
     assert response_1.get_json()['status'] == response_2.get_json()['status']
     assert response_1.get_json()['total-cost'] == response_2.get_json()['total-cost']
-    connection.cursor().execute('DELETE FROM order_items WHERE item = %s', ('rolex', ))
-    connection.cursor().execute('DELETE FROM orders WHERE customer = %s', ('admin', ))
-    connection.commit()
-    connection.close()
+    clean_orders(connection, 'admin')
+    commit_and_close(connection)
 
 
 def test_admin_can_update_order_status(test_client, connection):
@@ -156,11 +166,9 @@ def test_admin_can_update_order_status(test_client, connection):
     response_3 = test_client.get('/api/v1/orders/{}'.format(order_id), headers=headers_2)
     assert response_3.status_code == 200
     assert response_3.get_json()['status'] == 'processing'
-    connection.cursor().execute('DELETE FROM users WHERE username = %s', ('quill', ))
-    connection.cursor().execute('DELETE FROM order_items WHERE item = %s', ('milk', ))
-    connection.cursor().execute('DELETE FROM orders WHERE customer = %s', ('quill', ))
-    connection.commit()
-    connection.close()
+    clean_orders(connection, 'quill')
+    clean_users(connection, 'quill')
+    commit_and_close(connection)
 
 
 def test_api_can_return_created_menu_item_to_admin(test_client, connection):
