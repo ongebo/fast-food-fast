@@ -1,0 +1,10 @@
+Retrieve the food menu from the database
+Admin user calls this endpoint to see all menu items in the database
+---
+tags:
+  - Menu
+responses:
+  404:
+    description: The food menu is empty!
+  200:
+    description: Successfully retrieved and returned a list of food items from the database

@@ -1,0 +1,10 @@
+Add new food menu item to the database
+This endpoint is called by an Admin user to add a new food item to the database
+---
+tags:
+  - Menu
+responses:
+  400:
+    description: Bad POST request format!
+  201:
+    description: Successfully added a new food item to the database

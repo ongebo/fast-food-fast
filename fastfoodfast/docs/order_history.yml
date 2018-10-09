@@ -1,0 +1,10 @@
+Retrieve user order history
+A looged-in user calls this endpoint to see his/her order history
+---
+tags:
+  - Orders
+responses:
+  404:
+    description: No orders made by a user!
+  200:
+    description: Correctly returned a list of orders made by currently logged-in user

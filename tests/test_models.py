@@ -1,208 +1,179 @@
-"""
-Unit Tests for the Application Models Defined in fastfoodfast/models.py
-"""
-import pytest
-from fastfoodfast.models import Order, OrderNotFound, BadRequest, Menu
-from fastfoodfast.validation import validate_order_item, validate_order
+import pytest, psycopg2, os
+from fastfoodfast.models import User, Order, Menu
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 @pytest.fixture
-def order_model():
-    return Order()
+def database_connection():
+    database_url = 'postgres://ongebo:nothing@127.0.0.1:5432/testdb'
+    os.environ['DATABASE_URL'] = database_url
+    conn = psycopg2.connect(database_url)
+    return conn
 
 
-@pytest.fixture
-def menu_model():
-    return Menu()
+def clean_users(conn, *usernames):
+    """Used by tests to reset changes made to users table"""
+    cursor = conn.cursor()
+    for username in usernames:
+        cursor.execute('DELETE FROM users WHERE username = %s', (username, ))
 
 
-@pytest.fixture
-def valid_order_items():
-    order_item_1 = {'item': 'hamburger', 'quantity': 2, 'cost': 10000}
-    order_item_2 = {'item': 'pizza', 'quantity': 0.5, 'cost': 10000.4}
-    return [order_item_1, order_item_2]
+def clean_orders(conn, *customers):
+    """Used by tests to revert changes made to database when testing orders management"""
+    cursor = conn.cursor()
+    for customer in customers:
+        cursor.execute('SELECT id FROM orders WHERE customer = %s', (customer, ))
+        for order_id in cursor.fetchall():
+            cursor.execute('DELETE FROM order_items WHERE order_id = %s', (order_id, ))
+        cursor.execute('DELETE FROM orders WHERE customer = %s', (customer, ))
 
 
-@pytest.fixture
-def invalid_order_items():
-    order_item_1 = {'item': 45, 'quantity': 'alpha', 'cost': 'Ugx 2544'}
-    order_item_2 = {}
-    order_item_3 = ['pizza', 4, 67]
-    return [order_item_1, order_item_2, order_item_3]
+def commit_and_close(conn):
+    conn.commit()
+    conn.close()
 
 
-def add_order(id):
-    order = {'order-id': id, 'status': 'pending'}
-    order_items = [
-        {'item': 'Pizza', 'quantity': 1, 'cost': 15000},
-        {'item': 'Salad', 'quantity': 2, 'cost': 10000}
-    ]
-    total_cost = 0
-    for item in order_items:
-        total_cost += item['cost']
-    order['items'] = order_items
-    order['total-cost'] = total_cost
-    Order.orders.append(order)
-    return order
+def test_model_correctly_registers_new_user_to_the_database(database_connection):
+    user_model = User()
+    new_user = user_model.register_user({'username': 'customer', 'password': 'p@$$word'})
+    assert new_user['username'] == 'customer'
+    assert check_password_hash(new_user['password'], 'p@$$word')
+    assert new_user['admin'] == False
+    cursor = database_connection.cursor()
+    cursor.execute(
+        'SELECT username, password, admin FROM users WHERE username = %s', ('customer', )
+    )
+    result = cursor.fetchone()
+    assert 'customer' == result[0] and False == result[2]
+    assert check_password_hash(result[1], 'p@$$word')
+    clean_users(database_connection, 'customer')
+    commit_and_close(database_connection)
 
 
-def delete_order(id):
-    for x in range(len(Order.orders)):
-        if Order.orders[x]['order-id'] == id:
-            del Order.orders[x]
-
-
-def test_returns_correct_list_of_orders(order_model):
-    assert order_model.get_all() == Order.orders
-
-
-def test_order_model_can_return_order_with_correct_id(order_model):
-    order = add_order(3)
-    retrieved_order = order_model.get_order(3)
-    assert order == retrieved_order
-    delete_order(3)
-
-
-def test_order_model_raises_type_error_given_an_id_which_is_not_an_integer(order_model):
-    with pytest.raises(TypeError):
-        order_model.get_order('3')
-    with pytest.raises(TypeError):
-        order_model.get_order(23.45)
-
-
-def test_order_model_raises_order_not_found_if_requested_order_does_not_exist(order_model):
-    with pytest.raises(OrderNotFound):
-        order_model.get_order(34)
-
-
-def test_validation_returns_true_for_valid_order_items(order_model, valid_order_items):
-    order_item_1 = valid_order_items[0]
-    order_item_2 = valid_order_items[1]
-    assert validate_order_item(order_item_1)
-    assert validate_order_item(order_item_2)
-
-
-def test_validation_returns_false_for_invalid_order_items(order_model, invalid_order_items):
-    order_item_1 = invalid_order_items[0]
-    order_item_2 = invalid_order_items[1]
-    order_item_3 = invalid_order_items[2]
-    assert validate_order_item(order_item_1) == False
-    assert validate_order_item(order_item_2) == False
-    assert validate_order_item(order_item_3) == False
-
-
-def test_validation_returns_true_for_valid_orders(order_model, valid_order_items):
-    order_1 = {'items': valid_order_items}
-    order_2 = {'items': valid_order_items, 'status': 'pending', 'total-cost': 45000}
-    order_3 = {'items': valid_order_items, 'order-id': 5}
-    assert validate_order(order_1)
-    assert validate_order(order_2)
-    assert validate_order(order_3)
-
-
-def test_validation_returns_false_for_invalid_orders(order_model, invalid_order_items):
-    order_1 = {'items': invalid_order_items[0], 'status': 'accepted', 'total-cost': 45336, 'order-id': 45}
-    order_2 = {'items': invalid_order_items[1], 'total-cost': 765}
-    order_3 = {'items': invalid_order_items[2]}
-    assert validate_order(order_1) == False
-    assert validate_order(order_2) == False
-    assert validate_order(order_3) == False
-
-
-def test_that_order_model_correctly_creates_new_orders(order_model, valid_order_items):
-    order_1 = {'items': valid_order_items}
-    order_2 = {'items': valid_order_items, 'status': 'pending', 'total-cost': 45000}
-    order_3 = {'items': valid_order_items, 'order-id': 5}
-    result_1 = order_model.create_order(order_1)
-    result_2 = order_model.create_order(order_2)
-    result_3 = order_model.create_order(order_3)
-
-    total_cost = 0
-    for item in valid_order_items:
-        total_cost += float(item['cost'])
-    assert result_1['total-cost'] == total_cost
-    assert result_2['total-cost'] == total_cost
-    assert result_3['total-cost'] == total_cost
-    assert 'status' in result_1 and result_1['status'] == 'pending'
-    assert 'status' in result_2 and result_2['status'] == 'pending'
-    assert 'status' in result_3 and result_3['status'] == 'pending'
-    assert 'order-id' in result_1 and result_1['order-id'] == 0
-    assert 'order-id' in result_2 and result_2['order-id'] == 1
-    assert 'order-id' in result_3 and result_3['order-id'] == 2
-    assert result_1 in Order.orders
-    assert result_2 in Order.orders
-    assert result_3 in Order.orders
-    Order.orders = list()
-
-
-def test_order_model_raises_bad_request_given_bad_orders_to_create(order_model, invalid_order_items):
-    order_1 = {'items': invalid_order_items[0], 'status': 'accepted', 'total-cost': 45336, 'order-id': 45}
-    order_2 = {'items': invalid_order_items[1], 'total-cost': 765}
-    order_3 = {'items': invalid_order_items[2]}
-    with pytest.raises(BadRequest):
-        order_model.create_order(order_1)
-        order_model.create_order(order_2)
-        order_model.create_order(order_3)
-
-
-def test_that_order_model_correctly_updates_an_order(order_model, valid_order_items):
-    created_order = order_model.create_order({'items': valid_order_items})
-    order_model.update_order_status(created_order['order-id'], {'status': 'accepted'})
-    assert created_order['status'] == 'accepted'
-    Order.orders = list()
-
-
-def test_order_model_raises_exception_when_wrong_order_is_used_to_update(order_model, valid_order_items):
-    order = order_model.create_order({'items': valid_order_items})
-    with pytest.raises(BadRequest):
-        order_model.update_order_status(order['order-id'], {1: 2, 2: 3})
-    Order.orders = list()
-
-
-def test_that_order_model_can_delete_an_order_with_specific_id(order_model):
-    order_1 = add_order(34)
-    order_2 = add_order(45)
-    assert Order.orders == [order_1, order_2]
-    order_model.delete_order(34)
-    order_model.delete_order(45)
-    assert Order.orders == []
-    assert order_1 != None # the created orders
-    assert order_2 != None # are still bound to order_1 and order_2
-
-
-def test_order_model_raises_exception_when_trying_to_delete_non_existent_order(order_model):
-    with pytest.raises(OrderNotFound):
-        order_model.delete_order(567)
-
-
-def test_menu_model_can_create_a_new_menu_item(menu_model):
-    menu_item = {'item': 'Chicken', 'unit': 'piece', 'rate': 5000}
-    created_item = menu_model.create_menu_item(menu_item)
-    assert 'item-id' in created_item and created_item['item-id'] == 1
-    assert len(Menu.menu_items) == 1
-    assert created_item in Menu.menu_items
-    Menu.menu_items = list()
-
-
-def test_menu_model_raises_exception_when_creating_menu_item_with_bad_argument(menu_model):
-    bad_item_1 = {}
-    bad_item_2 = 567
+def test_model_raises_exception_when_registering_with_existent_username(database_connection):
+    user_model = User()
+    user = {'username': 'customer', 'password': 'p@$$word'}
+    user_model.register_user(user)
     with pytest.raises(Exception):
-        menu_model.create_menu_item(bad_item_1)
-        menu_model.create_menu_item(bad_item_2)
+        user_model.register_user(user) # try to re-register user
+    clean_users(database_connection, 'customer')
+    commit_and_close(database_connection)
 
 
-def test_menu_model_correctly_validates_menu_items(menu_model):
-    bad_item_1 = [1, 2, 3]
-    bad_item_2 = {'rate': 5000, 'unit': 'pack'}
-    valid_item = {'item': 'Pizza', 'rate': 20000}
-    assert menu_model.is_valid_menu_item(bad_item_1) == False
-    assert menu_model.is_valid_menu_item(bad_item_2) == False
-    assert menu_model.is_valid_menu_item(valid_item) == True
+def test_model_raises_exception_given_incorrect_user_data_for_registration(database_connection):
+    user_model = User()
+    incorrect_data = {'username': ' ', 'password': 786}
+    with pytest.raises(Exception):
+        user_model.register_user(incorrect_data)
 
 
-def test_menu_model_can_return_all_food_menu_items(menu_model):
-    assert menu_model.get_all() == []
-    item = menu_model.create_menu_item({'item': 'pizza', 'rate': 20000})
-    assert item in menu_model.get_all()
-    Menu.menu_items = list()
+def test_model_can_get_a_specific_user_by_username_from_db(database_connection):
+    user_model = User()
+    user_model.register_user({'username': 'Thor', 'password': 'asgard'})
+    user = user_model.get_user('Thor')
+    assert user['username'] == 'Thor'
+    assert check_password_hash(user['password'], 'asgard')
+    clean_users(database_connection, 'Thor')
+    commit_and_close(database_connection)
+
+
+def test_model_raises_exception_when_retrieving_non_existent_user(database_connection):
+    user_model = User()
+    with pytest.raises(Exception):
+        user_model.get_user('Non-existent user!')
+    with pytest.raises(Exception):
+        user_model.get_user(34)
+
+
+def test_model_can_add_a_new_order_to_the_database(database_connection):
+    order_model = Order()
+    order = {
+        'items': [{'item': 'pizza', 'quantity': 1, 'cost': 18000}],
+        'status': 'pending',
+        'total-cost': 18000
+    }
+    created_order = order_model.create_order(order, 'skywalker')
+    assert 'order-id' in created_order and 'status' in created_order
+    cursor = database_connection.cursor()
+    cursor.execute(
+        'SELECT * FROM orders WHERE public_id = %s', (created_order['order-id'], )
+    )
+    result = cursor.fetchone()
+    assert 'skywalker' in result and 'new' in result
+    cursor.execute('SELECT * FROM order_items WHERE order_id = %s', (result[0], ))
+    result = cursor.fetchone()
+    assert 'pizza' in result and 1.0 in result and 18000 in result
+    clean_orders(database_connection, 'skywalker')
+    commit_and_close(database_connection)
+
+
+def test_model_raises_exception_given_invalid_order_data(database_connection):
+    order_model = Order()
+    with pytest.raises(Exception):
+        order_model.create_order([], 'jon snow')
+
+
+def test_model_can_get_order_history_for_a_given_customer(database_connection):
+    order_model = Order()
+    order_1 = {'items': [{'item': 'pizza', 'quantity': 2, 'cost': 40000}]}
+    order_2 = {'items': [{'item': 'hamburger', 'quantity': 1, 'cost': 10000}]}
+    created_order1 = order_model.create_order(order_1, 'luke skywalker')
+    created_order2 = order_model.create_order(order_2, 'luke skywalker')
+    orders = order_model.get_order_history('luke skywalker')
+    assert created_order1 in orders and created_order2 in orders
+    clean_orders(database_connection, 'luke skywalker')
+    commit_and_close(database_connection)
+
+
+def test_model_raises_exception_when_no_orders_have_been_made_by_a_user(database_connection):
+    order_model = Order()
+    with pytest.raises(Exception):
+        order_model.get_order_history('museveni')
+
+
+def test_model_can_return_all_orders_in_database(database_connection):
+    order_model = Order()
+    order_1 = {'items': [{'item': 'pillao', 'quantity': 1, 'cost': 15000}]}
+    order_2 = {'items': [{'item': 'beef', 'quantity': 2, 'cost': 10000}]}
+    created_order_1 = order_model.create_order(order_1, 'thanos')
+    created_order_2 = order_model.create_order(order_2, 'nakia')
+    orders = order_model.get_all_orders()
+    created_order_1['customer'] = 'thanos'
+    created_order_2['customer'] = 'nakia'
+    assert created_order_1 in orders and created_order_2 in orders
+    clean_orders(database_connection, 'thanos', 'nakia')
+    commit_and_close(database_connection)
+
+
+def test_model_can_add_new_menu_item_to_menu_table_in_database(database_connection):
+    menu_model = Menu()
+    item = {'item': 'chicken', 'unit': 'piece', 'rate': 10000}
+    menu_model.add_menu_item(item)
+    cursor = database_connection.cursor()
+    cursor.execute('SELECT item, unit, rate FROM menu')
+    added_item = cursor.fetchone()
+    assert added_item[0] == item['item']
+    assert added_item[1] == item['unit']
+    assert added_item[2] == item['rate']
+    cursor.execute('DELETE FROM menu WHERE item = %s', ('chicken', ))
+    commit_and_close(database_connection)
+
+
+def test_model_can_return_list_of_food_items_in_the_menu(database_connection):
+    menu_model = Menu()
+    item_1 = {'item': 'chapati', 'unit': 'piece', 'rate': 1000}
+    item_2 = {'item': 'samosa', 'unit': 'pack', 'rate': 5000}
+    menu_model.add_menu_item(item_1)
+    menu_model.add_menu_item(item_2)
+    menu = menu_model.get_food_menu()
+    assert item_1 in menu and item_2 in menu
+    cursor = database_connection.cursor()
+    cursor.execute('DELETE FROM menu WHERE item = %s', ('chapati', ))
+    cursor.execute('DELETE FROM menu WHERE item = %s', ('samosa', ))
+    commit_and_close(database_connection)
+
+
+def test_model_raises_exception_when_menu_table_is_empty(database_connection):
+    menu_model = Menu()
+    with pytest.raises(Exception):
+        menu_model.get_food_menu()

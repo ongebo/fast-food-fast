@@ -1,7 +1,15 @@
-click==6.7
+Click==7.0
+flasgger==0.9.1
 Flask==1.0.2
+Flask-JWT-Extended==3.13.1
 gunicorn==19.9.0
 itsdangerous==0.24
 Jinja2==2.10
+jsonschema==2.6.0
 MarkupSafe==1.0
+mistune==0.8.3
+psycopg2==2.7.5
+PyJWT==1.6.4
+PyYAML==3.13
+six==1.11.0
 Werkzeug==0.14.1

@@ -1,118 +1,229 @@
+import psycopg2, uuid, os
+from .validation import Validation
+from werkzeug.security import generate_password_hash, check_password_hash
+
+
+validator = Validation()
+expected_user_data_format = """
+Ensure you follow these rules when providing user sign up data.
+
+1. User data should have the format:
+{
+    'username': '<username>',
+    'password': '<password>'
+}
+2. <username> and <password> cannot be empty strings
 """
-Model Classes Responsible for Handling Non-Persistent Data for the Application
-"""
-from .validation import validate_order_item, validate_order
 
 
-class OrderNotFound(Exception):
-    pass
+class Model:
+    """Base class for the model classes"""
+    def connect_to_db(self):
+        self.conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+        self.cursor = self.conn.cursor()
 
 
-class BadRequest(Exception):
-    pass
-
-
-class Order:
-    orders = list()
-
-    def get_all(self):
-        return Order.orders
+class User(Model):
+    def register_user(self, user):
+        """Adds a new user to the database"""
+        if validator.validate_user(user):
+            self.connect_to_db()
+            self.cursor.execute('SELECT username FROM users')
+            for record in self.cursor.fetchall():
+                if user['username'] in record:
+                    raise Exception('{} already exists!'.format(user['username']))
+            new_user = dict()
+            new_user['username'] = user['username']
+            new_user['password'] = generate_password_hash(user['password'], method='sha256')
+            new_user['admin'] = False
+            self.cursor.execute(
+                'INSERT INTO users (username, password, admin) VALUES (%s, %s, %s)',
+                (new_user['username'], new_user['password'], new_user['admin'])
+            )
+            self.conn.commit()
+            self.conn.close()
+            return new_user
+        else:
+            raise Exception(expected_user_data_format)
     
-    def get_order(self, order_id):
-        """Returns order with specific order_id if it exists"""
-        if not isinstance(order_id, int):
-            raise TypeError('The id should be an integer')
-        for order in Order.orders:
-            if order['order-id'] == order_id:
-                return order
-        raise OrderNotFound('No order with id {} exists'.format(order_id))
-    
-    def create_order(self, order):
-        """Creates and returns a reference to a new order in the orders list"""
-        if validate_order(order):
+    def get_user(self, username):
+        """Retrieves a user from the database"""
+        if not isinstance(username, str):
+            raise Exception('Username must be a string')
+        self.connect_to_db()
+        self.cursor.execute(
+            'SELECT username, password FROM users WHERE username = %s',
+            (username, )
+        )
+        result = self.cursor.fetchone()
+        self.conn.close()
+        if not result:
+            raise Exception('No user with name {} exists!'.format(username))
+        user = dict()
+        user['username'] = result[0]
+        user['password'] = result[1]
+        return user
+
+
+class Order(Model):
+    def create_order(self, order, customer):
+        """Adds a new order to the database"""
+        if validator.validate_order(order):
             new_order = dict()
             new_order['items'] = order['items']
-            new_order['status'] = 'pending'
+            new_order['status'] = 'new'
             total_cost = 0
             for item in order['items']:
                 total_cost += float(item['cost'])
             new_order['total-cost'] = total_cost
-            order_id = 0 if len(Order.orders) == 0 else Order.orders[-1]['order-id'] + 1
+            order_id = str(uuid.uuid4())[:8] # random public ID for security
             new_order['order-id'] = order_id
-            Order.orders.append(new_order)
+
+            self.connect_to_db()
+            self.cursor.execute(
+                'INSERT INTO orders (public_id, customer, status, total_cost) VALUES (%s, %s, %s, %s)',
+                (order_id, customer, 'new', total_cost)
+            )
+            self.cursor.execute(
+                'SELECT id FROM orders WHERE public_id = %s', (order_id, )
+            )
+            primary_key = self.cursor.fetchone()[0]
+            for item in new_order['items']:
+                self.cursor.execute(
+                    'INSERT INTO order_items (order_id, item, quantity, cost) VALUES (%s, %s, %s, %s)',
+                    (primary_key, item['item'], item['quantity'], item['cost'])
+                )
+            self.conn.commit()
+            self.conn.close()
             return new_order
         else:
-            raise BadRequest
+            raise Exception
     
-    def update_order_status(self, order_id, new_order):
-        """Updates order having id <order_id> with new_order"""
-        order_to_update = self.get_order(order_id)
-        if 'items' not in new_order:
-            new_order['items'] = order_to_update['items'][:] # slice to create a new copy
-        if validate_order(new_order):
-            order_to_update.update(new_order)
-            total_cost = 0
-            for item in order_to_update['items']:
-                total_cost += item['cost']
-            order_to_update['total-cost'] = total_cost
-        else:
-            raise BadRequest
+    def get_order_history(self, customer):
+        """Returns a list of all orders made by a user"""
+        self.connect_to_db()
+        self.cursor.execute(
+            'SELECT id, public_id, status, total_cost FROM orders WHERE customer = %s',
+            (customer, )
+        )
+        records = self.cursor.fetchall()
+        if not records:
+            raise Exception('No orders made by {}!'.format(customer))
+        orders = list()
+        for record in records:
+            order = dict()
+            order['order-id'] = record[1]
+            order['status'] = record[2]
+            order['total-cost'] = record[3]
+            self.cursor.execute(
+                'SELECT item, quantity, cost FROM order_items WHERE order_id = %s',
+                (record[0], )
+            )
+            items = list()
+            for item in self.cursor.fetchall():
+                item = {'item': item[0], 'quantity': item[1], 'cost': item[2]}
+                items.append(item)
+            order['items'] = items
+            orders.append(order)
+        return orders
     
-    def delete_order(self, order_id):
-        """Deletes order with specified order_id, raises exception if it's non-existent"""
-        if not isinstance(order_id, int):
-            raise TypeError('The id should be an integer')
-        order_present = False
-        order_index = None
-        for order in Order.orders:
-            if order['order-id'] == order_id:
-                order_present = True
-                order_index = Order.orders.index(order)
-                break # assuming there's no other order in the list with 'order-id' == order_id
-        if order_present:
-            del Order.orders[order_index]
-        else:
-            raise OrderNotFound('No order with id {} exists'.format(order_id))
-
-
-class Menu:
-    menu_items = list()
-
-    def create_menu_item(self, menu_item):
-        """Adds new food item to the menu, returns reference to it"""
-        if self.is_valid_menu_item(menu_item):
-            new_item = dict()
-            new_item['item'] = menu_item['item']
-            new_item['rate'] = menu_item['rate']
-            new_item['unit'] = menu_item.get('unit')
-            item_id = 1 if len(Menu.menu_items) == 0 else Menu.menu_items[-1]['item-id'] + 1
-            new_item['item-id'] = item_id
-            Menu.menu_items.append(new_item)
-            return new_item
-        else:
-            raise Exception('Invalid menu item data.')
-
-    def is_valid_menu_item(self, menu_item):
-        """Returns True if menu_item argument is valid, False otherwise"""
-        try:
-            assert isinstance(menu_item, dict)
-            assert 'item' in menu_item and isinstance(menu_item['item'], str)
-            assert 'rate' in menu_item and float(menu_item['rate'])
-
-            if len(menu_item) == 3:
-                assert 'unit' in menu_item or 'item-id' in menu_item
-            elif len(menu_item) == 4:
-                assert 'unit' in menu_item and 'item-id' in menu_item
-            elif len(menu_item) > 4:
-                return False
-            
-            if 'unit' in menu_item:
-                assert isinstance(menu_item['unit'], str)
-            if 'item-id' in menu_item:
-                assert float(menu_item['item-id'])
-            return True
-        except AssertionError:
-            return False
+    def get_all_orders(self):
+        """Fetches all orders from the database"""
+        self.connect_to_db()
+        self.cursor.execute(
+            'SELECT id, public_id, customer, status, total_cost FROM orders'
+        )
+        records = self.cursor.fetchall()
+        if not records:
+            raise Exception('No orders available!')
+        orders = list()
+        for record in records:
+            order = dict()
+            order['order-id'] = record[1]
+            order['customer'] = record[2]
+            order['status'] = record[3]
+            order['total-cost'] = record[4]
+            self.cursor.execute(
+                'SELECT item, quantity, cost FROM order_items WHERE order_id = %s',
+                (record[0], )
+            )
+            items = list()
+            for item in self.cursor.fetchall():
+                item = {'item': item[0], 'quantity': item[1], 'cost': item[2]}
+                items.append(item)
+            order['items'] = items
+            orders.append(order)
+        self.conn.close()
+        return orders
     
-    def get_all(self):
-        return Menu.menu_items
+    def get_specific_order(self, order_id):
+        """"Fetches a specific order from the database with public_id = <order_id>"""
+        self.connect_to_db()
+        self.cursor.execute('SELECT * FROM orders WHERE public_id = %s', (order_id, ))
+        record = self.cursor.fetchone()
+        if not record:
+            raise Exception('No order with id {} exists!'.format(order_id))
+        order = dict()
+        items = list()
+        self.cursor.execute(
+            'SELECT item, quantity, cost FROM order_items WHERE order_id = %s',
+            (record[0], )
+        )
+        for item in self.cursor.fetchall():
+            item = {'item': item[0], 'quantity': item[1], 'cost': item[2]}
+            items.append(item)
+        order['items'] = items
+        order['order-id'] = record[1]
+        order['customer'] = record[2]
+        order['status'] = record[3]
+        order['total-cost'] = record[4]
+        self.conn.close()
+        return order
+    
+    def update_order_status(self, order_id, status):
+        """Updates the status of an order with <order_id>"""
+        if not self.get_specific_order(order_id):
+            raise Exception('The specified order does not exist!')
+        validator.validate_status_data(status)
+        self.connect_to_db()
+        self.cursor.execute(
+            'UPDATE orders SET status = %s WHERE public_id = %s',
+            (status['status'], order_id)
+        )
+        self.conn.commit()
+        self.conn.close()
+    
+    def is_admin(self, user):
+        """Returns True if user is admin, False otherwise"""
+        self.connect_to_db()
+        self.cursor.execute('SELECT admin FROM users WHERE username = %s', (user, ))
+        value = self.cursor.fetchone()[0]
+        self.conn.close()
+        return value
+
+
+class Menu(Model):
+    def get_food_menu(self):
+        """Returns all food items in the menu"""
+        self.connect_to_db()
+        self.cursor.execute(
+            'SELECT item, unit, rate FROM menu'
+        )
+        menu_items = self.cursor.fetchall()
+        if not menu_items:
+            raise Exception('The food menu is empty')
+        menu = list()
+        for item in menu_items:
+            menu.append({'item': item[0], 'unit': item[1], 'rate': item[2]})
+        return menu
+    
+    def add_menu_item(self, menu_item):
+        """Adds a new item to the food menu"""
+        validator.validate_menu_item(menu_item)
+        self.connect_to_db()
+        self.cursor.execute(
+            'INSERT INTO menu (item, unit, rate) VALUES (%s, %s, %s)',
+            (menu_item['item'], menu_item['unit'], menu_item['rate'])
+        )
+        self.conn.commit()
+        self.conn.close()

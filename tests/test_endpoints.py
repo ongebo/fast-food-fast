@@ -1,0 +1,183 @@
+import pytest, psycopg2, os
+from fastfoodfast import app
+from werkzeug.security import check_password_hash
+
+
+@pytest.fixture
+def test_client():
+    os.environ['DATABASE_URL'] = 'postgres://ongebo:nothing@127.0.0.1:5432/testdb'
+    return app.test_client()
+
+
+@pytest.fixture
+def connection():
+    conn = psycopg2.connect(os.getenv('DATABASE_URL'))
+    return conn
+
+
+def register_and_login_user(name, password, test_client):
+    """Signs up and logs in a new user, returns Authorization header for the user"""
+    user_data = {'username': name, 'password': password}
+    test_client.post('/api/v1/auth/signup', json=user_data)
+    response = test_client.post('/api/v1/auth/login', json=user_data)
+    token = response.get_json()['token']
+    headers = {'Authorization': 'Bearer ' + token}
+    return headers
+
+
+def login_administrator(test_client):
+    """Logs in the administrator and returns headers containing JWT token for the admin"""
+    admin = {'username': 'admin', 'password': 'administrator'}
+    response = test_client.post('/api/v1/auth/login', json=admin)
+    token = response.get_json()['token']
+    headers = {'Authorization': 'Bearer ' + token}
+    return headers
+
+
+def clean_users(conn, *usernames):
+    """Used by tests to reset changes made to users table"""
+    cursor = conn.cursor()
+    for username in usernames:
+        cursor.execute('DELETE FROM users WHERE username = %s', (username, ))
+
+
+def clean_orders(conn, customer):
+    """Used by tests to revert changes made to database when testing orders management"""
+    cursor = conn.cursor()
+    cursor.execute('SELECT id FROM orders WHERE customer = %s', (customer, ))
+    for order_id in cursor.fetchall():
+        cursor.execute('DELETE FROM order_items WHERE order_id = %s', (order_id, ))
+    cursor.execute('DELETE FROM orders WHERE customer = %s', (customer, ))
+
+
+def commit_and_close(conn):
+    conn.commit()
+    conn.close()
+
+
+def test_api_correctly_registers_a_user(test_client, connection):
+    user_data = {'username': 'John Doe', 'password': 'JonathanDoe'}
+    response = test_client.post('/api/v1/auth/signup', json=user_data)
+    data = response.get_json()
+    assert response.status_code == 201
+    assert data['username'] == 'John Doe'
+    assert check_password_hash(data['password'], 'JonathanDoe')
+    assert data['admin'] == False
+    clean_users(connection, 'John Doe')
+    commit_and_close(connection)
+
+
+def test_api_returns_error_message_given_wrong_registration_data(test_client):
+    invalid_user_data = {'username': '  ', 'password': 'something'}
+    response = test_client.post('/api/v1/auth/signup', json=invalid_user_data)
+    assert response.status_code == 400
+    assert response.data # ensure that there is an error message
+
+
+def test_api_correctly_logs_in_registered_user(test_client, connection):
+    user_data = {'username': 'Jon Snow', 'password': 'winterfel'}
+    response = test_client.post('/api/v1/auth/signup', json=user_data)
+    assert response.status_code == 201
+    response_2 = test_client.post('/api/v1/auth/login', json=user_data)
+    assert response_2.status_code == 200
+    assert 'token' in response_2.get_json()
+    clean_users(connection, 'Jon Snow')
+    commit_and_close(connection)
+
+
+def test_api_returns_error_message_given_wrong_login_data(test_client):
+    invalid_data = {'username': 'something'}
+    response = test_client.post('/api/v1/auth/login', json=invalid_data)
+    assert response.status_code == 400
+    assert 'error' in response.get_json()
+
+
+def test_api_can_place_an_order_for_food(test_client, connection):
+    headers = register_and_login_user('Loki Odinson', 'mischief', test_client)
+    order = {'items': [{'item': 'pizza', 'quantity': 1, 'cost': 20000}]}
+    response = test_client.post('/api/v1/users/orders', json=order, headers=headers)
+    assert response.status_code == 201
+    assert 'order-id' in response.get_json()
+    clean_orders(connection, 'Loki Odinson')
+    clean_users(connection, 'Loki Odinson')
+    commit_and_close(connection)
+
+
+def test_api_returns_error_message_given_incorrect_post_order_data(test_client, connection):
+    headers = register_and_login_user('okoye', 'general', test_client)
+    response = test_client.post('/api/v1/users/orders', json={}, headers=headers)
+    assert response.status_code == 400
+    assert b'invalid data' in response.data
+    clean_users(connection, 'okoye')
+    commit_and_close(connection)
+
+
+def test_api_returns_user_order_history(test_client, connection):
+    headers = register_and_login_user('steve rodgers', 'capitan', test_client)
+    order_1 = {'items': [{'item': 'hot dog', 'quantity': 2, 'cost': 15000}]}
+    order_2 = {'items': [{'item': 'salad', 'quantity': 1, 'cost': 10000}]}
+    response_1 = test_client.post('/api/v1/users/orders', json=order_1, headers=headers)
+    response_2 = test_client.post('/api/v1/users/orders', json=order_2, headers=headers)
+    response_3 = test_client.get('/api/v1/users/orders', headers=headers)
+    assert response_1.status_code == 201 and response_2.status_code == 201
+    assert response_3.status_code == 200
+    assert response_1.get_json() in response_3.get_json()['orders']
+    assert response_2.get_json() in response_3.get_json()['orders']
+    clean_users(connection, 'steve rodgers')
+    clean_orders(connection, 'steve rodgers')
+    commit_and_close(connection)
+
+
+def test_api_returns_message_when_getting_non_existent_order_history(test_client, connection):
+    headers = register_and_login_user('winter soldier', 'soldier', test_client)
+    response = test_client.get('/api/v1/users/orders', headers=headers)
+    assert response.status_code == 404
+    assert 'message' in response.get_json()
+    cursor = connection.cursor()
+    cursor.execute('DELETE FROM users WHERE username = %s', ('winter soldier', ))
+    connection.commit()
+    connection.close()
+
+
+def test_admin_can_get_a_specific_order_by_id(test_client, connection):
+    headers = login_administrator(test_client)
+    order = {'items': [{'item': 'rolex', 'quantity': 2, 'cost': 2000}]}
+    response_1 = test_client.post('/api/v1/users/orders', json=order, headers=headers)
+    order_id = response_1.get_json()['order-id']
+    response_2 = test_client.get('/api/v1/orders/{}'.format(order_id), headers=headers)
+    assert response_1.status_code == 201
+    assert response_2.status_code == 200
+    assert response_1.get_json()['order-id'] == response_2.get_json()['order-id']
+    assert response_1.get_json()['status'] == response_2.get_json()['status']
+    assert response_1.get_json()['total-cost'] == response_2.get_json()['total-cost']
+    clean_orders(connection, 'admin')
+    commit_and_close(connection)
+
+
+def test_admin_can_update_order_status(test_client, connection):
+    headers_1 = register_and_login_user('quill', 'starlord', test_client)
+    order = {'items': [{'item': 'milk', 'quantity': 1, 'cost': 5000}]}
+    response_1 = test_client.post('/api/v1/users/orders', json=order, headers=headers_1)
+    order_id = response_1.get_json()['order-id']
+    headers_2 = login_administrator(test_client)
+    response_3 = test_client.put(
+        '/api/v1/orders/{}'.format(order_id), headers=headers_2, json={'status': 'processing'}
+    )
+    response_3 = test_client.get('/api/v1/orders/{}'.format(order_id), headers=headers_2)
+    assert response_3.status_code == 200
+    assert response_3.get_json()['status'] == 'processing'
+    clean_orders(connection, 'quill')
+    clean_users(connection, 'quill')
+    commit_and_close(connection)
+
+
+def test_api_can_return_created_menu_item_to_admin(test_client, connection):
+    headers = login_administrator(test_client)
+    menu_item = {'item': 'spaghetti', 'unit': 'pack', 'rate': 5000}
+    test_client.post('/api/v1/menu', json=menu_item, headers=headers)
+    response = test_client.get('/api/v1/menu', headers=headers)
+    assert menu_item in response.get_json()['menu']
+    assert response.status_code == 200
+    connection.cursor().execute('DELETE FROM menu WHERE item = %s', ('spaghetti', ))
+    connection.commit()
+    connection.close

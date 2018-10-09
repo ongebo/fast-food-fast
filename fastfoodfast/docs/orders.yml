@@ -1,0 +1,10 @@
+Get a list of all orders
+GET this endpoint as admin to see a list of all orders in the database
+---
+tags:
+  - Orders
+responses:
+  404:
+    description: No orders in the database!
+  200:
+    description: Successfully retrieved all orders from database

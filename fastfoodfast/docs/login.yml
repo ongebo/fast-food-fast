@@ -1,0 +1,27 @@
+Login as registered user.
+Post username and password to log in.
+---
+tags:
+  - Authentication
+parameters:
+  - name: username
+    type: string
+    required: true
+    description: Name used for registration
+  - name: password
+    type: string
+    required: true
+    description: Password used when creating account
+responses:
+  400:
+    description: Incorrect login credentials!
+  200:
+    description: Successfully logged in!
+    schema:
+      properties:
+        message:
+          type: string
+          default: You were successfully logged-in!
+        token:
+          type: string
+          description: JSON Web Token used to access secured routes for a limited time period
