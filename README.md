@@ -1,7 +1,7 @@
 # Fast-Food-Fast
 
 [![Build Status](https://travis-ci.org/ongebo/fast-food-fast.svg?branch=ft-register-user-160882822)](https://travis-ci.org/ongebo/fast-food-fast)
-[![Coverage Status](https://coveralls.io/repos/github/ongebo/fast-food-fast/badge.svg?branch=api-with-db)](https://coveralls.io/github/ongebo/fast-food-fast?branch=api-with-db)
+[![Coverage Status](https://coveralls.io/repos/github/ongebo/fast-food-fast/badge.svg?branch=develop)](https://coveralls.io/github/ongebo/fast-food-fast?branch=develop)
 
 Order Fast-Food Online, Have it Delivered Fast
 
