@@ -27,8 +27,8 @@ def register_a_user():
     """Creates a new user account"""
     try:
         user_data = request.get_json()
-        created_user = user_model.register_user(user_data)
-        return jsonify(created_user), 201
+        user_model.register_user(user_data)
+        return jsonify({'message': 'you were successfully registered!'}), 201
     except Exception as e:
         response = Response(str(e), status=400, mimetype='text/plain')
         return response
