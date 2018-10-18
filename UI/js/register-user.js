@@ -9,9 +9,11 @@ async function register(event) {
             requestBody[inputs[c].name] = inputs[c].value;
         }
     }
+    var headers = new Headers();
+    headers.append("Content-Type", "application/json");
     var request = new Request(
         "https://gbo-fff-with-db.herokuapp.com/api/v1/auth/signup",
-        {method: "POST", cache: "reload", body: JSON.stringify(requestBody)}
+        {method: "POST", cache: "reload", body: JSON.stringify(requestBody), headers: headers}
     );
     try {
         var promise = fetch(request);
