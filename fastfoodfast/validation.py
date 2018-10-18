@@ -67,19 +67,47 @@ class Validation:
         except:
             return False
     
-    def validate_user(self, user):
-        """Returns True if user data is valid, False otherwise"""
-        try:
-            assert isinstance(user, dict)
-            assert 'username' in user
-            user['username'] = user['username'].strip()
-            assert len(user['username']) != 0
-            assert 'password' in user and isinstance(user['password'], str)
-            user['password'] = user['password'].strip()
-            assert len(user['password']) != 0
-            return True
-        except:
-            return False
+    def validate_user_data(self, user_data):
+        assert isinstance(user_data, dict), 'Registration data should be a valid JSON string'
+        assert 'username' in user_data, 'Specify a username'
+        user_data['username'] = self.process_username(user_data['username'])
+        assert 'password' in user_data, 'Specify a password'
+        error_message = (
+            'password must contain atleast one lowercase letter, one uppercase letter, '
+            'a digit and be 6 to 12 characters long'
+        )
+        assert self.is_valid_password(user_data['password']), error_message
+        assert 'email' in user_data, 'Specify an email address'
+        assert 'telephone' in user_data, 'Specify telephone contact'
+    
+    def process_username(self, username):
+        assert isinstance(username, str), 'Username must be a string'
+        names = username.strip().split()
+        for name in names:
+            assert len(name) >= 3, 'Each name (first/last name) must contain atleast 3 letters'
+            for character in name:
+                assert character.isalpha(), (
+                    'Username can only contain valid name(s) separated by single spaces'
+                )
+        for i in range(len(names)):
+            names[i] = names[i].capitalize() # capitalize all names
+        return ' '.join(names)
+    
+    def is_valid_password(self, password):
+        assert isinstance(password, str), 'Password should be a string'
+        checks = {'a-z': str.islower, 'A-Z': str.isupper, '0-9': str.isdigit}
+        for character in password:
+            for key, check in checks.items():
+                if check(character):
+                    del checks[key]
+                    break # move onto the next character
+        return len(checks) == 0 and 6 <= len(password) <= 12
+    
+    def ensure_user_not_existent(self, username, cursor):
+        cursor.execute('SELECT username FROM users')
+        for record in cursor.fetchall():
+            if username in record:
+                raise Exception('{} already exists!'.format(username))
     
     def validate_menu_item(self, menu_item):
         """Ensures that menu item data sent by admin is valid, raises exception if invalid. """
