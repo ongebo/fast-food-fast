@@ -17,6 +17,8 @@ def create_tables(conn):
             Id SERIAL PRIMARY KEY,
             Username VARCHAR(80) NOT NULL,
             Password VARCHAR(80) NOT NULL,
+            Email VARCHAR(80),
+            Telephone VARCHAR(80),
             Admin BOOLEAN NOT NULL
         );
         """
