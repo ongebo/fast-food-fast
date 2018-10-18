@@ -8,12 +8,14 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token, ge
 from .models import User, Order, Menu
 from flasgger import Swagger
 from flasgger.utils import swag_from
+from flask_cors import CORS
 
 
 app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'secret-key'
 jwt = JWTManager(app)
 Swagger(app)
+CORS(app)
 user_model = User()
 order_model = Order()
 menu_model = Menu()
