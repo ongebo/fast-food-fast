@@ -30,8 +30,7 @@ def register_a_user():
         user_model.register_user(user_data)
         return jsonify({'message': 'you were successfully registered!'}), 201
     except Exception as e:
-        response = Response(str(e), status=400, mimetype='text/plain')
-        return response
+        return jsonify({'error': str(e)}), 400
 
 
 @app.route('/api/v1/auth/login', methods=['POST'])
