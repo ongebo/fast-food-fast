@@ -24,27 +24,21 @@ class Model:
 
 
 class User(Model):
-    def register_user(self, user):
+    def register_user(self, user_data):
         """Adds a new user to the database"""
-        if validator.validate_user(user):
-            self.connect_to_db()
-            self.cursor.execute('SELECT username FROM users')
-            for record in self.cursor.fetchall():
-                if user['username'] in record:
-                    raise Exception('{} already exists!'.format(user['username']))
-            new_user = dict()
-            new_user['username'] = user['username']
-            new_user['password'] = generate_password_hash(user['password'], method='sha256')
-            new_user['admin'] = False
-            self.cursor.execute(
-                'INSERT INTO users (username, password, admin) VALUES (%s, %s, %s)',
-                (new_user['username'], new_user['password'], new_user['admin'])
+        validator.validate_user_data(user_data)
+        self.connect_to_db()
+        validator.ensure_user_not_existent(user_data['username'], self.cursor)
+        password_hash = generate_password_hash(user_data['password'], method='sha256')
+        self.cursor.execute(
+            'INSERT INTO users (username, password, email, tel, admin) VALUES (%s, %s, %s, %s, %s)',
+            (
+                user_data['username'], password_hash, user_data['email'],
+                user_data['telephone'], False
             )
-            self.conn.commit()
-            self.conn.close()
-            return new_user
-        else:
-            raise Exception(expected_user_data_format)
+        )
+        self.conn.commit()
+        self.conn.close()
     
     def get_user(self, username):
         """Retrieves a user from the database"""
