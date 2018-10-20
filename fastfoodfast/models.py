@@ -26,7 +26,7 @@ class Model:
 class User(Model):
     def register_user(self, user_data):
         """Adds a new user to the database"""
-        validator.validate_user_data(user_data)
+        user_data = validator.validate_user_data(user_data)
         self.connect_to_db()
         validator.ensure_user_not_existent(user_data['username'], self.cursor)
         password_hash = generate_password_hash(user_data['password'], method='sha256')
