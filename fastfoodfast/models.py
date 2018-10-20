@@ -62,36 +62,34 @@ class User(Model):
 class Order(Model):
     def create_order(self, order, customer):
         """Adds a new order to the database"""
-        if validator.validate_order(order):
-            new_order = dict()
-            new_order['items'] = order['items']
-            new_order['status'] = 'new'
-            total_cost = 0
-            for item in order['items']:
-                total_cost += float(item['cost'])
-            new_order['total-cost'] = total_cost
-            order_id = str(uuid.uuid4())[:8] # random public ID for security
-            new_order['order-id'] = order_id
-
-            self.connect_to_db()
+        validator.validate_order(order)
+        total_cost = 0
+        for item in order['items']:
+            item['item'] = item['item'].strip() # remove leading and lagging spaces
+            total_cost += float(item['cost'])
+        order_id = str(uuid.uuid4())[:8] # random public ID for security
+        new_order = {
+            'items': order['items'], 'status': 'new',
+            'total-cost': total_cost, 'order-id': order_id
+        }
+        # add order to the database
+        self.connect_to_db()
+        self.cursor.execute(
+            'INSERT INTO orders (public_id, customer, status, total_cost) VALUES (%s, %s, %s, %s)',
+            (order_id, customer, 'new', total_cost)
+        )
+        self.cursor.execute(
+            'SELECT id FROM orders WHERE public_id = %s', (order_id, )
+        )
+        primary_key = self.cursor.fetchone()[0]
+        for item in new_order['items']:
             self.cursor.execute(
-                'INSERT INTO orders (public_id, customer, status, total_cost) VALUES (%s, %s, %s, %s)',
-                (order_id, customer, 'new', total_cost)
+                'INSERT INTO order_items (order_id, item, quantity, cost) VALUES (%s, %s, %s, %s)',
+                (primary_key, item['item'], item['quantity'], item['cost'])
             )
-            self.cursor.execute(
-                'SELECT id FROM orders WHERE public_id = %s', (order_id, )
-            )
-            primary_key = self.cursor.fetchone()[0]
-            for item in new_order['items']:
-                self.cursor.execute(
-                    'INSERT INTO order_items (order_id, item, quantity, cost) VALUES (%s, %s, %s, %s)',
-                    (primary_key, item['item'], item['quantity'], item['cost'])
-                )
-            self.conn.commit()
-            self.conn.close()
-            return new_order
-        else:
-            raise Exception
+        self.conn.commit()
+        self.conn.close()
+        return new_order
     
     def get_order_history(self, customer):
         """Returns a list of all orders made by a user"""
