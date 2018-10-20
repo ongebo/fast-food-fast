@@ -17,58 +17,30 @@ class Validation:
         if status_data['status'] not in ['new', 'processing', 'cancelled', 'complete']:
             raise Exception('Specify status as new, processing, cancelled, or complete')
         assert len(status_data) == 1, 'Redundant data in status request'
-
-    def validate_order_item(self, item):
-        """Checks that an item (dictionary) in an order items list is valid"""
-        try:
-            assert isinstance(item, dict)
-            assert 'item' in item and isinstance(item['item'], str)
-            item['item'] = item['item'].strip() # remove leading and trailing spaces
-            assert len(item['item']) != 0
-            for c in item['item']:
-                assert c.isalnum() or c.isspace()
-            assert 'quantity' in item and float(item['quantity'])
-            assert float(item['quantity']) > 0 # quantity cannot be zero or negative
-            assert 'cost' in item and float(item['cost'])
-            assert float(item['cost']) > 0 # cost cannot be negative
-            assert len(item) == 3
-            return True
-        except (AssertionError, TypeError, ValueError):
-            return False
     
     def validate_order(self, order):
-        """Returns True if the data for an order is valid, False otherwise"""
-        try:
-            assert isinstance(order, dict)
-            assert 'items' in order
-            assert isinstance(order['items'], list)
-            for item in order['items']:
-                assert self.validate_order_item(item)
-            
-            if len(order) == 2:
-                assert 'status' in order or 'total-cost' in order or 'order-id' in order
-            elif len(order) == 3:
-                condition_1 = 'status' in order and 'total-cost' in order
-                condition_2 = 'status' in order and 'order-id' in order
-                condition_3 = 'total-cost' in order and 'order-id' in order
-                assert condition_1 or condition_2 or condition_3
-            elif len(order) == 4:
-                assert 'status' in order and 'total-cost' in order and 'order-id' in order
-            elif len(order) > 4:
-                return False
-            
-            if 'status' in order:
-                order['status'] = order['status'].strip().lower()
-                assert order['status'] in ['pending', 'accepted', 'complete']
-            if 'total-cost' in order:
-                assert float(order['total-cost'])
-            if 'order-id' in order:
-                assert float(order['order-id'])
-            return True
-        except:
-            return False
+        assert isinstance(order, dict), 'Order data must be represented in JSON!'
+        assert 'items' in order, 'items to order not specified!'
+        assert isinstance(order['items'], list), 'Specify order items as a list'
+        assert len(order['items']) > 0, 'Items list empty!'
+        for item in order['items']:
+            self.validate_order_item(item)
+    
+    def validate_order_item(self, item):
+        assert isinstance(item, dict), 'Specify order item as a dictionary!'
+        assert 'item' in item, 'Specify item name!'
+        assert 'quantity' in item, 'Item quantity not specified!'
+        assert 'cost' in item, 'Item cost not specified!'
+        assert isinstance(item['item'], str), 'Item name must be a string!'
+        assert re.match('[a-zA-Z]{2,30}$', item['item'].strip()), 'Invalid item specified!'
+        assert float(item['quantity']), 'Specify quantity as a number!'
+        assert float(item['quantity']) > 0, 'Item quantity cannot be negative!'
+        assert float(item['cost']), 'Specify item cost as a number!'
+        assert float(item['cost']) > 0, 'Item cost cannot be negative!'
+        assert len(item) == 3, 'Redundant fields in request data!'
     
     def validate_user_data(self, user_data):
+        assert isinstance(user_data, dict), 'Specify registration data in JSON format!'
         self.ensure_required_fields_present(user_data)
         self.validate_username(user_data['username'])
         self.validate_email_address(user_data['email'])
