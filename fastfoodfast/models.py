@@ -4,16 +4,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 
 validator = Validation()
-expected_user_data_format = """
-Ensure you follow these rules when providing user sign up data.
-
-1. User data should have the format:
-{
-    'username': '<username>',
-    'password': '<password>'
-}
-2. <username> and <password> cannot be empty strings
-"""
 
 
 class Model:
