@@ -1,6 +1,7 @@
 """
 Validation code for checking the correctness of data sent to the API.
 """
+import re
 
 
 class Validation:
@@ -68,40 +69,61 @@ class Validation:
             return False
     
     def validate_user_data(self, user_data):
-        assert isinstance(user_data, dict), 'Registration data should be a valid JSON string'
-        assert 'username' in user_data, 'Specify a username'
-        user_data['username'] = self.process_username(user_data['username'])
-        assert 'password' in user_data, 'Specify a password'
+        self.ensure_required_fields_present(user_data)
+        self.validate_username(user_data['username'])
+        self.validate_email_address(user_data['email'])
+        self.validate_telephone_number(user_data['telephone'])
+        self.validate_password(user_data['password'])
+        return self.process_user_data(user_data)
+    
+    def ensure_required_fields_present(self, user_data):
+        assert 'username' in user_data, 'Username not specified!'
+        assert 'password' in user_data, 'Password not specified!'
+        assert 'email' in user_data, 'Email address not specified!'
+        assert 'telephone' in user_data, 'Phone number not specified!'
+    
+    def validate_username(self, username):
+        assert isinstance(username, str), 'Username must be a string!'
+        username_pattern = re.compile(r'[a-zA-Z]{3,30}( [a-zA-Z]{3,30})*$')
         error_message = (
-            'password must contain atleast one lowercase letter, one uppercase letter, '
-            'a digit and be 6 to 12 characters long'
+            'Username can only contain letters. Names (firstname/lastname) are separated'
+            ' by single spaces and each must contain atleast three letters!'
         )
-        assert self.is_valid_password(user_data['password']), error_message
-        assert 'email' in user_data, 'Specify an email address'
-        assert 'telephone' in user_data, 'Specify telephone contact'
+        assert username_pattern.match(username.strip()), error_message
     
-    def process_username(self, username):
-        assert isinstance(username, str), 'Username must be a string'
-        names = username.strip().split()
-        for name in names:
-            assert len(name) >= 3, 'Each name (first/last name) must contain atleast 3 letters'
-            for character in name:
-                assert character.isalpha(), (
-                    'Username can only contain valid name(s) separated by single spaces'
-                )
-        for i in range(len(names)):
-            names[i] = names[i].capitalize() # capitalize all names
-        return ' '.join(names)
+    def validate_email_address(self, email_address):
+        assert isinstance(email_address, str), 'Email address must be a string!'
+        pattern = re.compile(r'[a-zA-Z0-9]+@[a-zA-Z]+\.[a-zA-Z]{2,3}((\.[a-zA-Z]{2,3})+)?$')
+        assert pattern.match(email_address.strip()), 'Email address is invalid!'
     
-    def is_valid_password(self, password):
-        assert isinstance(password, str), 'Password should be a string'
+    def validate_telephone_number(self, telephone_number):
+        assert isinstance(telephone_number, str), 'Telephone contact must be a string!'
+        telephone_pattern = re.compile(r'\+[0-9]{1,3}-[0-9]{3}-[0-9]{6}$')
+        assert telephone_pattern.match(telephone_number.strip()), 'Telephone contact is invalid!'
+    
+    def validate_password(self, password):
+        assert isinstance(password, str), 'Password must be a string!'
         checks = {'a-z': str.islower, 'A-Z': str.isupper, '0-9': str.isdigit}
         for character in password:
             for key, check in checks.items():
                 if check(character):
                     del checks[key]
                     break # move onto the next character
-        return len(checks) == 0 and 6 <= len(password) <= 12
+        password_is_valid = len(checks) == 0 and 6 <= len(password) <= 12
+        error_message = (
+            'Password must contain atleast one lowercase letter, one uppercase letter'
+            ' a digit and be 6 to 12 characters long!'
+        )
+        assert password_is_valid, error_message
+    
+    def process_user_data(self, user_data):
+        names = user_data['username'].strip().split()
+        for i in range(len(names)):
+            names[i] = names[i].capitalize()
+        user_data['username'] = ' '.join(names)
+        user_data['email'] = user_data['email'].strip()
+        user_data['telephone'] = user_data['telephone'].strip()
+        return user_data
     
     def ensure_user_not_existent(self, username, cursor):
         cursor.execute('SELECT username FROM users')
