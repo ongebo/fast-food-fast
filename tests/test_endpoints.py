@@ -208,3 +208,16 @@ def test_api_can_return_created_menu_item_to_admin(test_client, connection):
     connection.cursor().execute('DELETE FROM menu WHERE item = %s', ('spaghetti', ))
     connection.commit()
     connection.close
+
+def test_api_returns_error_message_for_unauthorized_access_to_admin_routes(test_client):
+    headers = register_and_login_user('Tony Stark', '1ronM4n', test_client)
+    response_1 = test_client.get('/api/v1/orders', headers=headers)
+    response_2 = test_client.get('/api/v1/orders/67DAEDe', headers=headers)
+    status = {'status': 'processing'}
+    response_3 = test_client.put('/api/v1/orders/afdfik76', json=status, headers=headers)
+    menu_item = {'item': 'hot dog', 'unit': 'pack', 'rate': 10000}
+    response_4 = test_client.post('/api/v1/menu', json=menu_item, headers=headers)
+    assert response_1.status_code == 401 and 'error' in response_1.get_json()
+    assert response_2.status_code == 401 and 'error' in response_2.get_json()
+    assert response_3.status_code == 401 and 'error' in response_3.get_json()
+    assert response_4.status_code == 401 and 'error' in response_4.get_json()
