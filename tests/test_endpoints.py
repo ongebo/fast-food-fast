@@ -146,6 +146,25 @@ def test_api_returns_message_when_getting_non_existent_order_history(test_client
     connection.commit()
     connection.close()
 
+def test_admin_can_get_all_orders_from_database(test_client, connection):
+    headers_1 = register_and_login_user('Prisca', 'Pr1sca$', test_client)
+    headers_2 = register_and_login_user('Banner', 'St0ng3st', test_client)
+    headers_3 = login_administrator(test_client)
+    order_1 = {'items': [{'item': 'salad', 'quantity': 1, 'cost': 10000}]}
+    order_2 = {'items': [{'item': 'salad', 'quantity': 1, 'cost': 10000}]}
+    test_client.post('/api/v1/users/orders', json=order_1, headers=headers_1)
+    test_client.post('/api/v1/users/orders', json=order_2, headers=headers_2)
+    response = test_client.get('/api/v1/orders', headers=headers_3)
+    assert response.status_code == 200
+    order_items = list()
+    for order in response.get_json()['orders']:
+        order_items.append(order['items'])
+    assert order_1['items'] in order_items and order_2['items'] in order_items
+    clean_orders(connection, 'Prisca')
+    clean_orders(connection, 'Banner')
+    clean_users(connection, 'Prisca', 'Banner')
+    commit_and_close(connection)
+
 
 def test_admin_can_get_a_specific_order_by_id(test_client, connection):
     headers = login_administrator(test_client)
