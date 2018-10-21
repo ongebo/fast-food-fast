@@ -221,3 +221,9 @@ def test_api_returns_error_message_for_unauthorized_access_to_admin_routes(test_
     assert response_2.status_code == 401 and 'error' in response_2.get_json()
     assert response_3.status_code == 401 and 'error' in response_3.get_json()
     assert response_4.status_code == 401 and 'error' in response_4.get_json()
+
+
+def test_api_returns_404_error_when_requesting_non_existent_url(test_client):
+    response = test_client.get('/api/v2')
+    assert response.status_code == 404
+    assert 'error' in response.get_json()
