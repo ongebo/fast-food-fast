@@ -35,24 +35,31 @@ def commit_and_close(conn):
 
 def test_model_correctly_registers_new_user_to_the_database(database_connection):
     user_model = User()
-    new_user = user_model.register_user({'username': 'customer', 'password': 'p@$$word'})
-    assert new_user['username'] == 'customer'
-    assert check_password_hash(new_user['password'], 'p@$$word')
-    assert new_user['admin'] == False
+    user_model.register_user(
+        {
+            'username': 'customer', 'password': 'P4$$word',
+            'email': 'customer@mail.net', 'telephone': '+345-786-569134'
+        }
+    )
     cursor = database_connection.cursor()
     cursor.execute(
-        'SELECT username, password, admin FROM users WHERE username = %s', ('customer', )
+        'SELECT username, password, email, telephone, admin FROM '
+        'users WHERE username = %s', ('customer', )
     )
     result = cursor.fetchone()
-    assert 'customer' == result[0] and False == result[2]
-    assert check_password_hash(result[1], 'p@$$word')
+    assert 'customer' == result[0] and 'customer@mail.net' == result[2]
+    assert result[3] == '+345-786-569134' and result[4] == False
+    assert check_password_hash(result[1], 'P4$$word')
     clean_users(database_connection, 'customer')
     commit_and_close(database_connection)
 
 
 def test_model_raises_exception_when_registering_with_existent_username(database_connection):
     user_model = User()
-    user = {'username': 'customer', 'password': 'p@$$word'}
+    user = {
+        'username': 'customer', 'password': 'P4$$word',
+        'email': 'name@domain.com', 'telephone': '+2-465-231786'
+    }
     user_model.register_user(user)
     with pytest.raises(Exception):
         user_model.register_user(user) # try to re-register user
@@ -69,10 +76,13 @@ def test_model_raises_exception_given_incorrect_user_data_for_registration(datab
 
 def test_model_can_get_a_specific_user_by_username_from_db(database_connection):
     user_model = User()
-    user_model.register_user({'username': 'Thor', 'password': 'asgard'})
+    user_model.register_user({
+        'username': 'Thor', 'password': 'Asg4rd1an',
+        'email': 'thor@asgard.avr', 'telephone': '+23-345-916919'
+    })
     user = user_model.get_user('Thor')
     assert user['username'] == 'Thor'
-    assert check_password_hash(user['password'], 'asgard')
+    assert check_password_hash(user['password'], 'Asg4rd1an')
     clean_users(database_connection, 'Thor')
     commit_and_close(database_connection)
 
