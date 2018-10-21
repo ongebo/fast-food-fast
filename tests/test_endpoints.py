@@ -17,7 +17,10 @@ def connection():
 
 def register_and_login_user(name, password, test_client):
     """Signs up and logs in a new user, returns Authorization header for the user"""
-    user_data = {'username': name, 'password': password}
+    user_data = {
+        'username': name, 'password': password,
+        'email': 'name@domain.com', 'telephone': '+256-753-653973'
+    }
     test_client.post('/api/v1/auth/signup', json=user_data)
     response = test_client.post('/api/v1/auth/login', json=user_data)
     token = response.get_json()['token']
