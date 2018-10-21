@@ -21,7 +21,8 @@ class User(Model):
         validator.ensure_user_not_existent(user_data['username'], self.cursor)
         password_hash = generate_password_hash(user_data['password'], method='sha256')
         self.cursor.execute(
-            'INSERT INTO users (username, password, email, tel, admin) VALUES (%s, %s, %s, %s, %s)',
+            'INSERT INTO users (username, password, email, telephone, admin)'
+            ' VALUES (%s, %s, %s, %s, %s)',
             (
                 user_data['username'], password_hash, user_data['email'],
                 user_data['telephone'], False
