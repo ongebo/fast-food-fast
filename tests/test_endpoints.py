@@ -209,7 +209,7 @@ def test_api_can_return_created_menu_item_to_admin(test_client, connection):
     connection.commit()
     connection.close
 
-def test_api_returns_error_message_for_unauthorized_access_to_admin_routes(test_client):
+def test_api_returns_error_for_unauthorized_access_to_admin_routes(test_client, connection):
     headers = register_and_login_user('Tony Stark', '1ronM4n', test_client)
     response_1 = test_client.get('/api/v1/orders', headers=headers)
     response_2 = test_client.get('/api/v1/orders/67DAEDe', headers=headers)
@@ -221,6 +221,8 @@ def test_api_returns_error_message_for_unauthorized_access_to_admin_routes(test_
     assert response_2.status_code == 401 and 'error' in response_2.get_json()
     assert response_3.status_code == 401 and 'error' in response_3.get_json()
     assert response_4.status_code == 401 and 'error' in response_4.get_json()
+    clean_users(connection, 'Tony Stark')
+    commit_and_close(connection)
 
 
 def test_api_returns_404_error_when_requesting_non_existent_url(test_client):
