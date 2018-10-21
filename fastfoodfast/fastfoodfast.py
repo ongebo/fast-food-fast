@@ -72,7 +72,7 @@ def get_user_order_history():
         orders = order_model.get_order_history(customer)
         return jsonify({'orders': orders}), 200
     except Exception as e:
-        return jsonify({'message': str(e)}), 404
+        return jsonify({'error': str(e)}), 404
 
 
 @app.route('/api/v1/orders', methods=['GET'])
@@ -83,10 +83,10 @@ def get_all_orders():
     try:
         identity = get_jwt_identity()
         if not order_model.is_admin(identity):
-            return jsonify({'message': 'only admin can get all orders'}), 401
+            return jsonify({'error': 'only admin can get all orders'}), 401
         return jsonify({'orders': order_model.get_all_orders()}), 200
     except Exception as e:
-        return jsonify({'message': str(e)}), 404
+        return jsonify({'error': str(e)}), 404
 
 
 @app.route('/api/v1/orders/<order_id>', methods=['GET'])
@@ -96,11 +96,11 @@ def get_specific_order(order_id):
     """Retrieves a specific food order from the database"""
     try:
         if not order_model.is_admin(get_jwt_identity()):
-            return jsonify({'message': 'only admin can fetch a specific order'}), 401
+            return jsonify({'error': 'only admin can fetch a specific order'}), 401
         order = order_model.get_specific_order(order_id)
         return jsonify(order), 200
     except Exception as e:
-        return jsonify({'message': str(e)}), 404
+        return jsonify({'error': str(e)}), 404
 
 
 @app.route('/api/v1/orders/<order_id>', methods=['PUT'])
@@ -111,11 +111,11 @@ def update_order_status(order_id):
     try:
         status = request.get_json()
         if not order_model.is_admin(get_jwt_identity()):
-            return jsonify({'message': 'only admin can update order status'}), 401
+            return jsonify({'error': 'only admin can update order status'}), 401
         order_model.update_order_status(order_id, status)
         return jsonify({'message': 'successfully updated order status'}), 200
     except Exception as e:
-        return jsonify({'message': str(e)}), 400
+        return jsonify({'error': str(e)}), 400
 
 
 @app.route('/api/v1/menu', methods=['GET'])
@@ -137,7 +137,7 @@ def add_menu_item():
     """Adds a new food menu item to the database"""
     try:
         if not order_model.is_admin(get_jwt_identity()):
-            return jsonify({'message': 'you are not an administrator'}), 401
+            return jsonify({'error': 'you are not an administrator'}), 401
         menu_item = request.get_json()
         menu_model.add_menu_item(menu_item)
         return jsonify({'message': 'correctly created new menu item'}), 201
