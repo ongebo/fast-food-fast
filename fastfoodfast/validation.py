@@ -90,10 +90,7 @@ class Validation:
         assert password_is_valid, error_message
     
     def process_user_data(self, user_data):
-        names = user_data['username'].strip().split()
-        for i in range(len(names)):
-            names[i] = names[i].capitalize()
-        user_data['username'] = ' '.join(names)
+        user_data['username'] = user_data['username'].strip()
         user_data['email'] = user_data['email'].strip()
         user_data['telephone'] = user_data['telephone'].strip()
         return user_data
