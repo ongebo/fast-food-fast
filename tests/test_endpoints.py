@@ -21,9 +21,10 @@ def register_and_login_user(name, password, test_client):
         'username': name, 'password': password,
         'email': 'name@domain.com', 'telephone': '+256-753-653973'
     }
-    test_client.post('/api/v1/auth/signup', json=user_data)
-    response = test_client.post('/api/v1/auth/login', json=user_data)
-    token = response.get_json()['token']
+    response_1 = test_client.post('/api/v1/auth/signup', json=user_data)
+    assert response_1.status_code == 201
+    response_2 = test_client.post('/api/v1/auth/login', json=user_data)
+    token = response_2.get_json()['token']
     headers = {'Authorization': 'Bearer ' + token}
     return headers
 
@@ -59,13 +60,14 @@ def commit_and_close(conn):
 
 
 def test_api_correctly_registers_a_user(test_client, connection):
-    user_data = {'username': 'John Doe', 'password': 'JonathanDoe'}
+    user_data = {
+        'username': 'John Doe', 'password': 'J0nathanD0e',
+        'email': 'jonathadoe@gmail.com', 'telephone': '+1-345-345981'
+    }
     response = test_client.post('/api/v1/auth/signup', json=user_data)
     data = response.get_json()
     assert response.status_code == 201
-    assert data['username'] == 'John Doe'
-    assert check_password_hash(data['password'], 'JonathanDoe')
-    assert data['admin'] == False
+    assert data['message'] == 'you were successfully registered!'
     clean_users(connection, 'John Doe')
     commit_and_close(connection)
 
@@ -74,13 +76,16 @@ def test_api_returns_error_message_given_wrong_registration_data(test_client):
     invalid_user_data = {'username': '  ', 'password': 'something'}
     response = test_client.post('/api/v1/auth/signup', json=invalid_user_data)
     assert response.status_code == 400
-    assert response.data # ensure that there is an error message
+    assert response.get_json()['error'] # ensure that there is an error message
 
 
 def test_api_correctly_logs_in_registered_user(test_client, connection):
-    user_data = {'username': 'Jon Snow', 'password': 'winterfel'}
-    response = test_client.post('/api/v1/auth/signup', json=user_data)
-    assert response.status_code == 201
+    user_data = {
+        'username': 'Jon Snow', 'password': 'W1nterfel',
+        'email': 'jonsnow@winterfel.net', 'telephone': '+45-457-345911'
+    }
+    response_1 = test_client.post('/api/v1/auth/signup', json=user_data)
+    assert response_1.status_code == 201
     response_2 = test_client.post('/api/v1/auth/login', json=user_data)
     assert response_2.status_code == 200
     assert 'token' in response_2.get_json()
@@ -96,7 +101,7 @@ def test_api_returns_error_message_given_wrong_login_data(test_client):
 
 
 def test_api_can_place_an_order_for_food(test_client, connection):
-    headers = register_and_login_user('Loki Odinson', 'mischief', test_client)
+    headers = register_and_login_user('Loki Odinson', 'M1sch1ef', test_client)
     order = {'items': [{'item': 'pizza', 'quantity': 1, 'cost': 20000}]}
     response = test_client.post('/api/v1/users/orders', json=order, headers=headers)
     assert response.status_code == 201
@@ -107,16 +112,16 @@ def test_api_can_place_an_order_for_food(test_client, connection):
 
 
 def test_api_returns_error_message_given_incorrect_post_order_data(test_client, connection):
-    headers = register_and_login_user('okoye', 'general', test_client)
+    headers = register_and_login_user('okoye', 'Genera1', test_client)
     response = test_client.post('/api/v1/users/orders', json={}, headers=headers)
     assert response.status_code == 400
-    assert b'invalid data' in response.data
+    assert 'error' in response.get_json()
     clean_users(connection, 'okoye')
     commit_and_close(connection)
 
 
 def test_api_returns_user_order_history(test_client, connection):
-    headers = register_and_login_user('steve rodgers', 'capitan', test_client)
+    headers = register_and_login_user('steve rodgers', 'C4pit4n', test_client)
     order_1 = {'items': [{'item': 'hot dog', 'quantity': 2, 'cost': 15000}]}
     order_2 = {'items': [{'item': 'salad', 'quantity': 1, 'cost': 10000}]}
     response_1 = test_client.post('/api/v1/users/orders', json=order_1, headers=headers)
@@ -132,7 +137,7 @@ def test_api_returns_user_order_history(test_client, connection):
 
 
 def test_api_returns_message_when_getting_non_existent_order_history(test_client, connection):
-    headers = register_and_login_user('winter soldier', 'soldier', test_client)
+    headers = register_and_login_user('winter soldier', 'S0ldier', test_client)
     response = test_client.get('/api/v1/users/orders', headers=headers)
     assert response.status_code == 404
     assert 'message' in response.get_json()
@@ -158,7 +163,7 @@ def test_admin_can_get_a_specific_order_by_id(test_client, connection):
 
 
 def test_admin_can_update_order_status(test_client, connection):
-    headers_1 = register_and_login_user('quill', 'starlord', test_client)
+    headers_1 = register_and_login_user('quill', 'St4rl0rd', test_client)
     order = {'items': [{'item': 'milk', 'quantity': 1, 'cost': 5000}]}
     response_1 = test_client.post('/api/v1/users/orders', json=order, headers=headers_1)
     order_id = response_1.get_json()['order-id']
