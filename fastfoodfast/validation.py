@@ -32,7 +32,8 @@ class Validation:
         assert 'quantity' in item, 'Item quantity not specified!'
         assert 'cost' in item, 'Item cost not specified!'
         assert isinstance(item['item'], str), 'Item name must be a string!'
-        assert re.match('[a-zA-Z]{2,30}$', item['item'].strip()), 'Invalid item specified!'
+        pattern = re.compile(r'[a-zA-Z]{2,30}( [a-zA-Z]{2,30})*$')
+        assert pattern.match(item['item'].strip()), 'Invalid item specified!'
         assert float(item['quantity']), 'Specify quantity as a number!'
         assert float(item['quantity']) > 0, 'Item quantity cannot be negative!'
         assert float(item['cost']), 'Specify item cost as a number!'
