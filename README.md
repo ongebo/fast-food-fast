@@ -62,7 +62,7 @@ More information about the API here: https://gbo-fff-with-db.herokuapp.com/apido
 ## Installation Instructions
 To run the application, follow these steps:
 * Install python 3 and Postman on your local machine
-* Clone this repository and checkout to the api-with-db branch
+* Clone this repository and checkout to the develop branch
 * Navigate to the repository root (fast-food-fast) and create a virtual environment
 ```
 $ cd fast-food-fast
