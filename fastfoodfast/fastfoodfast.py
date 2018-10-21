@@ -75,7 +75,7 @@ def get_user_order_history():
         return jsonify({'message': str(e)}), 404
 
 
-@app.route('/api/v1/orders/', methods=['GET'])
+@app.route('/api/v1/orders', methods=['GET'])
 @jwt_required
 @swag_from('docs/orders.yml')
 def get_all_orders():
