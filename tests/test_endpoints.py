@@ -140,7 +140,7 @@ def test_api_returns_message_when_getting_non_existent_order_history(test_client
     headers = register_and_login_user('winter soldier', 'S0ldier', test_client)
     response = test_client.get('/api/v1/users/orders', headers=headers)
     assert response.status_code == 404
-    assert 'message' in response.get_json()
+    assert 'error' in response.get_json()
     cursor = connection.cursor()
     cursor.execute('DELETE FROM users WHERE username = %s', ('winter soldier', ))
     connection.commit()
