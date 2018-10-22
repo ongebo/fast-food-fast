@@ -84,7 +84,7 @@ class Validation:
                     break # move onto the next character
         password_is_valid = len(checks) == 0 and 6 <= len(password) <= 12
         error_message = (
-            'Password must contain atleast one lowercase letter, one uppercase letter'
+            'Password must contain atleast one lowercase letter, one uppercase letter,'
             ' a digit and be 6 to 12 characters long!'
         )
         assert password_is_valid, error_message
