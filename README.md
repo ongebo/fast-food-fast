@@ -46,16 +46,12 @@ When using the API, an example order is represented in JSON as:
     "items": [
         {"item": "hamburger", "quantity": 2, "cost": 12000},
         {"item": "pizza", "quantity": 1, "cost": 20000}
-    ],
-    "status": "pending",
-    "total-cost": 22000,
-    "order-id": 23
+    ]
 }
 ```
 Points to note:
 * "items" is compulsory and its value must be a list of individual items
-* When posting an order, "status", "total-cost", and "order-id" are optional, they are automatically assigned by the API
-* Version 1 of the RESTful API uses data structures to store orders, so the orders don't persist among multiple runs of the application
+* Each item is represented as a valid JSON string (Python dictionary) and must contain the keys: "item", "quantity", and "cost"
 
 More information about the API here: https://gbo-fff-with-db.herokuapp.com/apidocs
 
