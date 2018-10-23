@@ -24,11 +24,11 @@
   <form action="index.html" method="GET">
     <span class="form-title">Create Account</span>
     Username:
-    <input type="text" name="username" placeholder="Enter your name" required><br>
+    <input type="text" name="username" placeholder="Enter your name" pattern="[a-zA-Z]{3,30}( [a-zA-Z]{3,30})*" required><br>
     Email:
     <input type="email" name="email-address" placeholder="Enter your email" required><br>
     Telephone:
-    <input type="text" name="telephone" placeholder="Enter your number" required><br>
+    <input type="text" name="telephone" placeholder="Enter your number" pattern="\+[0-9]{1,3}-[0-9]{3}-[0-9]{6}" required><br>
     Password:
     <input type="password" name="password" placeholder="Enter your password" required><br>
     Re-type Password:
