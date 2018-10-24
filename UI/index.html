@@ -24,7 +24,7 @@
     <form action="food-order.html" method="GET" autocomplete="on">
       <span class="form-title">Login</span>
       Username:
-      <input type="text" name="username" placeholder="Enter your name" autofocus required><br>
+      <input type="text" name="username" placeholder="Enter your name" pattern="[a-zA-Z]{3,30}( [a-zA-Z]{3,30})*" autofocus required><br>
       Password:
       <input type="password" name="password" placeholder="Enter your password" required><br>
       <input type="submit" value="Login">
