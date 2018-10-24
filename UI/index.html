@@ -7,6 +7,14 @@
   <link rel="stylesheet" type="text/css" href="css/styles.css">
   <link rel="stylesheet" type="text/css" href="css/forms.css">
   <title>Login</title>
+  <script>
+      window.addEventListener("load", function() {
+          var form = document.querySelector("form");
+          form.addEventListener("submit", function(event) {
+              event.preventDefault();
+          });
+      });
+  </script>
 </head>
 <body>
     <div class="header">
