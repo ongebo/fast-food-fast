@@ -10,9 +10,12 @@
   <script>
       window.addEventListener("load", function() {
           var form = document.querySelector("form");
+          var nameInput = document.querySelector("input[name=username]");
           form.addEventListener("submit", function(event) {
               event.preventDefault();
           });
+          nameInput.title = "Username can only contain letters. Each name (firstname/lastname)" +
+          " must contain atleast three letters, names are separated by single spaces.";
       });
   </script>
 </head>
