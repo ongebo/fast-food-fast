@@ -1,10 +1,12 @@
 var userButton = document.querySelector("input[value=Login]");
 var adminButton = document.querySelector("input[value='Login as Admin']");
-userButton.addEventListener("click", function(event) {login();});
-adminButton.addEventListener("click", function(event) {login(admin=true);});
+userButton.addEventListener("click", function(event) {login(event);});
+adminButton.addEventListener("click", function(event) {login(event, admin=true);});
 
-async function login(admin=false) {
+async function login(event, admin=false) {
+    var buttonValue = event.target.value; // store value of the clicked button
     removeErrorMessages();
+    displayWaitingSignal(event);
     var request = createRequestObject();
     try {
         var response = await fetch(request);
@@ -18,6 +20,8 @@ async function login(admin=false) {
             }
         } else {
             displayErrorMessage(responseBody);
+            event.target.disabled = false;     // restore clicked login
+            event.target.value = buttonValue;  // button to its initial state
         }
     } catch (error) {
         alert(error);
@@ -40,12 +44,16 @@ function createRequestObject() {
 function displayErrorMessage(responseBody) {
     var errorMessage = responseBody.error;
     var errorOutputElement;
+    var errorSource;
     if (errorMessage.indexOf("password") != -1) {
         errorOutputElement = document.querySelector(".password-error");
+        errorSource = document.querySelector("input[name=password]");
     } else {
         errorOutputElement = document.querySelector(".username-error");
+        errorSource = document.querySelector("input[name=username]");
     }
     errorOutputElement.innerHTML = errorMessage;
+    errorSource.classList.add("error");
 }
 
 function removeErrorMessages() {
@@ -53,4 +61,10 @@ function removeErrorMessages() {
     var passwordErrorElement = document.querySelector(".password-error");
     nameErrorElement.innerHTML = "";
     passwordErrorElement.innerHTML = "";
+}
+
+function displayWaitingSignal(event) {
+    var eventSource = event.target;
+    eventSource.value = "Logging in...";
+    eventSource.disabled = true;
 }
