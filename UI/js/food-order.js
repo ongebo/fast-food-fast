@@ -1,4 +1,5 @@
 fetchAndDisplayMenu();
+var orderList = [];
 
 function fetchAndDisplayMenu() {
     var request = createRequestObject();
@@ -33,7 +34,7 @@ function displayMenu(menuData) {
     var menuItems = menuData.menu;
     for (var c = 0; c < menuItems.length; c++) {
         var item = menuItems[c];
-        var itemElement = createMenuItemElement(item);
+        var itemElement = createMenuItemElement(item, c);
         var itemDetails = createItemDetailsElement(item.unit, c);
         menu.appendChild(itemElement);
         menu.appendChild(itemDetails);
@@ -45,12 +46,14 @@ function displayMenu(menuData) {
     attachEventHandlersToMenuItems();
 }
 
-function createMenuItemElement(item) {
+function createMenuItemElement(item, id) {
     var h3 = document.createElement("h3");
+    h3.id = "name" + id;
     h3.textContent = item.item;
     var rate = document.createTextNode("Ugx " + item.rate + " per " + item.unit);
     var itemElement = document.createElement("div");
     itemElement.setAttribute("class", "menu-item");
+    itemElement.id = "item" + id;
     itemElement.appendChild(h3);
     itemElement.appendChild(rate);
     return itemElement;
@@ -67,6 +70,8 @@ function createItemDetailsElement(unit, id) {
     span.appendChild(input);
     var button = document.createElement("button");
     button.innerHTML = "Add to List";
+    button.id = "button" + id;
+    button.addEventListener("click", addItemToList);
 
     var itemDetails = document.createElement("div");
     itemDetails.setAttribute("class", "menu-item-details");
@@ -88,4 +93,35 @@ function attachEventHandlersToMenuItems() {
             }
         });
     }
+}
+
+function addItemToList(event) {
+    var buttonId = event.target.id;
+    alert(buttonId.match(/[0-9]+/));
+    var orderItem = createOrderItem(buttonId.match(/[0-9]+/));
+    orderList.push(orderItem);
+    updateDisplayedOrderList(orderItem);
+}
+
+function createOrderItem(idSuffix) {
+    var itemSelector = "#item" + idSuffix;
+    var item = document.getElementById("name" + idSuffix);
+    var quantity = document.querySelector("#input" + idSuffix).value;
+    var rate = parseFloat(document.querySelector(itemSelector).innerHTML.match(/[0-9]+/));
+    var cost = quantity * rate;
+    var orderItem = {item: item, quantity: quantity, cost: cost};
+    return orderItem;
+}
+
+function updateDisplayedOrderList(orderItem) {
+    var itemsList = document.querySelector(".order-list");
+    var emptyListMessage = document.getElementById("empty-list");
+    if (emptyListMessage != null)
+        itemsList.removeChild(emptyListMessage);
+    var content = orderItem.quantity + " " + orderItem.unit + "s of @ Ugx " + orderItem.cost;
+    var text = document.createTextNode(content);
+    var p = document.createElement("p");
+    p.setAttribute("class", "order-list-item");
+    p.appendChild(text);
+    itemsList.appendChild(p);
 }
