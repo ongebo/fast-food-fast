@@ -126,3 +126,61 @@ function updateDisplayedOrderList(orderItem, unit) {
     p.appendChild(text);
     itemsList.insertBefore(p, orderButton);
 }
+    var text = document.createTextNode(content);
+    var p = document.createElement("p");
+    p.setAttribute("class", "order-list-item");
+    p.appendChild(text);
+    itemsList.insertBefore(p, orderButton);
+}
+
+function displayOrderList() {
+    var listElement = document.querySelector(".order-list");
+    var orderButton = document.querySelector(".order-list > button");
+    removeChildElements(listElement);
+    for (var c = 0; c < orderList.length; c++) {
+        var unit = getItemUnit(orderList[c].item);
+        var content = orderList[c].quantity + " " + unit + "s of " + orderList[c].item +
+        " @ Ugx " + orderList[c].cost;
+        var p = document.createElement("p");
+        p.setAttribute("class", "order-list-item");
+        p.appendChild(document.createTextNode(content));
+        listElement.insertBefore(p, orderButton);
+    }
+    listElement.insertBefore(createOrderTotalElement(), orderButton);
+}
+
+function removeChildElements(listElement) {
+    var listLength = listElement.children.length;
+    while (listLength > 2) {
+        for (var c = 0; c < listLength; c++) {
+            var child = listElement.children[c];
+            if (child.className != "order" && child.className != "title") {
+                listElement.removeChild(child);
+                break;
+            }
+        }
+        listLength = listElement.children.length;
+    }
+}
+
+function getItemUnit(orderItem) {
+    var menuItems = document.getElementsByClassName("menu-item");
+    var unit;
+    for (var c = 0; c < menuItems.length; c++) {
+        if (menuItems[c].querySelector("h3").innerHTML == orderItem) {
+            unit = menuItems[c].innerHTML.match(/per [a-zA-Z]+/).toString().substring(4);
+            return unit;
+        }
+    }
+}
+
+function createOrderTotalElement() {
+    var orderTotal = 0;
+    for (var c = 0; c < orderList.length; c++) {
+        orderTotal += orderList[c].cost;
+    }
+    var orderTotalElement = document.createElement("h2");
+    orderTotalElement.setAttribute("class", "order-total");
+    orderTotalElement.appendChild(document.createTextNode("Order Total: " + orderTotal));
+    return orderTotalElement;
+}
