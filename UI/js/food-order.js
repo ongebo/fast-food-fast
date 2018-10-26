@@ -103,7 +103,7 @@ function addItemToList(event) {
         }
     }
     if (itemNotInList)
-    orderList.push(orderItem);
+        orderList.push(orderItem);
     displayOrderList();
 }
 
@@ -116,27 +116,6 @@ function createOrderItem(idSuffix) {
     var cost = quantity * rate;
     var orderItem = {item: item, quantity: quantity, cost: cost};
     return orderItem;
-}
-
-function updateDisplayedOrderList(orderItem, unit) {
-    var itemsList = document.querySelector(".order-list");
-    var orderButton = document.querySelector(".order-list > button");
-    var emptyListMessage = document.getElementById("empty-list");
-    if (emptyListMessage != null)
-        emptyListMessage.parentNode.removeChild(emptyListMessage);
-    var content = orderItem.quantity + " " + unit + "s of " + orderItem.item +
-    " @ Ugx " + orderItem.cost;
-    var text = document.createTextNode(content);
-    var p = document.createElement("p");
-    p.setAttribute("class", "order-list-item");
-    p.appendChild(text);
-    itemsList.insertBefore(p, orderButton);
-}
-    var text = document.createTextNode(content);
-    var p = document.createElement("p");
-    p.setAttribute("class", "order-list-item");
-    p.appendChild(text);
-    itemsList.insertBefore(p, orderButton);
 }
 
 function displayOrderList() {
