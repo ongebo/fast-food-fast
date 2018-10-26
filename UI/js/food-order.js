@@ -95,10 +95,16 @@ function addItemToList(event) {
     var buttonId = event.target.id;
     var idSuffix = buttonId.match(/[0-9]+/);
     var orderItem = createOrderItem(idSuffix);
+    var itemNotInList = true;
+    for (var c = 0; c < orderList.length; c++) {
+        if (orderList[c].item == orderItem.item) {
+            orderList[c] = orderItem;
+            itemNotInList = false;
+        }
+    }
+    if (itemNotInList)
     orderList.push(orderItem);
-    var itemElement = document.querySelector("#item" + idSuffix);
-    var unit = itemElement.innerHTML.match(/per [a-zA-Z]+/).toString().substring(4);
-    updateDisplayedOrderList(orderItem, unit);
+    displayOrderList();
 }
 
 function createOrderItem(idSuffix) {
