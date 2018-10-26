@@ -38,6 +38,8 @@ function displayMenu(menuData) {
     var orderButton = document.createElement("button");
     orderButton.setAttribute("class", "order");
     orderButton.innerHTML = "Place Order";
+    orderButton.addEventListener("click", placeOrder);
+    document.querySelector(".order-list > button").addEventListener("click", placeOrder);
     menu.appendChild(orderButton);
     attachEventHandlersToMenuItems();
 }
@@ -168,4 +170,42 @@ function createOrderTotalElement() {
     orderTotalElement.setAttribute("class", "order-total");
     orderTotalElement.appendChild(document.createTextNode("Order Total: " + orderTotal));
     return orderTotalElement;
+}
+
+function placeOrder() {
+    var request = createOrderRequestObject();
+    try {
+        fetch(request).then(
+            response => {
+                if (response.status == 201) {
+                    showMessageAboutOrder("Your order was successful!");
+                } else {
+                    showMessageAboutOrder("Your order was not successful!");
+                }
+            }
+        );
+    } catch (error) {
+        showMessageAboutOrder(error);
+    }
+}
+
+function createOrderRequestObject() {
+    var headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "Bearer " + sessionStorage.getItem("token"));
+    var requestBody = {items: orderList}
+    var request = new Request(
+        "https://gbo-fff-with-db.herokuapp.com/api/v1/users/orders",
+        {method: "POST", headers: headers, body: JSON.stringify(requestBody)}
+    );
+    return request;
+}
+
+function showMessageAboutOrder(message) {
+    var listElement = document.querySelector(".order-list");
+    var orderButton = document.querySelector(".order-list > button");
+    removeChildElements(listElement);
+    var messageElement = document.createElement("h2");
+    messageElement.textContent = message;
+    listElement.insertBefore(messageElement, orderButton);
 }
