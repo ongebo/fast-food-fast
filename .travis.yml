@@ -13,7 +13,13 @@ before_script:
     - psql -c "GRANT ALL PRIVILEGES ON DATABASE testdb TO ongebo"
 
 install:
-    - pip install -r requirements.txt
+    - pip install pytest
+    - pip install pytest-cov
+    - pip install coveralls
+    - pip install psycopg2
+    - pip install flask-jwt-extended
+    - pip install flasgger
+    - pip install Flask-Cors
 
 script:
     - python db_setup.py testdb
