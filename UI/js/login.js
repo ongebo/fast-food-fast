@@ -14,7 +14,7 @@ async function login(event, admin=false) {
         if (response.status == 200) {
             sessionStorage.setItem("token", responseBody.token);
             if (admin) {
-                window.location.href = "admin-menu.html";
+                redirectAdminUser(responseBody);
             } else {
                 window.location.href = "food-order.html";
             }
