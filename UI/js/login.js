@@ -72,3 +72,15 @@ function displayWaitingSignal(event) {
     eventSource.value = "Logging in...";
     eventSource.disabled = true;
 }
+
+function redirectAdminUser(responseBody) {
+    if (responseBody.admin == true) {
+        sessionStorage.setItem("admin", true);
+        window.location.href = "admin-menu.html";
+    } else {
+        var nameField = document.querySelector("input[name=username]");
+        var errorField = document.querySelector(".username-error");
+        nameField.classList.add("error");
+        errorField.innerHTML = nameField.value + " is not admin!";
+    }
+}
