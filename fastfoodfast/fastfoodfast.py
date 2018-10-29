@@ -140,7 +140,7 @@ def add_menu_item():
             return jsonify({'error': 'you are not an administrator'}), 401
         menu_item = request.get_json()
         menu_model.add_menu_item(menu_item)
-        return jsonify({'message': 'correctly created new menu item'}), 201
+        return jsonify({'message': 'Successfully added new food item to the menu!'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
