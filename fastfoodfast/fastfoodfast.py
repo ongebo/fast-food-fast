@@ -43,7 +43,12 @@ def login_a_user():
         if not check_password_hash(user['password'], data['password']):
             return jsonify({'error': 'wrong password'}), 401
         token = create_access_token(identity=user['username'])
-        return jsonify({'token': token}), 200
+        response_body = {
+            'message': 'You have been successfully logged in!',
+            'admin': order_model.is_admin(user['username']),
+            'token': token
+        }
+        return jsonify(response_body), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
