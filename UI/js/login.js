@@ -5,7 +5,7 @@ adminButton.addEventListener("click", function(event) {login(event, admin=true);
 
 async function login(event, admin=false) {
     var buttonValue = event.target.value; // store value of the clicked button
-    removeErrorMessages();
+    removeErrorSignals();
     displayWaitingSignal(event);
     var request = createRequestObject();
     try {
@@ -56,7 +56,7 @@ function displayErrorMessage(responseBody) {
     errorSource.classList.add("error");
 }
 
-function removeErrorMessages() {
+function removeErrorSignals() {
     var nameErrorElement = document.querySelector(".username-error");
     var passwordErrorElement = document.querySelector(".password-error");
     nameErrorElement.innerHTML = "";
