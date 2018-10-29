@@ -59,8 +59,12 @@ function displayErrorMessage(responseBody) {
 function removeErrorSignals() {
     var nameErrorElement = document.querySelector(".username-error");
     var passwordErrorElement = document.querySelector(".password-error");
+    var nameField = document.querySelector("input[name=username]");
+    var passwordField = document.querySelector("input[name=password]");
     nameErrorElement.innerHTML = "";
     passwordErrorElement.innerHTML = "";
+    nameField.classList.remove("error");
+    passwordField.classList.remove("error");
 }
 
 function displayWaitingSignal(event) {
