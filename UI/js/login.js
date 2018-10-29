@@ -20,12 +20,12 @@ async function login(event, admin=false) {
             }
         } else {
             displayErrorMessage(responseBody);
-            event.target.disabled = false;     // restore clicked login
-            event.target.value = buttonValue;  // button to its initial state
         }
     } catch (error) {
         alert(error);
     }
+    event.target.disabled = false;     // restore clicked login
+    event.target.value = buttonValue;  // button to its initial state
 }
 
 function createRequestObject() {
