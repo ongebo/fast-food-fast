@@ -204,8 +204,10 @@ def test_api_can_return_created_menu_item_to_admin(test_client, connection):
     response_1 = test_client.post('/api/v1/menu', json=menu_item, headers=headers)
     response_2 = test_client.get('/api/v1/menu', headers=headers)
     created_item = response_1.get_json()
-    assert response_1.status_code == 201
+    response_3 = test_client.get('/api/v1/menu/{}'.format(created_item['id']), headers=headers)
+    assert response_1.status_code == 201 and response_3.status_code == 200
     assert created_item in response_2.get_json()['menu']
+    assert menu_item == response_3.get_json()
     assert response_2.status_code == 200
     connection.cursor().execute('DELETE FROM menu WHERE item = %s', ('spaghetti', ))
     connection.commit()
