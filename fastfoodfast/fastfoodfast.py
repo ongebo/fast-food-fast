@@ -143,7 +143,7 @@ def get_food_item(identity):
         item = menu_model.get_specific_menu_item(identity)
         return jsonify(item), 200
     except Exception as e:
-        return jsonify(str(e)), 404
+        return jsonify({'error': str(e)}), 404
 
 
 @app.route('/api/v1/menu', methods=['POST'])
