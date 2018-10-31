@@ -103,14 +103,15 @@ class Validation:
     
     def validate_menu_item(self, menu_item):
         """Ensures that menu item data sent by admin is valid, raises exception if invalid. """
-        assert isinstance(menu_item, dict), 'Invalid format for menu item, it should be a dictionary'
-        assert 'item' in menu_item and isinstance(menu_item['item'], str), 'Define item as a string'
-        menu_item['item'] = menu_item['item'].strip()
-        if len(menu_item['item']) == 0:
-            raise Exception('Item name cannot be empty!')
-        for c in menu_item['item']:
-            if not c.isalnum() and not c.isspace():
-                raise Exception('Item name can only contain letters, numbers and spaces')
-        assert 'unit' in menu_item and isinstance(menu_item['unit'], str), 'Specify correct item unit'
-        assert 'rate' in menu_item and float(menu_item['rate']), 'Specify correc item rate'
-        assert len(menu_item) == 3, 'Redundant data specified for menu item'
+        assert isinstance(menu_item, dict), 'Specify menu item as a valid JSON string'
+        assert 'item' in menu_item, 'item not specified!'
+        assert 'unit' in menu_item, 'unit not specified!'
+        assert 'rate' in menu_item, 'rate not specified!'
+        assert len(menu_item) == 3, 'redundant data in request body!'
+        assert isinstance(menu_item['item'], str), 'item must be specified as a string!'
+        item_pattern = re.compile('[a-zA-Z]{3,30}( [a-zA-Z])*$')
+        assert item_pattern.match(menu_item['item'].strip()), 'invalid item name!'
+        assert isinstance(menu_item['unit'], str), 'unit must be specified as a string!'
+        unit_pattern = re.compile('[a-zA-Z]{2,30}')
+        assert unit_pattern.match(menu_item['unit']), 'invalid unit specified!'
+        assert float(menu_item['rate']) > 0, 'specify rate as a number greater than zero'
