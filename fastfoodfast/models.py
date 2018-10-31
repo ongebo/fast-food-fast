@@ -248,3 +248,13 @@ class Menu(Model):
         )
         self.conn.commit()
         self.conn.close()
+    
+    def delete_menu_item(self, identity):
+        """Deletes menu item whose id is specified by the 'identity' parameter"""
+        self.connect_to_db()
+        self.cursor.execute('SELECT item FROM menu WHERE id = %s', (identity, ))
+        item = self.cursor.fetchone()[0]
+        assert item, 'No item with id {} exists!'.format(identity)
+        self.cursor.execute('DELETE FROM menu WHERE id = %s', (identity, ))
+        self.conn.commit()
+        self.conn.close()
