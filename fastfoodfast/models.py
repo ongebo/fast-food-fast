@@ -235,3 +235,16 @@ class Menu(Model):
         self.conn.commit()
         self.conn.close()
         return new_item
+    
+    def update_menu_item(self, identity, new_menu_item):
+        """Updates menu item identified by 'identity' with 'new_menu_item'"""
+        validator.validate_menu_item(new_menu_item)
+        item_to_update = self.get_specific_menu_item(identity)
+        item_to_update.update(new_menu_item)
+        self.connect_to_db()
+        self.cursor.execute(
+            'UPDATE menu SET item = %s, unit = %s, rate = %s WHERE id = %s',
+            (item_to_update['item'], item_to_update['unit'], item_to_update['rate'], identity)
+        )
+        self.conn.commit()
+        self.conn.close()
