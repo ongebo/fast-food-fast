@@ -174,9 +174,9 @@ def update_menu_item(identity):
             {'message': 'Successfully updated menu item with id {}'.format(identity)}
         ), 200
     except Exception as e:
-        if isinstance(e, AssertionError):
-            return jsonify({'error': str(e)}), 400
-        return jsonify({'error': str(e)}), 404
+        if 'No item with id' in str(e):
+            return jsonify({'error': str(e)}), 404
+        return jsonify({'error': str(e)}), 400
 
 
 @app.route('/api/v1/menu/<int:identity>', methods=['DELETE'])
