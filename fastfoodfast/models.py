@@ -205,6 +205,18 @@ class Menu(Model):
         self.conn.close()
         return menu
     
+    def get_specific_menu_item(self, identity):
+        """Returns specific item in the food menu"""
+        self.connect_to_db()
+        self.cursor.execute(
+            'SELECT item, unit, rate FROM menu WHERE id = %s', (identity, )
+        )
+        item = self.cursor.fetchone()
+        if not item:
+            raise Exception('No item with id {} exists!'.format(identity))
+        self.conn.close()
+        return {'item': item[0], 'unit': item[1], 'rate': item[2]}
+    
     def add_menu_item(self, menu_item):
         """Adds a new item to the food menu"""
         validator.validate_menu_item(menu_item)
