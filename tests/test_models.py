@@ -217,3 +217,11 @@ def test_model_updates_a_menu_item(database_connection):
     cursor = database_connection.cursor()
     cursor.execute('DELETE FROM menu WHERE item = %s', ('Pork', ))
     commit_and_close(database_connection)
+
+
+def test_model_can_delete_a_specific_menu_item(database_connection):
+    menu_model = Menu()
+    item_id = menu_model.add_menu_item({'item': 'Salad', 'unit': 'Plate', 'rate': 7000})['id']
+    menu_model.delete_menu_item(item_id)
+    with pytest.raises(Exception):
+        menu_model.get_specific_menu_item(item_id)
