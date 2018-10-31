@@ -175,7 +175,7 @@ def test_model_can_return_list_of_food_items_in_the_menu(database_connection):
     item_2 = {'item': 'samosa', 'unit': 'pack', 'rate': 5000}
     menu_model.add_menu_item(item_1)
     menu_model.add_menu_item(item_2)
-    menu = menu_model.get_food_menu()
+    menu = menu_model.get_food_menu(return_id=False)
     assert item_1 in menu and item_2 in menu
     cursor = database_connection.cursor()
     cursor.execute('DELETE FROM menu WHERE item = %s', ('chapati', ))
