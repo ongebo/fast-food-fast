@@ -113,7 +113,7 @@ class Validation:
         assert item_pattern.match(menu_item['item'].strip()), 'invalid item name!'
         assert isinstance(menu_item['unit'], str), 'unit must be specified as a string!'
         unit_pattern = re.compile('[a-zA-Z]{2,30}')
-        assert unit_pattern.match(menu_item['unit']), 'invalid unit specified!'
+        assert unit_pattern.match(menu_item['unit'].strip()), 'invalid unit specified!'
         assert float(menu_item['rate']) > 0, 'specify rate as a number greater than zero'
     
     def ensure_menu_item_not_existent(self, item_name, cursor):
