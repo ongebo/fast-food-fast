@@ -48,6 +48,14 @@ class User(Model):
         user['username'] = result[0]
         user['password'] = result[1]
         return user
+    
+    def is_admin(self, user):
+        """Returns True if user is admin, False otherwise"""
+        self.connect_to_db()
+        self.cursor.execute('SELECT admin FROM users WHERE username = %s', (user, ))
+        value = self.cursor.fetchone()[0]
+        self.conn.close()
+        return value
 
 
 class Order(Model):
@@ -175,14 +183,6 @@ class Order(Model):
         )
         self.conn.commit()
         self.conn.close()
-    
-    def is_admin(self, user):
-        """Returns True if user is admin, False otherwise"""
-        self.connect_to_db()
-        self.cursor.execute('SELECT admin FROM users WHERE username = %s', (user, ))
-        value = self.cursor.fetchone()[0]
-        self.conn.close()
-        return value
 
 
 class Menu(Model):
