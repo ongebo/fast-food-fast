@@ -115,3 +115,8 @@ class Validation:
         unit_pattern = re.compile('[a-zA-Z]{2,30}')
         assert unit_pattern.match(menu_item['unit']), 'invalid unit specified!'
         assert float(menu_item['rate']) > 0, 'specify rate as a number greater than zero'
+    
+    def ensure_menu_item_not_existent(self, item_name, cursor):
+        cursor.execute('SELECT item FROM menu')
+        for item in cursor.fetchall():
+            assert item_name.lower() != item[0].lower(), item_name + ' already exists!'
