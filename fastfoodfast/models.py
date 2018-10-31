@@ -186,18 +186,22 @@ class Orders(Model):
 
 
 class Menu(Model):
-    def get_food_menu(self):
+    def get_food_menu(self, return_id=True):
         """Returns all food items in the menu"""
         self.connect_to_db()
         self.cursor.execute(
-            'SELECT item, unit, rate FROM menu'
+            'SELECT id, item, unit, rate FROM menu'
         )
         menu_items = self.cursor.fetchall()
         if not menu_items:
             raise Exception('The food menu is empty')
         menu = list()
-        for item in menu_items:
-            menu.append({'item': item[0], 'unit': item[1], 'rate': item[2]})
+        if (return_id):
+            for item in menu_items:
+                menu.append({'id': item[0], 'item': item[1], 'unit': item[2], 'rate': item[3]})
+        else:
+            for item in menu_items:
+                menu.append({'item': item[1], 'unit': item[2], 'rate': item[3]})
         return menu
     
     def add_menu_item(self, menu_item):
