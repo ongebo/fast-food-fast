@@ -204,3 +204,16 @@ def test_model_raises_exception_when_getting_non_existent_item_from_menu(databas
     menu_model = Menu()
     with pytest.raises(Exception):
         menu_model.get_specific_menu_item(-3)
+
+
+def test_model_updates_a_menu_item(database_connection):
+    menu_model = Menu()
+    item = {'item': 'Pork', 'unit': 'kilogram', 'rate': 14000}
+    created_item = menu_model.add_menu_item(item)
+    item['rate'] = 18000 # change rate from 14000 to 18000
+    menu_model.update_menu_item(created_item['id'], item)
+    updated_item = menu_model.get_specific_menu_item(created_item['id'])
+    assert updated_item['rate'] == 18000
+    cursor = database_connection.cursor()
+    cursor.execute('DELETE FROM menu WHERE item = %s', ('Pork', ))
+    commit_and_close(database_connection)
