@@ -144,8 +144,8 @@ def add_menu_item():
         if not users_model.is_admin(get_jwt_identity()):
             return jsonify({'error': 'you are not an administrator'}), 401
         menu_item = request.get_json()
-        menu_model.add_menu_item(menu_item)
-        return jsonify({'message': 'Successfully added new food item to the menu!'}), 201
+        created_item = menu_model.add_menu_item(menu_item)
+        return jsonify(created_item), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 400
 
