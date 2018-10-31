@@ -179,6 +179,21 @@ def update_menu_item(identity):
         return jsonify({'error': str(e)}), 404
 
 
+@app.route('/api/v1/menu/<int:identity>', methods=['DELETE'])
+@jwt_required
+def delete_menu_item(identity):
+    """Deletes menu item with id specified as 'identity'"""
+    try:
+        if not users_model.is_admin(get_jwt_identity()):
+            return jsonify({'error': 'Only admin can delete a food item!'}), 401
+        menu_model.delete_menu_item(identity)
+        return jsonify(
+            {'message': 'Successfully deleted food item with id {}'.format(identity)}
+        ), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 404
+
+
 @app.errorhandler(404)
 def resource_not_found(error):
     """Displays an error message when a 404 error occurs"""
