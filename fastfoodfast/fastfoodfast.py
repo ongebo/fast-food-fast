@@ -5,7 +5,7 @@ Definitions of API routes for managing users, orders, and food menu data.
 from flask import Flask, request, jsonify, Response
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import JWTManager, jwt_required, create_access_token, get_jwt_identity
-from .models import User, Order, Menu
+from .models import Users, Orders, Menu
 from flasgger import Swagger
 from flasgger.utils import swag_from
 from flask_cors import CORS
@@ -16,8 +16,8 @@ app.config['JWT_SECRET_KEY'] = 'secret-key'
 jwt = JWTManager(app)
 Swagger(app)
 CORS(app)
-user_model = User()
-order_model = Order()
+users_model = Users()
+orders_model = Orders()
 menu_model = Menu()
 
 
@@ -27,7 +27,7 @@ def register_a_user():
     """Creates a new user account"""
     try:
         user_data = request.get_json()
-        user_model.register_user(user_data)
+        users_model.register_user(user_data)
         return jsonify({'message': 'you were successfully registered!'}), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -39,13 +39,13 @@ def login_a_user():
     """Logs in a registered user"""
     try:
         data = request.get_json()
-        user = user_model.get_user(data['username'])
+        user = users_model.get_user(data['username'])
         if not check_password_hash(user['password'], data['password']):
             return jsonify({'error': 'wrong password'}), 401
         token = create_access_token(identity=user['username'])
         response_body = {
             'message': 'You have been successfully logged in!',
-            'admin': order_model.is_admin(user['username']),
+            'admin': users_model.is_admin(user['username']),
             'token': token
         }
         return jsonify(response_body), 200
@@ -61,7 +61,7 @@ def place_new_order_for_food():
     try:
         order = request.get_json()
         customer = get_jwt_identity()
-        created_order = order_model.create_order(order, customer)
+        created_order = orders_model.create_order(order, customer)
         return jsonify(created_order), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -74,7 +74,7 @@ def get_user_order_history():
     """Gets a list of orders made by a user in the past"""
     try:
         customer = get_jwt_identity()
-        orders = order_model.get_order_history(customer)
+        orders = orders_model.get_order_history(customer)
         return jsonify({'orders': orders}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 404
@@ -87,9 +87,9 @@ def get_all_orders():
     """Retrieves all food orders from the database"""
     try:
         identity = get_jwt_identity()
-        if not order_model.is_admin(identity):
+        if not users_model.is_admin(identity):
             return jsonify({'error': 'only admin can get all orders'}), 401
-        return jsonify({'orders': order_model.get_all_orders()}), 200
+        return jsonify({'orders': orders_model.get_all_orders()}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 404
 
@@ -100,9 +100,9 @@ def get_all_orders():
 def get_specific_order(order_id):
     """Retrieves a specific food order from the database"""
     try:
-        if not order_model.is_admin(get_jwt_identity()):
+        if not users_model.is_admin(get_jwt_identity()):
             return jsonify({'error': 'only admin can fetch a specific order'}), 401
-        order = order_model.get_specific_order(order_id)
+        order = orders_model.get_specific_order(order_id)
         return jsonify(order), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 404
@@ -115,9 +115,9 @@ def update_order_status(order_id):
     """Updates the status of an order in the database"""
     try:
         status = request.get_json()
-        if not order_model.is_admin(get_jwt_identity()):
+        if not users_model.is_admin(get_jwt_identity()):
             return jsonify({'error': 'only admin can update order status'}), 401
-        order_model.update_order_status(order_id, status)
+        orders_model.update_order_status(order_id, status)
         return jsonify({'message': 'successfully updated order status'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 400
@@ -141,7 +141,7 @@ def get_food_items():
 def add_menu_item():
     """Adds a new food menu item to the database"""
     try:
-        if not order_model.is_admin(get_jwt_identity()):
+        if not users_model.is_admin(get_jwt_identity()):
             return jsonify({'error': 'you are not an administrator'}), 401
         menu_item = request.get_json()
         menu_model.add_menu_item(menu_item)
