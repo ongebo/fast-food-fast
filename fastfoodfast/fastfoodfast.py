@@ -164,6 +164,7 @@ def add_menu_item():
 @app.route('/api/v1/menu/<int:identity>', methods=['PUT'])
 @jwt_required
 def update_menu_item(identity):
+    """Edits the menu item identified by 'identity' if it exists"""
     try:
         if not users_model.is_admin(get_jwt_identity()):
             return jsonify({'error': 'Only admin can edit a food item!'}), 401
