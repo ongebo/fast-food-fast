@@ -135,6 +135,17 @@ def get_food_items():
         return jsonify({'error': str(e)}), 404
 
 
+@app.route('/api/v1/menu/<int:identity>', methods=['GET'])
+@jwt_required
+def get_food_item(identity):
+    """Retrieves specific food item from the menu"""
+    try:
+        item = menu_model.get_specific_menu_item(identity)
+        return jsonify(item), 200
+    except Exception as e:
+        return jsonify(str(e)), 404
+
+
 @app.route('/api/v1/menu', methods=['POST'])
 @jwt_required
 @swag_from('docs/menu_item.yml')
