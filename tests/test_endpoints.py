@@ -259,6 +259,13 @@ def test_api_enables_admin_to_delete_a_specific_menu_item(test_client):
     assert response_2.status_code == 404
 
 
+def test_api_returns_404_when_admin_tries_to_delete_non_existent_menu_item(test_client):
+    headers = login_administrator(test_client)
+    response = test_client.delete('/api/v1/menu/0', headers=headers)
+    assert response.status_code == 404
+    assert 'error' in response.get_json()
+
+
 def test_api_returns_error_for_unauthorized_access_to_admin_routes(test_client, connection):
     headers = register_and_login_user('Tony Stark', '1ronM4n', test_client)
     response_1 = test_client.get('/api/v1/orders', headers=headers)
