@@ -109,10 +109,10 @@ class Validation:
         assert 'rate' in menu_item, 'rate not specified!'
         assert len(menu_item) == 3, 'redundant data in request body!'
         assert isinstance(menu_item['item'], str), 'item must be specified as a string!'
-        item_pattern = re.compile('[a-zA-Z]{3,30}( [a-zA-Z])*$')
+        item_pattern = re.compile('[a-zA-Z]{3,30}( [a-zA-Z]{3,30})*$')
         assert item_pattern.match(menu_item['item'].strip()), 'invalid item name!'
         assert isinstance(menu_item['unit'], str), 'unit must be specified as a string!'
-        unit_pattern = re.compile('[a-zA-Z]{2,30}')
+        unit_pattern = re.compile('[a-zA-Z]{2,30}$')
         assert unit_pattern.match(menu_item['unit'].strip()), 'invalid unit specified!'
         assert float(menu_item['rate']) > 0, 'specify rate as a number greater than zero'
     
