@@ -266,6 +266,15 @@ def test_api_returns_404_when_admin_tries_to_delete_non_existent_menu_item(test_
     assert 'error' in response.get_json()
 
 
+def test_api_returns_401_when_non_admin_user_tries_to_delete_menu_item(test_client, connection):
+    headers = register_and_login_user('Jack Sparrow', 'P1rateCap', test_client)
+    response = test_client.delete('/api/v1/menu/1', headers=headers)
+    assert response.status_code == 401
+    assert 'error' in response.get_json()
+    clean_users(connection, 'Jack Sparrow')
+    commit_and_close(connection)
+
+
 def test_api_returns_error_for_unauthorized_access_to_admin_routes(test_client, connection):
     headers = register_and_login_user('Tony Stark', '1ronM4n', test_client)
     response_1 = test_client.get('/api/v1/orders', headers=headers)
