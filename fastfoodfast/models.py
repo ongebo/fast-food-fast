@@ -13,7 +13,7 @@ class Model:
         self.cursor = self.conn.cursor()
 
 
-class User(Model):
+class Users(Model):
     def register_user(self, user_data):
         """Adds a new user to the database"""
         user_data = validator.validate_user_data(user_data)
@@ -58,7 +58,7 @@ class User(Model):
         return value
 
 
-class Order(Model):
+class Orders(Model):
     def create_order(self, order, customer):
         """Adds a new order to the database"""
         validator.validate_order(order)
