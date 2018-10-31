@@ -249,6 +249,16 @@ def test_api_returns_error_for_bad_request_or_unauthorized_access_to_edit_menu_i
     commit_and_close(connection)
 
 
+def test_api_enables_admin_to_delete_a_specific_menu_item(test_client):
+    headers = login_administrator(test_client)
+    menu_item = {'item': 'Juice', 'unit': 'Glass', 'rate': 2500}
+    item_id = test_client.post('/api/v1/menu', headers=headers, json=menu_item).get_json()['id']
+    response_1 = test_client.delete('/api/v1/menu/{}'.format(item_id), headers=headers)
+    response_2 = test_client.get('/api/v1/menu', headers=headers)
+    assert response_1.status_code == 200
+    assert response_2.status_code == 404
+
+
 def test_api_returns_error_for_unauthorized_access_to_admin_routes(test_client, connection):
     headers = register_and_login_user('Tony Stark', '1ronM4n', test_client)
     response_1 = test_client.get('/api/v1/orders', headers=headers)
