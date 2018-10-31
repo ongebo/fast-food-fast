@@ -187,3 +187,20 @@ def test_model_raises_exception_when_menu_table_is_empty(database_connection):
     menu_model = Menu()
     with pytest.raises(Exception):
         menu_model.get_food_menu()
+
+
+def test_model_can_return_specific_item_from_food_menu(database_connection):
+    menu_model = Menu()
+    item = {'item': 'Roast Chicken', 'unit': 'Set', 'rate': 15000}
+    created_item = menu_model.add_menu_item(item)
+    created_item = menu_model.get_specific_menu_item(created_item['id'])
+    assert item == created_item
+    cursor = database_connection.cursor()
+    cursor.execute('DELETE FROM menu WHERE item = %s', ('Roast Chicken', ))
+    commit_and_close(database_connection)
+
+
+def test_model_raises_exception_when_getting_non_existent_item_from_menu(database_connection):
+    menu_model = Menu()
+    with pytest.raises(Exception):
+        menu_model.get_specific_menu_item(-3)
