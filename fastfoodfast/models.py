@@ -202,6 +202,7 @@ class Menu(Model):
         else:
             for item in menu_items:
                 menu.append({'item': item[1], 'unit': item[2], 'rate': item[3]})
+        self.conn.close()
         return menu
     
     def add_menu_item(self, menu_item):
