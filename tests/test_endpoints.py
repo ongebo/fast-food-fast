@@ -220,6 +220,35 @@ def test_api_raises_404_when_fetching_non_existent_menu_item(test_client):
     assert response.status_code == 404
 
 
+def test_api_enables_admin_to_edit_a_menu_item(test_client, connection):
+    headers = login_administrator(test_client)
+    item = {'item': 'Muchomo', 'unit': 'Stick', 'rate': 4000}
+    response_1 = test_client.post('/api/v1/menu', json=item, headers=headers)
+    item_id = response_1.get_json()['id']
+    item['rate'] = 3000 # update item's rate
+    response_2 = test_client.put('/api/v1/menu/{}'.format(item_id), headers=headers, json=item)
+    response_3 = test_client.get('/api/v1/menu/{}'.format(item_id), headers=headers)
+    assert response_1.status_code == 201 and response_2.status_code == 200
+    assert response_3.status_code == 200
+    assert item == response_3.get_json()
+    connection.cursor().execute('DELETE FROM menu WHERE item = %s', ('Muchomo', ))
+    commit_and_close(connection)
+
+
+def test_api_returns_error_for_bad_request_or_unauthorized_access_to_edit_menu_item(test_client, connection):
+    headers_1 = login_administrator(test_client)
+    headers_2 = register_and_login_user('Mike', 'M1chael', test_client)
+    item = {'item': 'Hamburger', 'unit': 'Pack'} # invalid menu item
+    response_1 = test_client.put('/api/v1/menu/1', headers=headers_1, json=item)
+    response_2 = test_client.put('/api/v1/menu/-2', headers=headers_1, json=item)
+    response_3 = test_client.put('/api/v1/menu/1', headers=headers_2, json=item)
+    assert response_1.status_code == 400
+    assert response_2.status_code == 404
+    assert response_3.status_code == 401
+    clean_users(connection, 'Mike')
+    commit_and_close(connection)
+
+
 def test_api_returns_error_for_unauthorized_access_to_admin_routes(test_client, connection):
     headers = register_and_login_user('Tony Stark', '1ronM4n', test_client)
     response_1 = test_client.get('/api/v1/orders', headers=headers)
