@@ -213,6 +213,13 @@ def test_api_can_return_created_menu_item_to_admin(test_client, connection):
     connection.commit()
     connection.close
 
+
+def test_api_raises_404_when_fetching_non_existent_menu_item(test_client):
+    headers = login_administrator(test_client)
+    response = test_client.get('/api/v1/menu/0', headers=headers)
+    assert response.status_code == 404
+
+
 def test_api_returns_error_for_unauthorized_access_to_admin_routes(test_client, connection):
     headers = register_and_login_user('Tony Stark', '1ronM4n', test_client)
     response_1 = test_client.get('/api/v1/orders', headers=headers)
