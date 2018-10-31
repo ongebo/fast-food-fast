@@ -161,6 +161,23 @@ def add_menu_item():
         return jsonify({'error': str(e)}), 400
 
 
+@app.route('/api/v1/menu/<int:identity>', methods=['PUT'])
+@jwt_required
+def update_menu_item(identity):
+    try:
+        if not users_model.is_admin(get_jwt_identity()):
+            return jsonify({'error': 'Only admin can edit a food item!'}), 401
+        updated_menu_item = request.get_json()
+        menu_model.update_menu_item(identity, updated_menu_item)
+        return jsonify(
+            {'message': 'Successfully updated menu item with id {}'.format(identity)}
+        ), 200
+    except Exception as e:
+        if isinstance(e, AssertionError):
+            return jsonify({'error': str(e)}), 400
+        return jsonify({'error': str(e)}), 404
+
+
 @app.errorhandler(404)
 def resource_not_found(error):
     """Displays an error message when a 404 error occurs"""
