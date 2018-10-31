@@ -204,9 +204,17 @@ class Menu(Model):
         """Adds a new item to the food menu"""
         validator.validate_menu_item(menu_item)
         self.connect_to_db()
+        validator.ensure_menu_item_not_existent(menu_item['item'].strip(), self.cursor)
+        new_item = {
+            'item': menu_item['item'].strip(), 'unit': menu_item['unit'].strip(),
+            'rate': float(menu_item['rate'])
+        }
         self.cursor.execute(
             'INSERT INTO menu (item, unit, rate) VALUES (%s, %s, %s)',
-            (menu_item['item'], menu_item['unit'], menu_item['rate'])
+            (new_item['item'], new_item['unit'], new_item['rate'])
         )
+        self.cursor.execute('SELECT id FROM menu WHERE item = %s', (new_item['item'], ))
+        new_item['id'] = self.cursor.fetchone()[0]
         self.conn.commit()
         self.conn.close()
+        return new_item
