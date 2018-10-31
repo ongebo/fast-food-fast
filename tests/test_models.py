@@ -1,5 +1,5 @@
 import pytest, psycopg2, os
-from fastfoodfast.models import User, Order, Menu
+from fastfoodfast.models import Users, Orders, Menu
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -34,7 +34,7 @@ def commit_and_close(conn):
 
 
 def test_model_correctly_registers_new_user_to_the_database(database_connection):
-    user_model = User()
+    user_model = Users()
     user_model.register_user(
         {
             'username': 'customer', 'password': 'P4$$word',
@@ -55,7 +55,7 @@ def test_model_correctly_registers_new_user_to_the_database(database_connection)
 
 
 def test_model_raises_exception_when_registering_with_existent_username(database_connection):
-    user_model = User()
+    user_model = Users()
     user = {
         'username': 'customer', 'password': 'P4$$word',
         'email': 'name@domain.com', 'telephone': '+2-465-231786'
@@ -68,14 +68,14 @@ def test_model_raises_exception_when_registering_with_existent_username(database
 
 
 def test_model_raises_exception_given_incorrect_user_data_for_registration(database_connection):
-    user_model = User()
+    user_model = Users()
     incorrect_data = {'username': ' ', 'password': 786}
     with pytest.raises(Exception):
         user_model.register_user(incorrect_data)
 
 
 def test_model_can_get_a_specific_user_by_username_from_db(database_connection):
-    user_model = User()
+    user_model = Users()
     user_model.register_user({
         'username': 'Thor', 'password': 'Asg4rd1an',
         'email': 'thor@asgard.avr', 'telephone': '+23-345-916919'
@@ -88,7 +88,7 @@ def test_model_can_get_a_specific_user_by_username_from_db(database_connection):
 
 
 def test_model_raises_exception_when_retrieving_non_existent_user(database_connection):
-    user_model = User()
+    user_model = Users()
     with pytest.raises(Exception):
         user_model.get_user('Non-existent user!')
     with pytest.raises(Exception):
@@ -96,7 +96,7 @@ def test_model_raises_exception_when_retrieving_non_existent_user(database_conne
 
 
 def test_model_can_add_a_new_order_to_the_database(database_connection):
-    order_model = Order()
+    order_model = Orders()
     order = {
         'items': [{'item': 'pizza', 'quantity': 1, 'cost': 18000}],
         'status': 'pending',
@@ -118,13 +118,13 @@ def test_model_can_add_a_new_order_to_the_database(database_connection):
 
 
 def test_model_raises_exception_given_invalid_order_data(database_connection):
-    order_model = Order()
+    order_model = Orders()
     with pytest.raises(Exception):
         order_model.create_order([], 'jon snow')
 
 
 def test_model_can_get_order_history_for_a_given_customer(database_connection):
-    order_model = Order()
+    order_model = Orders()
     order_1 = {'items': [{'item': 'pizza', 'quantity': 2, 'cost': 40000}]}
     order_2 = {'items': [{'item': 'hamburger', 'quantity': 1, 'cost': 10000}]}
     created_order1 = order_model.create_order(order_1, 'luke skywalker')
@@ -136,13 +136,13 @@ def test_model_can_get_order_history_for_a_given_customer(database_connection):
 
 
 def test_model_raises_exception_when_no_orders_have_been_made_by_a_user(database_connection):
-    order_model = Order()
+    order_model = Orders()
     with pytest.raises(Exception):
         order_model.get_order_history('museveni')
 
 
 def test_model_can_return_all_orders_in_database(database_connection):
-    order_model = Order()
+    order_model = Orders()
     order_1 = {'items': [{'item': 'pillao', 'quantity': 1, 'cost': 15000}]}
     order_2 = {'items': [{'item': 'beef', 'quantity': 2, 'cost': 10000}]}
     created_order_1 = order_model.create_order(order_1, 'thanos')
