@@ -58,7 +58,7 @@ function displayAdminMenu(menu) {
         item.textContent = menu[c].item;
         unit.textContent = menu[c].unit;
         rate.textContent = menu[c].rate;
-        var tdsWithLinks = createTableDataWithLinks();
+        var tdsWithLinks = createTableDataWithLinks(c);
         var tableRow = document.createElement("tr");
         tableRow.appendChild(item);
         tableRow.appendChild(unit);
@@ -69,11 +69,12 @@ function displayAdminMenu(menu) {
     }
 }
 
-function createTableDataWithLinks() {
+function createTableDataWithLinks(id) {
     var editLink = document.createElement("a");
     var deleteLink = document.createElement("a");
     editLink.setAttribute("class", "edit");
     editLink.href = "#";
+    editLink.id = id;
     editLink.textContent = "Edit";
     deleteLink.setAttribute("class", "delete");
     deleteLink.href = "#";
