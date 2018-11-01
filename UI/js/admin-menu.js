@@ -15,6 +15,7 @@ document.querySelector(".add").addEventListener("click", event => {
     document.querySelector("input[type=submit]").value = "Add";
     document.querySelector(".modal").style.display = "block";
 });
+document.querySelector(".modal-content > form").addEventListener("submit", submitFormData);
 
 async function fetchAndDisplayAdminMenu() {
     var request = createRequestObject();
@@ -98,4 +99,8 @@ function displayEditDialog(event) {
     document.querySelector(".form-title").textContent = "Edit Menu Item";
     document.querySelector("input[type=submit]").value = "Edit";
     document.querySelector(".modal").style.display = "block";
+}
+
+function submitFormData(event) {
+    //
 }
