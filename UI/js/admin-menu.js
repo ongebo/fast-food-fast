@@ -1,4 +1,6 @@
 fetchAndDisplayAdminMenu();
+var menu = [];
+
 window.addEventListener("click", event => {
     var modal = document.querySelector(".modal");
     if (event.target == modal) {
@@ -22,6 +24,7 @@ async function fetchAndDisplayAdminMenu() {
             displayEmptyMenuMessage();
         } else {
             var responseBody = await response.json();
+            menu = responseBody.menu;
             displayAdminMenu(responseBody.menu);
         }
     } catch (error) {
@@ -75,6 +78,7 @@ function createTableDataWithLinks(id) {
     editLink.setAttribute("class", "edit");
     editLink.href = "#";
     editLink.id = id;
+    editLink.addEventListener("click", displayEditDialog);
     editLink.textContent = "Edit";
     deleteLink.setAttribute("class", "delete");
     deleteLink.href = "#";
@@ -84,4 +88,14 @@ function createTableDataWithLinks(id) {
     editTableData.appendChild(editLink);
     deleteTableData.appendChild(deleteLink);
     return [editTableData, deleteTableData];
+}
+
+function displayEditDialog(event) {
+    var linkId = parseInt(event.target.id);
+    document.querySelector("input[name=item]").value = menu[linkId].item;
+    document.querySelector("input[name=unit]").value = menu[linkId].unit;
+    document.querySelector("input[name=rate]").value = menu[linkId].rate;
+    document.querySelector(".form-title").textContent = "Edit Menu Item";
+    document.querySelector("input[type=submit]").value = "Edit";
+    document.querySelector(".modal").style.display = "block";
 }
