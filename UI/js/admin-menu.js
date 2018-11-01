@@ -16,6 +16,9 @@ document.querySelector(".close").addEventListener("click", event => {
 document.querySelector(".add").addEventListener("click", event => {
     document.querySelector(".form-title").textContent = "Add Menu Item";
     document.querySelector("input[type=submit]").value = "Add";
+    document.querySelector("input[name=item]").value = "";
+    document.querySelector("input[name=unit]").value = "";
+    document.querySelector("input[name=rate]").value = "";
     document.querySelector(".modal").style.display = "block";
 });
 document.querySelector(".modal-content > form").addEventListener("submit", submitFormData);
