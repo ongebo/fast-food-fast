@@ -111,7 +111,7 @@ function submitFormData(event) {
     if (action == "Edit") {
         editMenuItem();
     } else if (action == "Add") {
-        // add menu item
+        addMenuItem();
     }
     submitButton.disabled = false;
     submitButton.value = action;
@@ -168,4 +168,38 @@ function displayBadRequestError(responseBody) {
         document.querySelector("input[name=rate]").classList.add("error");
         document.querySelector(".rate-error").textContent = errorMessage;
     }
+}
+
+async function addMenuItem() {
+    var request = createAddRequestObject();
+    try {
+        var response = await fetch(request);
+        if (response.status == 201) {
+            document.querySelector("input[type=submit]").value = "Add Successful!";
+            location.reload(true);
+        } else if (response.status == 400) {
+            var responseBody = await response.json();
+            displayBadRequestError(responseBody);
+        } else if (response.status == 401) {
+            window.location.href = "index.html";
+        }
+    } catch (error) {
+        alert(error);
+    }
+}
+
+function createAddRequestObject() {
+    var headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "Bearer " + sessionStorage.getItem("token"));
+    var requestBody = {
+        item: document.querySelector("input[name=item]").value,
+        unit: document.querySelector("input[name=unit]").value,
+        rate: document.querySelector("input[name=rate]").value
+    }
+    var request = new Request(
+        "https://gbo-fff-with-db.herokuapp.com/api/v1/menu",
+        {method: "POST", headers: headers, body: JSON.stringify(requestBody)}
+    );
+    return request;
 }
