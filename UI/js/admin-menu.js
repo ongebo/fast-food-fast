@@ -5,7 +5,7 @@ async function fetchAndDisplayAdminMenu() {
     try {
         var response = await fetch(request);
         if (response.status == 404) {
-            // display error message
+            displayEmptyMenuMessage();
         } else {
             // fetch and display response body
         }
@@ -23,4 +23,13 @@ function createRequestObject() {
         {method: "GET", headers: headers}
     );
     return request;
+}
+
+function displayEmptyMenuMessage() {
+    var messageElement = document.createElement("h2");
+    messageElement.setAttribute("class", "title");
+    messageElement.textContent = "The food menu is empty!";
+    var table = document.querySelector(".menu-list");
+    var menu = document.querySelector(".admin-menu");
+    menu.replaceChild(messageElement, table);
 }
