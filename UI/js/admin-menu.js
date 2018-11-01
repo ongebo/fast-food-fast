@@ -1,5 +1,6 @@
 fetchAndDisplayAdminMenu();
 var menu = [];
+var itemToEdit;
 
 window.addEventListener("click", event => {
     var modal = document.querySelector(".modal");
@@ -93,6 +94,7 @@ function createTableDataWithLinks(id) {
 
 function displayEditDialog(event) {
     var linkId = parseInt(event.target.id);
+    itemToEdit = menu[linkId].id;
     document.querySelector("input[name=item]").value = menu[linkId].item;
     document.querySelector("input[name=unit]").value = menu[linkId].unit;
     document.querySelector("input[name=rate]").value = menu[linkId].rate;
@@ -102,5 +104,68 @@ function displayEditDialog(event) {
 }
 
 function submitFormData(event) {
-    //
+    var submitButton = document.querySelector("input[type=submit]");
+    var action = submitButton.value;
+    submitButton.disabled = true;
+    submitButton.value = "Submitting...";
+    if (action == "Edit") {
+        editMenuItem();
+    } else if (action == "Add") {
+        // add menu item
+    }
+    submitButton.disabled = false;
+    submitButton.value = action;
+}
+
+async function editMenuItem() {
+    var request = createEditRequestObject();
+    try {
+        var response = await fetch(request);
+        if (response.status == 200) {
+            document.querySelector("input[type=submit]").value = "Update Successful!";
+            location.reload(true);
+        } else if (response.status == 401) {
+            window.location.href = "index.html";
+        } else if (response.status == 400) {
+            var responseBody = await response.json();
+            displayBadRequestError(responseBody);
+        } else if (response.status == 404) {
+            var item = document.querySelector("input[name=item]");
+            item.classList.add("error");
+            document.querySelector(".item-error").textContent = item.value +
+            " doesn't exist in database!";
+        }
+    } catch (error) {
+        alert(error);
+    }
+}
+
+function createEditRequestObject() {
+    var headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "Bearer " + sessionStorage.getItem("token"));
+    var requestBody = {
+        item: document.querySelector("input[name=item]").value,
+        unit: document.querySelector("input[name=unit]").value,
+        rate: document.querySelector("input[name=rate]").value
+    }
+    var request = new Request(
+        "https://gbo-fff-with-db.herokuapp.com/api/v1/menu/" + itemToEdit,
+        {method: "PUT", headers: headers, body: JSON.stringify(requestBody)}
+    );
+    return request;
+}
+
+function displayBadRequestError(responseBody) {
+    var errorMessage = responseBody.error;
+    if (errorMessage.indexOf("item") != -1) {
+        document.querySelector("input[name=item]").classList.add("error");
+        document.querySelector(".item-error").textContent = errorMessage;
+    } else if (errorMessage.indexOf("unit") != -1) {
+        document.querySelector("input[name=unit]").classList.add("error");
+        document.querySelector(".unit-error").textContent = errorMessage;
+    } else {
+        document.querySelector("input[name=rate]").classList.add("error");
+        document.querySelector(".rate-error").textContent = errorMessage;
+    }
 }
