@@ -8,6 +8,11 @@ window.addEventListener("click", event => {
 document.querySelector(".close").addEventListener("click", event => {
     document.querySelector(".modal").style.display = "none";
 });
+document.querySelector(".add").addEventListener("click", event => {
+    document.querySelector(".form-title").textContent = "Add Menu Item";
+    document.querySelector("input[type=submit]").value = "Add";
+    document.querySelector(".modal").style.display = "block";
+});
 
 async function fetchAndDisplayAdminMenu() {
     var request = createRequestObject();
