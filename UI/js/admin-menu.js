@@ -1,4 +1,13 @@
 fetchAndDisplayAdminMenu();
+window.addEventListener("click", event => {
+    var modal = document.querySelector(".modal");
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+});
+document.querySelector(".close").addEventListener("click", event => {
+    document.querySelector(".modal").style.display = "none";
+});
 
 async function fetchAndDisplayAdminMenu() {
     var request = createRequestObject();
