@@ -10,6 +10,12 @@
   <link rel="stylesheet" type="text/css"  href="css/food-order.css">
   <link rel="stylesheet" type="text/css"  href="css/admin-menu.css">
   <title>Manage Food Menu</title>
+  <script>
+      window.addEventListener("load", event => {
+          var form = document.querySelector("form");
+          form.addEventListener("submit", e => {e.preventDefault();});
+      });
+  </script>
 </head>
 <body>
   <div class="header">
