@@ -6,10 +6,12 @@ window.addEventListener("click", event => {
     var modal = document.querySelector(".modal");
     if (event.target == modal) {
         modal.style.display = "none";
+        removeErrorSignals();
     }
 });
 document.querySelector(".close").addEventListener("click", event => {
     document.querySelector(".modal").style.display = "none";
+    removeErrorSignals();
 });
 document.querySelector(".add").addEventListener("click", event => {
     document.querySelector(".form-title").textContent = "Add Menu Item";
@@ -108,6 +110,7 @@ function submitFormData(event) {
     var action = submitButton.value;
     submitButton.disabled = true;
     submitButton.value = "Submitting...";
+    removeErrorSignals();
     if (action == "Edit") {
         editMenuItem();
     } else if (action == "Add") {
@@ -202,4 +205,14 @@ function createAddRequestObject() {
         {method: "POST", headers: headers, body: JSON.stringify(requestBody)}
     );
     return request;
+}
+
+function removeErrorSignals() {
+    document.querySelector(".item-error").textContent = "";
+    document.querySelector(".unit-error").textContent = "";
+    document.querySelector(".rate-error").textContent = "";
+    var erroredFields = document.getElementsByClassName("error");
+    for (var c = 0; c < erroredFields.length; c++) {
+        erroredFields[c].classList.remove("error");
+    }
 }
