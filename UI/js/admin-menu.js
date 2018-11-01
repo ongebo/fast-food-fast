@@ -7,7 +7,8 @@ async function fetchAndDisplayAdminMenu() {
         if (response.status == 404) {
             displayEmptyMenuMessage();
         } else {
-            // fetch and display response body
+            var responseBody = await response.json();
+            displayAdminMenu(responseBody.menu);
         }
     } catch (error) {
         alert(error);
@@ -32,4 +33,40 @@ function displayEmptyMenuMessage() {
     var table = document.querySelector(".menu-list");
     var menu = document.querySelector(".admin-menu");
     menu.replaceChild(messageElement, table);
+}
+
+function displayAdminMenu(menu) {
+    var menuList = document.querySelector(".menu-list");
+    for (var c = 0; c < menu.length; c++) {
+        var item = document.createElement("td");
+        var unit = document.createElement("td");
+        var rate = document.createElement("td");
+        item.textContent = menu[c].item;
+        unit.textContent = menu[c].unit;
+        rate.textContent = menu[c].rate;
+        var tdsWithLinks = createTableDataWithLinks();
+        var tableRow = document.createElement("tr");
+        tableRow.appendChild(item);
+        tableRow.appendChild(unit);
+        tableRow.appendChild(rate);
+        tableRow.appendChild(tdsWithLinks[0]);
+        tableRow.appendChild(tdsWithLinks[1]);
+        menuList.appendChild(tableRow);
+    }
+}
+
+function createTableDataWithLinks() {
+    var editLink = document.createElement("a");
+    var deleteLink = document.createElement("a");
+    editLink.setAttribute("class", "edit");
+    editLink.href = "#";
+    editLink.textContent = "Edit";
+    deleteLink.setAttribute("class", "delete");
+    deleteLink.href = "#";
+    deleteLink.textContent = "Delete";
+    var editTableData = document.createElement("td");
+    var deleteTableData = document.createElement("td");
+    editTableData.appendChild(editLink);
+    deleteTableData.appendChild(deleteLink);
+    return [editTableData, deleteTableData];
 }
