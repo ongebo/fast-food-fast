@@ -5,26 +5,26 @@ var itemToEdit;
 var deleteLinkId;
 
 function attachEventHandlers() {
-window.addEventListener("click", event => {
-    var modal = document.querySelector(".modal");
-    if (event.target == modal) {
-        modal.style.display = "none";
+    window.addEventListener("click", event => {
+        var modal = document.querySelector(".modal");
+        if (event.target == modal) {
+            modal.style.display = "none";
+            removeErrorSignals();
+        }
+    });
+    document.querySelector(".close").addEventListener("click", event => {
+        document.querySelector(".modal").style.display = "none";
         removeErrorSignals();
-    }
-});
-document.querySelector(".close").addEventListener("click", event => {
-    document.querySelector(".modal").style.display = "none";
-    removeErrorSignals();
-});
-document.querySelector(".add").addEventListener("click", event => {
-    document.querySelector(".form-title").textContent = "Add Menu Item";
-    document.querySelector("input[type=submit]").value = "Add";
-    document.querySelector("input[name=item]").value = "";
-    document.querySelector("input[name=unit]").value = "";
-    document.querySelector("input[name=rate]").value = "";
-    document.querySelector(".modal").style.display = "block";
-});
-document.querySelector(".modal-content > form").addEventListener("submit", submitFormData);
+    });
+    document.querySelector(".add").addEventListener("click", event => {
+        document.querySelector(".form-title").textContent = "Add Menu Item";
+        document.querySelector("input[type=submit]").value = "Add";
+        document.querySelector("input[name=item]").value = "";
+        document.querySelector("input[name=unit]").value = "";
+        document.querySelector("input[name=rate]").value = "";
+        document.querySelector(".modal").style.display = "block";
+    });
+    document.querySelector(".modal-content > form").addEventListener("submit", submitFormData);
     document.querySelector(".no").addEventListener("click", event => {
         document.querySelector(".confirm-box").style.display = "none";
     });
@@ -97,6 +97,8 @@ function createTableDataWithLinks(id) {
     editLink.textContent = "Edit";
     deleteLink.setAttribute("class", "delete");
     deleteLink.href = "#";
+    deleteLink.id = id;
+    deleteLink.addEventListener("click", confirmDelete);
     deleteLink.textContent = "Delete";
     var editTableData = document.createElement("td");
     var deleteTableData = document.createElement("td");
@@ -243,9 +245,6 @@ async function deleteMenuItem(event) {
         }
     } catch (error) {
         alert(error);
-        document.querySelector(".confirm-box").style.display = "none";
-    }
-}
         document.querySelector(".confirm-box").style.display = "none";
     }
 }
