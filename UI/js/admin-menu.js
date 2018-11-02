@@ -2,6 +2,7 @@ fetchAndDisplayAdminMenu();
 attachEventHandlers();
 var menu = [];
 var itemToEdit;
+var deleteLinkId;
 
 function attachEventHandlers() {
 window.addEventListener("click", event => {
@@ -225,4 +226,46 @@ function removeErrorSignals() {
     for (var c = 0; c < erroredFields.length; c++) {
         erroredFields[c].classList.remove("error");
     }
+}
+
+async function deleteMenuItem(event) {
+    var request = createDeleteRequestObject();
+    try {
+        var response = await fetch(request);
+        var promptElement = document.querySelector(".prompt-message");
+        if (response.status == 200) {
+            promptElement.textContent = "Delete Successful!";
+            location.reload(true);
+        } else if (response.status == 404) {
+            promptElement.textContent = "Item not in database!";
+        } else if (response.status == 401) {
+            window.location.href = "index.html";
+        }
+    } catch (error) {
+        alert(error);
+        document.querySelector(".confirm-box").style.display = "none";
+    }
+}
+        document.querySelector(".confirm-box").style.display = "none";
+    }
+}
+
+function createDeleteRequestObject() {
+    var headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "Bearer " + sessionStorage.getItem("token"));
+    var request = new Request(
+        "https://gbo-fff-with-db.herokuapp.com/api/v1/menu/" + menu[deleteLinkId].id,
+        {method: "DELETE", headers: headers}
+    );
+    return request;
+}
+
+function confirmDelete(event) {
+    deleteLinkId = event.target.id;
+    var itemName = menu[deleteLinkId].item;
+    var promptElement = document.querySelector(".prompt-message");
+    var confirmBox = document.querySelector(".confirm-box");
+    promptElement.textContent = "Are you sure you want to delete " + itemName + "?";
+    confirmBox.style.display = "block";
 }
