@@ -1,7 +1,9 @@
 fetchAndDisplayAdminMenu();
+attachEventHandlers();
 var menu = [];
 var itemToEdit;
 
+function attachEventHandlers() {
 window.addEventListener("click", event => {
     var modal = document.querySelector(".modal");
     if (event.target == modal) {
@@ -22,6 +24,7 @@ document.querySelector(".add").addEventListener("click", event => {
     document.querySelector(".modal").style.display = "block";
 });
 document.querySelector(".modal-content > form").addEventListener("submit", submitFormData);
+}
 
 async function fetchAndDisplayAdminMenu() {
     var request = createRequestObject();
