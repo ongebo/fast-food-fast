@@ -59,7 +59,7 @@ th, td {
   background: darkgreen;
 }
 
-.modal {
+.modal, .confirm-box {
     display: none;
     position: fixed;
     top: 0;
@@ -70,7 +70,7 @@ th, td {
     background: rgba(0, 0, 0, 0.4);
 }
 
-.modal-content {
+.modal-content, .confirm-box-content {
     width: 40%;
     margin-top: 5%;
     margin-left: auto;
@@ -141,13 +141,41 @@ input[type=submit]:disabled {
 }
   
 @media only screen and (min-width: 600px) and (max-width: 1000px) {
-    .modal-content {
+    .modal-content, .confirm-box-content {
         width: 80%;
     }
 }
   
 @media only screen and (max-width: 600px) {
-    .modal-content {
+    .modal-content, .confirm-box-content {
         width: 100%;
     }
+}
+
+.yes, .no {
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.yes {
+    background: green;
+    border: none;
+}
+
+.no {
+    background: red;
+    border: none;
+}
+
+.yes:focus, .yes:hover {
+    background: darkgreen;
+}
+
+.no:focus, .no:hover {
+    background: darkred;
+}
+
+.confirm-box-content {
+    text-align: center;
 }
