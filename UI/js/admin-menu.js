@@ -24,6 +24,10 @@ document.querySelector(".add").addEventListener("click", event => {
     document.querySelector(".modal").style.display = "block";
 });
 document.querySelector(".modal-content > form").addEventListener("submit", submitFormData);
+    document.querySelector(".no").addEventListener("click", event => {
+        document.querySelector(".confirm-box").style.display = "none";
+    });
+    document.querySelector(".yes").addEventListener("click", deleteMenuItem);
 }
 
 async function fetchAndDisplayAdminMenu() {
