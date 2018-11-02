@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script src="js/admin-check.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <link rel="stylesheet" type="text/css"  href="css/styles.css">
@@ -9,6 +10,24 @@
   <link rel="stylesheet" type="text/css"  href="css/food-order.css">
   <link rel="stylesheet" type="text/css"  href="css/admin-menu.css">
   <title>Manage Food Menu</title>
+  <script>
+      window.addEventListener("load", event => {
+          var form = document.querySelector("form");
+          form.addEventListener("submit", e => {e.preventDefault();});
+      });
+  </script>
+  <style>
+      .item-error, .unit-error, .rate-error {
+          color: red;
+          font-size: 0.8em;
+          display: block;
+      }
+      
+      .error {
+          border: 1px solid red;
+          box-shadow: 0 0 5px red;
+      }
+  </style>
 </head>
 <body>
   <div class="header">
@@ -19,6 +38,27 @@
     <li><a href="admin-orders.html">Orders</a></li>
     <li><a href="index.html" class="right">Log Out</a></li>
   </ul>
+  <div class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <form>
+        <span class="form-title"></span>
+        Item:
+        <input type="text" name="item" placeholder="Item name" required>
+        <span class="item-error"></span>
+        <br>
+        Unit:
+        <input type="text" name="unit" placeholder="Item unit" required>
+        <span class="unit-error"></span>
+        <br>
+        Rate:
+        <input type="text" name="rate" placeholder="Item rate" required>
+        <span class="rate-error"></span>
+        <br>
+        <input type="submit" value="">
+      </form>
+    </div>
+  </div>
   <div class="admin-menu">
     <h2 class="title">Manage Food Menu</h2>
     <table class="menu-list">
@@ -27,22 +67,16 @@
         <th>Unit</th>
         <th>Rate (Ugx)</th>
       </tr>
-      <tr>
-        <td>Chicken</td>
-        <td>Piece</td>
-        <td>3500</td>
-        <td><a href="#" class="edit">Edit</a></td>
-        <td><a href="#" class="delete">Delete</a></td>
-      </tr>
-      <tr>
-        <td>Potato Chips</td>
-        <td>Pack</td>
-        <td>2000</td>
-        <td><a href="#" class="edit">Edit</a></td>
-        <td><a href="#" class="delete">Delete</a></td>
-      </tr>
     </table>
     <a href="#" class="add">Add New Food Item</a>
   </div>
+  <div class="confirm-box">
+      <div class="confirm-box-content">
+          <p class="prompt-message"></p>
+          <button class="yes">Yes</button>
+          <button class="no">No</button>
+      </div>
+  </div>
+  <script src="js/admin-menu.js"></script>
 </body>
 </html>
