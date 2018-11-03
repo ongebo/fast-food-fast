@@ -1,3 +1,5 @@
+fetchAndDisplayOrders();
+
 async function fetchAndDisplayOrders() {
     var request = createOrdersRequestObject();
     try {
@@ -24,9 +26,6 @@ function createOrdersRequestObject() {
     var request = new Request(
         "https://gbo-fff-with-db.herokuapp.com/api/v1/orders",
         {method: "GET", headers: headers}
-    );
-    return request;
-}       {method: "GET", headers: headers}
     );
     return request;
 }
