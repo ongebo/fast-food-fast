@@ -131,5 +131,43 @@ function createAcceptedOrderLinks() {
 }
 
 function displayNewOrders(newOrders) {
-    //
+    var container = document.querySelector(".new");
+    for (var c = 0; c < newOrders.length; c++) {
+        var order = newOrders[c];
+        var customer = document.createElement("h3");
+        var items = createOrderItemsElements(order.items);
+        var total = document.createElement("h3");
+        var optionLinks = createNewOrderUpdateLinks();
+        var orderElement = document.createElement("div");
+        customer.textContent = order.customer + " #" + order["order-id"];
+        total.textContent = "Total: Ugx " + order["total-cost"];
+        orderElement.appendChild(customer);
+        for (var i = 0; i < items.length; i++)
+            orderElement.appendChild(items[i]);
+        orderElement.appendChild(total);
+        orderElement.appendChild(optionLinks);
+        orderElement.setAttribute("class", "process-order");
+        container.appendChild(orderElement);
+    }
+}
+
+function createNewOrderUpdateLinks() {
+    var span = document.createElement("span");
+    var acceptLink = document.createElement("a");
+    var declineLink = document.createElement("a");
+    var completeLink = document.createElement("a");
+    acceptLink.href = "#";
+    acceptLink.setAttribute("class", "accept");
+    acceptLink.textContent = "Accept";
+    declineLink.href = "#";
+    declineLink.setAttribute("class", "decline");
+    declineLink.textContent = "Decline";
+    completeLink.href = "#";
+    completeLink.setAttribute("class", "complete");
+    completeLink.textContent = "Complete";
+    span.setAttribute("class", "admin-options");
+    span.appendChild(acceptLink);
+    span.appendChild(declineLink);
+    span.appendChild(completeLink);
+    return span;
 }
