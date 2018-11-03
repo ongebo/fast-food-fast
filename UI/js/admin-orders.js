@@ -109,7 +109,7 @@ function createOrderItemsElements(orderItems) {
             unit = name + "s";
         else
             unit = name;
-        paragraph.textContent = orderItem.quantity + " " + unit + " @ Ugx" + orderItem.cost;
+        paragraph.textContent = orderItem.quantity + " " + unit + " @ Ugx " + orderItem.cost;
         paragraphs.push(paragraph);
     }
     return paragraphs;
