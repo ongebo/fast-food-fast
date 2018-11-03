@@ -72,6 +72,7 @@ function createOrderDetailsLink() {
     var link = document.createElement("a");
     link.href = "#";
     link.setAttribute("class", "details");
+    link.textContent = "Details";
     td.appendChild(link);
     return td;
 }
