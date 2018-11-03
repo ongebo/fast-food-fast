@@ -3,7 +3,8 @@ async function fetchAndDisplayOrders() {
     try {
         var response = await fetch(request);
         if (response.status == 200) {
-            // fetch and display response body
+            var responseBody = await response.json();
+            displayOrders(responseBody.orders);
         } else if (response.status == 401) {
             window.location.href = "index.html";
         } else if (response.status == 404) {
