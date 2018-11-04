@@ -1,5 +1,6 @@
 fetchAndDisplayOrders();
 attachEventHandlers();
+var orders;
 
 function attachEventHandlers() {
     document.querySelector(".no").addEventListener("click", e => {
@@ -17,6 +18,7 @@ async function fetchAndDisplayOrders() {
         var response = await fetch(request);
         if (response.status == 200) {
             var responseBody = await response.json();
+            orders = responseBody.orders;
             displayOrders(responseBody.orders);
         } else if (response.status == 401) {
             window.location.href = "index.html";
@@ -64,7 +66,7 @@ function displayCompleteOrders(completeOrders) {
         var name = document.createElement("td");
         var identity = document.createElement("td");
         var cost = document.createElement("td");
-        var detailsLink = createOrderDetailsLink();
+        var detailsLink = createOrderDetailsLink(order["order-id"]);
         name.textContent = order.customer;
         identity.textContent = order["order-id"];
         cost.textContent = order["total-cost"];
@@ -78,12 +80,14 @@ function displayCompleteOrders(completeOrders) {
     }
 }
 
-function createOrderDetailsLink() {
+function createOrderDetailsLink(orderId) {
     var td = document.createElement("td");
     var link = document.createElement("a");
     link.href = "#";
     link.setAttribute("class", "details");
     link.textContent = "Details";
+    link.id = orderId;
+    link.addEventListener("click", showOrderDetails);
     td.appendChild(link);
     return td;
 }
@@ -257,4 +261,35 @@ function createOrderUpdateRequestObject(status, orderId) {
         {method: "PUT", headers: headers, body: JSON.stringify(requestBody)}
     );
     return request;
+}
+
+function showOrderDetails(event) {
+    event.preventDefault();
+    var order;
+    for (var c = 0; c < orders.length; c++)
+        if (orders[c]["order-id"] == event.target.id)
+            order = orders[c];
+    var customer = document.createElement("h3");
+    var items = createOrderItemsElements(order.items);
+    var status = document.createElement("h3");
+    var total = document.createElement("h3");
+    var orderElement = document.createElement("div");
+
+    customer.textContent = order.customer + " #" + order["order-id"];
+    status.textContent = "Status: " + order.status;
+    total.textContent = "Total: Ugx " + order["total-cost"];
+    orderElement.appendChild(customer);
+    for (var i = 0; i < items.length; i++)
+        orderElement.appendChild(items[i]);
+    orderElement.appendChild(status);
+    orderElement.appendChild(total);
+    orderElement.setAttribute("class", "process-order");
+
+    var container = document.querySelector(".order-details");
+    var oldChild = document.querySelector(".order-details .process-order");
+    if (oldChild)
+        container.replaceChild(orderElement, oldChild);
+    else
+        container.appendChild(orderElement);
+    document.querySelector(".order").style.display = "block";
 }
