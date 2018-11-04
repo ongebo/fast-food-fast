@@ -172,3 +172,86 @@ function createNewOrderUpdateLinks() {
     span.appendChild(completeLink);
     return span;
 }
+
+    acceptLink.href = "#";
+    acceptLink.setAttribute("class", "accept");
+    acceptLink.textContent = "Accept";
+    acceptLink.id = orderId;
+    acceptLink.addEventListener("click", acceptOrder);
+    
+    declineLink.href = "#";
+    declineLink.setAttribute("class", "decline");
+    declineLink.textContent = "Decline";
+    declineLink.id = orderId;
+    declineLink.addEventListener("click", declineOrder);
+    
+    completeLink.href = "#";
+    completeLink.setAttribute("class", "complete");
+    completeLink.textContent = "Complete";
+    completeLink.id = orderId;
+    completeLink.addEventListener("click", completeOrder);
+    
+    span.setAttribute("class", "admin-options");
+    span.appendChild(acceptLink);
+    span.appendChild(declineLink);
+    span.appendChild(completeLink);
+    return span;
+}
+
+function acceptOrder(event) {
+    event.preventDefault();
+    var yesButton = document.querySelector(".confirm-box .yes");
+    var promptElement = document.querySelector(".prompt-message");
+    yesButton.className = "yes processing";
+    yesButton.id = event.target.id;
+    promptElement.textContent = "Do you want to accept order #" + event.target.id + "?";
+    document.querySelector(".confirm-box").style.display = "block";
+}
+
+function declineOrder(event) {
+    event.preventDefault();
+    var yesButton = document.querySelector(".confirm-box .yes");
+    var promptElement = document.querySelector(".prompt-message");
+    yesButton.className = "yes cancelled";
+    yesButton.id = event.target.id;
+    promptElement.textContent = "Do you want to decline order #" + event.target.id + "?";
+    document.querySelector(".confirm-box").style.display = "block";
+}
+
+function completeOrder(event) {
+    event.preventDefault();
+    var yesButton = document.querySelector(".confirm-box .yes");
+    var promptElement = document.querySelector(".prompt-message");
+    yesButton.className = "yes complete";
+    yesButton.id = event.target.id;
+    promptElement.textContent = "Do you want to complete order #" + event.target.id + "?";
+    document.querySelector(".confirm-box").style.display = "block";
+}
+
+async function updateOrderStatus(event) {
+    var orderId = event.target.id;
+    var status = event.target.className.substring(4);
+    var request = createOrderUpdateRequestObject(status, orderId);
+    try {
+        var response = await fetch(request);
+        if (response.status == 200) {
+            location.reload(true);
+        } else if (response.status == 401) {
+            location.href = "index.html";
+        }
+    } catch (error) {
+        alert(error);
+    }
+}
+
+function createOrderUpdateRequestObject(status, orderId) {
+    var headers = new Headers();
+    headers.append("Content-Type", "application/json");
+    headers.append("Authorization", "Bearer " + sessionStorage.getItem("token"));
+    var requestBody = {status: status};
+    var request = new Request(
+        "https://gbo-fff-with-db.herokuapp.com/api/v1/orders/" + orderId,
+        {method: "PUT", headers: headers, body: JSON.stringify(requestBody)}
+    );
+    return request;
+}
