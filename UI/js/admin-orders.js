@@ -6,6 +6,9 @@ function attachEventHandlers() {
         document.querySelector(".confirm-box").style.display = "none";
     });
     document.querySelector(".yes").addEventListener("click", updateOrderStatus);
+    document.querySelector(".close").addEventListener("click", function() {
+        document.querySelector(".order").style.display = "none";
+    });
 }
 
 async function fetchAndDisplayOrders() {
