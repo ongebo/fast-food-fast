@@ -50,3 +50,64 @@
   color: white;
   background: darkblue;
 }
+
+.confirm-box {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.confirm-box-content {
+    width: 40%;
+    margin-top: 5%;
+    margin-left: auto;
+    margin-right: auto;
+    background: white;
+    margin: 1px solid black;
+    padding: 10px;
+}
+
+@media only screen and (min-width: 600px) and (max-width: 1000px) {
+    .confirm-box-content {
+        width: 80%;
+    }
+}
+  
+@media only screen and (max-width: 600px) {
+    .confirm-box-content {
+        width: 100%;
+    }
+}
+
+.yes, .no {
+    color: white;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.yes {
+    background: green;
+    border: none;
+}
+
+.no {
+    background: red;
+    border: none;
+}
+
+.yes:focus, .yes:hover {
+    background: darkgreen;
+}
+
+.no:focus, .no:hover {
+    background: darkred;
+}
+
+.confirm-box-content {
+    text-align: center;
+}
