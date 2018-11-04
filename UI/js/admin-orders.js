@@ -92,7 +92,7 @@ function displayAcceptedOrders(acceptedOrders) {
         var customer = document.createElement("h3");
         var items = createOrderItemsElements(order.items);
         var total = document.createElement("h3");
-        var optionLinks = createAcceptedOrderLinks();
+        var optionLinks = createAcceptedOrderLinks(order["order-id"]);
         var orderElement = document.createElement("div");
         customer.textContent = order.customer + " #" + order["order-id"];
         total.textContent = "Total: Ugx " + order["total-cost"];
@@ -123,16 +123,23 @@ function createOrderItemsElements(orderItems) {
     return paragraphs;
 }
 
-function createAcceptedOrderLinks() {
+function createAcceptedOrderLinks(orderId) {
     var span = document.createElement("span");
     var cancelLink = document.createElement("a");
     var completeLink = document.createElement("a");
+    
     cancelLink.href = "#";
     cancelLink.setAttribute("class", "decline");
     cancelLink.textContent = "Cancel";
+    cancelLink.id = orderId;
+    cancelLink.addEventListener("click", declineOrder)
+
     completeLink.href = "#";
     completeLink.setAttribute("class", "complete");
     completeLink.textContent = "Complete";
+    completeLink.id = orderId;
+    completeLink.addEventListener("click", completeOrder);
+    
     span.setAttribute("class", "admin-options");
     span.appendChild(cancelLink);
     span.appendChild(completeLink);
@@ -146,7 +153,7 @@ function displayNewOrders(newOrders) {
         var customer = document.createElement("h3");
         var items = createOrderItemsElements(order.items);
         var total = document.createElement("h3");
-        var optionLinks = createNewOrderUpdateLinks();
+        var optionLinks = createNewOrderUpdateLinks(order["order-id"]);
         var orderElement = document.createElement("div");
         customer.textContent = order.customer + " #" + order["order-id"];
         total.textContent = "Total: Ugx " + order["total-cost"];
@@ -160,26 +167,11 @@ function displayNewOrders(newOrders) {
     }
 }
 
-function createNewOrderUpdateLinks() {
+function createNewOrderUpdateLinks(orderId) {
     var span = document.createElement("span");
     var acceptLink = document.createElement("a");
     var declineLink = document.createElement("a");
     var completeLink = document.createElement("a");
-    acceptLink.href = "#";
-    acceptLink.setAttribute("class", "accept");
-    acceptLink.textContent = "Accept";
-    declineLink.href = "#";
-    declineLink.setAttribute("class", "decline");
-    declineLink.textContent = "Decline";
-    completeLink.href = "#";
-    completeLink.setAttribute("class", "complete");
-    completeLink.textContent = "Complete";
-    span.setAttribute("class", "admin-options");
-    span.appendChild(acceptLink);
-    span.appendChild(declineLink);
-    span.appendChild(completeLink);
-    return span;
-}
 
     acceptLink.href = "#";
     acceptLink.setAttribute("class", "accept");
