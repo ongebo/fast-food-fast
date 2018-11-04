@@ -1,4 +1,12 @@
 fetchAndDisplayOrders();
+attachEventHandlers();
+
+function attachEventHandlers() {
+    document.querySelector(".no").addEventListener("click", e => {
+        document.querySelector(".confirm-box").style.display = "none";
+    });
+    document.querySelector(".yes").addEventListener("click", updateOrderStatus);
+}
 
 async function fetchAndDisplayOrders() {
     var request = createOrdersRequestObject();
