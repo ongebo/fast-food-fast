@@ -51,7 +51,7 @@
   background: darkblue;
 }
 
-.confirm-box {
+.confirm-box, .order {
     display: none;
     position: fixed;
     top: 0;
@@ -62,7 +62,7 @@
     background: rgba(0, 0, 0, 0.4);
 }
 
-.confirm-box-content {
+.confirm-box-content, .order-details {
     width: 40%;
     margin-top: 5%;
     margin-left: auto;
@@ -73,13 +73,13 @@
 }
 
 @media only screen and (min-width: 600px) and (max-width: 1000px) {
-    .confirm-box-content {
+    .confirm-box-content, .order-details {
         width: 80%;
     }
 }
   
 @media only screen and (max-width: 600px) {
-    .confirm-box-content {
+    .confirm-box-content, .order-details {
         width: 100%;
     }
 }
@@ -110,4 +110,15 @@
 
 .confirm-box-content {
     text-align: center;
+}
+
+.close {
+    float: right;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.close:hover {
+    cursor: pointer;
+    color: red;
 }
